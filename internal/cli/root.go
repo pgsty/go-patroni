@@ -510,7 +510,9 @@ func ExecuteContext(ctx context.Context, options CommandOptions) int {
 	command := NewRootCommandWithOptions(options)
 	if err := command.ExecuteContext(ctx); err != nil {
 		if !errorWasRendered(err) {
-			fmt.Fprintln(command.ErrOrStderr(), err)
+			// The command has already failed, and there is no remaining
+			// channel on which a stderr write failure could be reported.
+			_, _ = fmt.Fprintln(command.ErrOrStderr(), err)
 		}
 		return exitCode(err)
 	}

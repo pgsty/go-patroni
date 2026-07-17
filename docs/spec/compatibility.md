@@ -76,6 +76,9 @@ the point-in-time record above does not make future runs optional.
   fail closed before sending an unsupported feature.
 - Mixed-version clusters are supported only when every relevant member is
   inside the configured subrange and supports the requested feature.
+- Embedded CLIs retain the canonical machine API. `VersionInfo.application`
+  is optional host metadata; the top-level version fields continue to describe
+  go-patroni and its audited range.
 - Intentional wire, machine-output, command, or security-default divergence
   MUST be recorded in `compatibility/deviations.yaml` with rationale and tests.
 

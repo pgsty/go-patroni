@@ -489,7 +489,7 @@ func (application *adapter) runShowConfig(command *cobra.Command, args []string,
 
 func (application *adapter) runVersion(command *cobra.Command, args []string, options *versionOptions) (returnedError error) {
 	if len(args) == 0 {
-		information := newMachineVersionInfo(nil)
+		information := application.newMachineVersionInfo(nil)
 		if application.root.output == "json" || application.root.output == "yaml" {
 			document, documentError := newMachineSuccessEnvelope(machineKindVersionInfo, machineMetadata{
 				RequestID: application.requestID(), ObservedAt: application.now().Format(time.RFC3339Nano), Warnings: []string{},
@@ -502,7 +502,7 @@ func (application *adapter) runVersion(command *cobra.Command, args []string, op
 			}
 			return nil
 		}
-		_, err := fmt.Fprintf(application.stdout, "patronictl version %s\n", version.String())
+		_, err := fmt.Fprintf(application.stdout, "%s version %s\n", application.application.Name, application.application.Version)
 		return err
 	}
 	runtime, err := application.openRuntime(command, runtimeRequest{
@@ -518,10 +518,10 @@ func (application *adapter) runVersion(command *cobra.Command, args []string, op
 		AllowUnsupportedRead: application.root.allowUnsupportedRead,
 	})
 	if application.root.output == "json" || application.root.output == "yaml" {
-		return finishResult(application, application.root.output, runtime, machineVersionResult(result), "VersionInfo", nil)
+		return finishResult(application, application.root.output, runtime, application.machineVersionResult(result), "VersionInfo", nil)
 	}
 	return finishResult(application, application.root.output, runtime, result, "VersionInfo", func(writer io.Writer, data control.VersionData) error {
-		if _, err := fmt.Fprintf(writer, "patronictl version %s\n", version.String()); err != nil {
+		if _, err := fmt.Fprintf(writer, "%s version %s\n", application.application.Name, application.application.Version); err != nil {
 			return err
 		}
 		if len(data.Members) > 0 {
@@ -552,13 +552,23 @@ func (application *adapter) runVersion(command *cobra.Command, args []string, op
 // serialize the control DTO directly. Local and cluster forms have one shape;
 // members is always an array, including for `patronictl version` without a cluster.
 type machineVersionInfo struct {
-	Version          string                 `json:"version" yaml:"version"`
-	Commit           string                 `json:"commit" yaml:"commit"`
-	BuildTime        string                 `json:"buildTime" yaml:"buildTime"`
-	GoVersion        string                 `json:"goVersion" yaml:"goVersion"`
-	SupportedPatroni string                 `json:"supportedPatroni" yaml:"supportedPatroni"`
-	MachineSchema    string                 `json:"machineSchema" yaml:"machineSchema"`
-	Members          []machineMemberVersion `json:"members" yaml:"members"`
+	Version          string                  `json:"version" yaml:"version"`
+	Commit           string                  `json:"commit" yaml:"commit"`
+	BuildTime        string                  `json:"buildTime" yaml:"buildTime"`
+	GoVersion        string                  `json:"goVersion" yaml:"goVersion"`
+	SupportedPatroni string                  `json:"supportedPatroni" yaml:"supportedPatroni"`
+	MachineSchema    string                  `json:"machineSchema" yaml:"machineSchema"`
+	Application      *machineApplicationInfo `json:"application,omitempty" yaml:"application,omitempty"`
+	Members          []machineMemberVersion  `json:"members" yaml:"members"`
+}
+
+type machineApplicationInfo struct {
+	Name             string `json:"name" yaml:"name"`
+	Version          string `json:"version" yaml:"version"`
+	Commit           string `json:"commit" yaml:"commit"`
+	BuildTime        string `json:"buildTime" yaml:"buildTime"`
+	GoVersion        string `json:"goVersion" yaml:"goVersion"`
+	SupportedPatroni string `json:"supportedPatroni" yaml:"supportedPatroni"`
 }
 
 type machineMemberVersion struct {
@@ -569,7 +579,7 @@ type machineMemberVersion struct {
 	Error           *machineError `json:"error,omitempty" yaml:"error,omitempty"`
 }
 
-func newMachineVersionInfo(members []control.MemberVersion) machineVersionInfo {
+func (application *adapter) newMachineVersionInfo(members []control.MemberVersion) machineVersionInfo {
 	information := version.Current()
 	machineMembers := make([]machineMemberVersion, 0, len(members))
 	for _, member := range members {
@@ -578,17 +588,25 @@ func newMachineVersionInfo(members []control.MemberVersion) machineVersionInfo {
 			HTTPStatus: member.HTTPStatus, Error: newMachineError(member.Error),
 		})
 	}
-	return machineVersionInfo{
+	result := machineVersionInfo{
 		Version: information.Version, Commit: information.Commit, BuildTime: information.BuildTime,
 		GoVersion: information.GoVersion, SupportedPatroni: information.SupportedPatroni,
 		MachineSchema: information.MachineSchema, Members: machineMembers,
 	}
+	if application != nil && application.application.Info != nil {
+		info := application.application.Info
+		result.Application = &machineApplicationInfo{
+			Name: info.Name, Version: info.Version, Commit: info.Commit, BuildTime: info.BuildTime,
+			GoVersion: info.GoVersion, SupportedPatroni: info.SupportedPatroni,
+		}
+	}
+	return result
 }
 
-func machineVersionResult(result control.Result[control.VersionData]) control.Result[machineVersionInfo] {
+func (application *adapter) machineVersionResult(result control.Result[control.VersionData]) control.Result[machineVersionInfo] {
 	return control.Result[machineVersionInfo]{
 		OperationID: result.OperationID, Outcome: result.Outcome, Target: result.Target, Path: result.Path,
-		Data: newMachineVersionInfo(result.Data.Members), Evidence: append([]control.Evidence{}, result.Evidence...), Error: result.Error,
+		Data: application.newMachineVersionInfo(result.Data.Members), Evidence: append([]control.Evidence{}, result.Evidence...), Error: result.Error,
 	}
 }
 

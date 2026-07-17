@@ -751,6 +751,32 @@ patronictl -c /etc/patroni/patroni.yml -o json \
 具体 acknowledgement 文本以当前命令的提示和 `--help` 为准；自动化在升级二进制后
 应重新跑预检，不应猜测确认内容。
 
+### 5.6 在自己的 Go 程序中嵌入完整命令树
+
+如果产品希望保留自己的二进制名称和专属命令，同时复用全部 Patroni 命令，使用公共
+`cli` 包，而不是复制 `internal/cli`：
+
+```go
+root := cli.NewRootCommand(cli.Options{
+    Application: cli.Application{
+        Name: "boar", Short: "Patroni control plane", Version: buildVersion,
+        RequestIDPrefix: "boar-cli",
+    },
+    Environment: patroniruntime.EnvironmentOptions{
+        Load: config.LoadRequest{Path: "/infra/conf/patronictl.yml"},
+        UserAgent: "boar/" + buildVersion,
+    },
+    Extensions: []cli.Extension{newServeCommand},
+})
+err := root.ExecuteContext(ctx)
+```
+
+扩展命令通过 `ExtensionContext.Invocation` 获得规范化的根参数，不需要再次解析
+`--config-file`、`--dcs-url`/`--dcs`、`--insecure`、`--context` 或 `--output`。
+嵌入后的 JSON/YAML 仍使用 `patroni.pgsty.com/v1alpha1`；`version` 的可选
+`data.application` 只描述宿主程序，不会覆盖 SDK 自身的版本与支持范围。已经拥有
+命令框架的应用（例如 Pig）也可以只调用 `control`/`runtime`，无需引入 Cobra 适配层。
+
 ## 6. Agent 与自动化使用方式
 
 ### 6.1 Agent 的首选接口

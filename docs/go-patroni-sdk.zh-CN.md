@@ -54,7 +54,9 @@ JSON”入口，请先阅读独立的
 flowchart LR
     APP["Go 应用"] --> REST["根包：Patroni REST"]
     APP --> CTRL["control.Service"]
-    CLI["cmd/patronictl"] --> CTRL
+    APP --> CLICOMP["cli：公共组合门面"]
+    CLICOMP --> CLI["internal/cli 与 cmd/patronictl"]
+    CLI --> CTRL
     CFG["config：Patroni YAML 与上下文"] --> RT["runtime：依赖组装"]
     RT --> CTRL
     CTRL --> DCS["dcs 接口"]
@@ -77,7 +79,8 @@ flowchart LR
 | `postgres` | 收集式/流式多结果集查询、同连接角色校验、行数/字节限制、TLS 模式 |
 | `control` | 与适配器无关的读操作、Prepare/Execute 写操作、证据、结果分类和版本门禁 |
 | `runtime` | 从有效配置创建 etcd、REST、PostgreSQL 与 `control.Service` |
-| `cmd/patronictl`、`internal/cli` | Cobra 命令、交互确认、人类输出和版本化机器输出 |
+| `cli` | 面向 Boar、Pig 等宿主的公共命令树组合、程序身份、运行时默认值与扩展命令接口 |
+| `cmd/patronictl`、`internal/cli` | 公共门面背后的 Cobra 命令、交互确认、人类输出和版本化机器输出实现 |
 
 ### 2.3 三套数据模型不能混为一谈
 
@@ -725,6 +728,11 @@ BeginResult -> WriteRow * N -> EndResult
 Go CLI 额外提供 `discover`、`inspect-config` 和多集群 `--all`。`-o` 输出稳定
 JSON/YAML envelope，schema 位于 `schema/machine/v1alpha1`。自动化应该消费
 机器格式，不要解析人类表格。
+
+宿主程序可通过公共 `cli` 包嵌入整棵命令树，并注册自己的顶层命令；核心
+`control`/`runtime` 仍不依赖 Cobra。嵌入程序不会创建第二套机器协议：envelope
+继续使用 `patroni.pgsty.com/v1alpha1`，`VersionInfo.application` 仅以可选字段记录
+宿主名称、构建信息与收窄后的 Patroni 支持范围。
 
 ## 11. 兼容性与历史版本
 

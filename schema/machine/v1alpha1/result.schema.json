@@ -1,5 +1,37 @@
 {
   "$defs": {
+    "cli_machineApplicationInfo": {
+      "additionalProperties": false,
+      "properties": {
+        "buildTime": {
+          "type": "string"
+        },
+        "commit": {
+          "type": "string"
+        },
+        "goVersion": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "supportedPatroni": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "buildTime",
+        "commit",
+        "goVersion",
+        "name",
+        "supportedPatroni",
+        "version"
+      ],
+      "type": "object"
+    },
     "cli_machineCluster": {
       "additionalProperties": false,
       "properties": {
@@ -319,6 +351,9 @@
     "cli_machineVersionInfo": {
       "additionalProperties": false,
       "properties": {
+        "application": {
+          "$ref": "#/$defs/cli_machineApplicationInfo"
+        },
         "buildTime": {
           "type": "string"
         },

@@ -188,7 +188,7 @@ func (application *adapter) newVersionCommand() *cobra.Command {
 	options := &versionOptions{}
 	command := &cobra.Command{
 		Use:   "version [cluster_name] [member_names...]",
-		Short: "Output version of patronictl or a running Patroni instance",
+		Short: "Output version of " + application.application.Name + " or a running Patroni instance",
 		Args:  cobra.ArbitraryArgs,
 		RunE: func(command *cobra.Command, args []string) error {
 			return application.runVersion(command, args, options)

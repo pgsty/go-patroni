@@ -13,13 +13,100 @@ import (
 	"io"
 	"os"
 	"os/signal"
+	stdlibruntime "runtime"
+	"strings"
 	"syscall"
 	"time"
 
 	"github.com/pgsty/go-patroni/control"
 	"github.com/pgsty/go-patroni/internal/version"
+	patroniruntime "github.com/pgsty/go-patroni/runtime"
 	"github.com/spf13/cobra"
 )
+
+// Application describes an embedding command's presentation and optional
+// build identity. The Patroni machine contract remains owned by go-patroni;
+// Info identifies the host application without replacing SDK metadata.
+type Application struct {
+	Name            string
+	Short           string
+	Version         string
+	RequestIDPrefix string
+	Info            *ApplicationInfo
+}
+
+// ApplicationInfo is emitted as optional host metadata by the version command.
+type ApplicationInfo struct {
+	Name             string
+	Version          string
+	Commit           string
+	BuildTime        string
+	GoVersion        string
+	SupportedPatroni string
+}
+
+// CommandOptions controls construction of an embeddable Patroni CLI tree.
+// Extensions add product-specific commands without importing this internal
+// implementation directly; the public cli package is the supported facade.
+type CommandOptions struct {
+	Stdin         io.Reader
+	Stdout        io.Writer
+	Stderr        io.Writer
+	Application   Application
+	Environment   patroniruntime.EnvironmentOptions
+	Extensions    []Extension
+	IsInteractive func() bool
+}
+
+// Extension adds one product-owned top-level command to the Patroni CLI tree.
+type Extension func(ExtensionContext) *cobra.Command
+
+// ExtensionContext exposes only stable composition helpers to an extension.
+type ExtensionContext struct {
+	application *adapter
+}
+
+// RootInvocation is the normalized root flag state visible to extensions.
+// Set fields distinguish explicit CLI overrides from displayed defaults.
+type RootInvocation struct {
+	ConfigFile    string
+	ConfigFileSet bool
+	DCSURL        string
+	DCSURLSet     bool
+	Insecure      bool
+	InsecureSet   bool
+	Context       string
+	Output        string
+}
+
+// Invocation resolves root aliases and returns the effective extension view.
+func (extension ExtensionContext) Invocation(command *cobra.Command) (RootInvocation, error) {
+	if extension.application == nil {
+		return RootInvocation{}, usageError("CLI extension is not initialized")
+	}
+	return extension.application.rootInvocation(command)
+}
+
+// UsageError returns an error with the CLI's stable usage exit category.
+func (ExtensionContext) UsageError(message string) error {
+	message = strings.TrimSpace(message)
+	if message == "" {
+		message = "invalid CLI extension invocation"
+	}
+	return usageError(message)
+}
+
+// ExitError returns an error with a stable control category and exit code.
+func (ExtensionContext) ExitError(category control.Category, message string, cause error) error {
+	if category == "" {
+		category = control.CategoryInternal
+	}
+	message = strings.TrimSpace(message)
+	if message == "" {
+		message = "CLI extension failed"
+	}
+	return &exitError{category: category, code: control.ExitCode(category), message: message, cause: cause}
+}
 
 type rootOptions struct {
 	configFile           string
@@ -41,6 +128,67 @@ type adapter struct {
 	clock       func() time.Time
 	newID       func() string
 	interactive func() bool
+	application Application
+}
+
+func defaultApplication() Application {
+	return Application{
+		Name: "patronictl", Short: "Native Go command-line control for Patroni clusters",
+		Version: version.String(), RequestIDPrefix: "patronictl-go-cli",
+	}
+}
+
+func normalizeApplication(application Application) Application {
+	defaults := defaultApplication()
+	application.Name = strings.TrimSpace(application.Name)
+	if application.Name == "" {
+		application.Name = defaults.Name
+	}
+	application.Short = strings.TrimSpace(application.Short)
+	if application.Short == "" {
+		application.Short = defaults.Short
+	}
+	application.Version = strings.TrimSpace(application.Version)
+	if application.Version == "" {
+		application.Version = defaults.Version
+	}
+	application.RequestIDPrefix = strings.TrimSpace(application.RequestIDPrefix)
+	if application.RequestIDPrefix == "" {
+		if application.Name == defaults.Name {
+			application.RequestIDPrefix = defaults.RequestIDPrefix
+		} else {
+			application.RequestIDPrefix = application.Name + "-cli"
+		}
+	}
+	if application.Info != nil {
+		copyInfo := *application.Info
+		copyInfo.Name = strings.TrimSpace(copyInfo.Name)
+		if copyInfo.Name == "" {
+			copyInfo.Name = application.Name
+		}
+		copyInfo.Version = strings.TrimSpace(copyInfo.Version)
+		if copyInfo.Version == "" {
+			copyInfo.Version = application.Version
+		}
+		copyInfo.Commit = strings.TrimSpace(copyInfo.Commit)
+		if copyInfo.Commit == "" {
+			copyInfo.Commit = "unknown"
+		}
+		copyInfo.BuildTime = strings.TrimSpace(copyInfo.BuildTime)
+		if copyInfo.BuildTime == "" {
+			copyInfo.BuildTime = "unknown"
+		}
+		copyInfo.GoVersion = strings.TrimSpace(copyInfo.GoVersion)
+		if copyInfo.GoVersion == "" {
+			copyInfo.GoVersion = stdlibruntime.Version()
+		}
+		copyInfo.SupportedPatroni = strings.TrimSpace(copyInfo.SupportedPatroni)
+		if copyInfo.SupportedPatroni == "" {
+			copyInfo.SupportedPatroni = version.Current().SupportedPatroni
+		}
+		application.Info = &copyInfo
+	}
+	return application
 }
 
 // NewRootCommand constructs the standalone adapter without process-global
@@ -50,6 +198,36 @@ func NewRootCommand(stdout, stderr io.Writer) *cobra.Command {
 	return newRootCommandWithAllBoundaries(
 		os.Stdin, stdout, stderr, defaultRuntimeFactory, time.Now, newCLIRequestID,
 		func() bool { return isTerminalFile(os.Stdin) },
+	)
+}
+
+// NewRootCommandWithOptions constructs the command tree for an embedding
+// application. The zero value preserves standalone patronictl behavior.
+func NewRootCommandWithOptions(options CommandOptions) *cobra.Command {
+	stdin := options.Stdin
+	if stdin == nil {
+		stdin = os.Stdin
+	}
+	stdout := options.Stdout
+	if stdout == nil {
+		stdout = os.Stdout
+	}
+	stderr := options.Stderr
+	if stderr == nil {
+		stderr = os.Stderr
+	}
+	interactive := options.IsInteractive
+	if interactive == nil {
+		interactive = func() bool {
+			file, ok := stdin.(*os.File)
+			return ok && isTerminalFile(file)
+		}
+	}
+	application := normalizeApplication(options.Application)
+	return newRootCommandWithComposition(
+		stdin, stdout, stderr, runtimeFactoryWithOptions(options.Environment), time.Now,
+		func() string { return newCLIRequestIDWithPrefix(application.RequestIDPrefix) },
+		interactive, application, options.Environment, options.Extensions,
 	)
 }
 
@@ -75,14 +253,32 @@ func newRootCommandWithAllBoundaries(
 	newID func() string,
 	interactive func() bool,
 ) *cobra.Command {
+	return newRootCommandWithComposition(
+		stdin, stdout, stderr, factory, clock, newID, interactive,
+		defaultApplication(), patroniruntime.EnvironmentOptions{}, nil,
+	)
+}
+
+func newRootCommandWithComposition(
+	stdin io.Reader,
+	stdout, stderr io.Writer,
+	factory runtimeFactory,
+	clock func() time.Time,
+	newID func() string,
+	interactive func() bool,
+	profile Application,
+	environment patroniruntime.EnvironmentOptions,
+	extensions []Extension,
+) *cobra.Command {
+	profile = normalizeApplication(profile)
 	application := &adapter{
 		stdin: stdin, input: bufio.NewReader(stdin), stdout: stdout, stderr: stderr,
-		factory: factory, clock: clock, newID: newID, interactive: interactive,
+		factory: factory, clock: clock, newID: newID, interactive: interactive, application: profile,
 	}
 	command := &cobra.Command{
-		Use:              "patronictl",
-		Short:            "Native Go command-line control for Patroni clusters",
-		Version:          version.String(),
+		Use:              application.application.Name,
+		Short:            application.application.Short,
+		Version:          application.application.Version,
 		SilenceErrors:    true,
 		SilenceUsage:     true,
 		TraverseChildren: true,
@@ -96,7 +292,10 @@ func newRootCommandWithAllBoundaries(
 	command.SetOut(stdout)
 	command.SetErr(stderr)
 
-	defaultConfig, _ := defaultConfigPath()
+	defaultConfig := strings.TrimSpace(environment.Load.Path)
+	if defaultConfig == "" {
+		defaultConfig, _ = defaultConfigPath()
+	}
 	// Click group options are intentionally local to the root. With
 	// TraverseChildren this preserves `patronictl -c FILE query ... -c SQL` and the
 	// equivalent -d pair without illegal Cobra inherited-shorthand collisions.
@@ -106,12 +305,21 @@ func newRootCommandWithAllBoundaries(
 	command.Flags().BoolVarP(&application.root.insecure, "insecure", "k", false, "Allow connections to SSL sites without certs")
 
 	command.PersistentFlags().StringVar(&application.root.context, "context", "", "Select a named Patroni context")
-	command.PersistentFlags().StringVarP(&application.root.output, "output", "o", "", "go-patroni output envelope: human, json, or yaml")
+	command.PersistentFlags().StringVarP(&application.root.output, "output", "o", "", application.application.Name+" output envelope: human, json, or yaml")
 	command.PersistentFlags().BoolVar(&application.root.allowUnsupportedRead, "allow-unsupported-read", false,
 		"Allow best-effort reads from an unsupported Patroni major version")
 
 	application.addReadCommands(command)
 	application.addWriteCommands(command)
+	extensionContext := ExtensionContext{application: application}
+	for _, extend := range extensions {
+		if extend == nil {
+			continue
+		}
+		if child := extend(extensionContext); child != nil {
+			command.AddCommand(child)
+		}
+	}
 	command.InitDefaultCompletionCmd()
 	application.wrapCommandErrors(command)
 	return command
@@ -165,11 +373,19 @@ func (application *adapter) wrapCommandErrors(command *cobra.Command) {
 }
 
 func newCLIRequestID() string {
+	return newCLIRequestIDWithPrefix(defaultApplication().RequestIDPrefix)
+}
+
+func newCLIRequestIDWithPrefix(prefix string) string {
+	prefix = strings.TrimSpace(prefix)
+	if prefix == "" {
+		prefix = defaultApplication().RequestIDPrefix
+	}
 	var value [16]byte
 	if _, err := rand.Read(value[:]); err != nil {
-		return "patronictl-go-cli-" + time.Now().UTC().Format("20060102T150405.000000000")
+		return prefix + "-" + time.Now().UTC().Format("20060102T150405.000000000")
 	}
-	return "patronictl-go-cli-" + hex.EncodeToString(value[:])
+	return prefix + "-" + hex.EncodeToString(value[:])
 }
 
 func (application *adapter) now() time.Time {
@@ -197,6 +413,27 @@ func (application *adapter) requestID() string {
 		}
 	}
 	return newCLIRequestID()
+}
+
+func (application *adapter) rootInvocation(command *cobra.Command) (RootInvocation, error) {
+	if command == nil {
+		return RootInvocation{}, usageError("CLI extension command is nil")
+	}
+	root := command.Root()
+	dcsURL := application.root.dcsURL
+	dcsURLSet := root.Flags().Changed("dcs-url")
+	if root.Flags().Changed("dcs") {
+		if dcsURLSet && application.root.dcsAlias != dcsURL {
+			return RootInvocation{}, usageError("--dcs-url and --dcs specify different values")
+		}
+		dcsURL, dcsURLSet = application.root.dcsAlias, true
+	}
+	return RootInvocation{
+		ConfigFile: application.root.configFile, ConfigFileSet: root.Flags().Changed("config-file"),
+		DCSURL: dcsURL, DCSURLSet: dcsURLSet,
+		Insecure: application.root.insecure, InsecureSet: root.Flags().Changed("insecure"),
+		Context: application.root.context, Output: application.root.output,
+	}, nil
 }
 
 type exitError struct {
@@ -250,13 +487,25 @@ func errorWasRendered(err error) bool {
 
 // Execute owns process signals and exact patronictl-compatible exit mapping.
 func Execute() int {
+	return ExecuteWithOptions(CommandOptions{})
+}
+
+// ExecuteWithOptions owns process signals for an embedding application.
+func ExecuteWithOptions(options CommandOptions) int {
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer cancel()
+	return ExecuteContext(ctx, options)
+}
 
-	command := NewRootCommand(os.Stdout, os.Stderr)
+// ExecuteContext runs an embedding command tree with caller-owned cancellation.
+func ExecuteContext(ctx context.Context, options CommandOptions) int {
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	command := NewRootCommandWithOptions(options)
 	if err := command.ExecuteContext(ctx); err != nil {
 		if !errorWasRendered(err) {
-			fmt.Fprintln(os.Stderr, err)
+			fmt.Fprintln(command.ErrOrStderr(), err)
 		}
 		return exitCode(err)
 	}

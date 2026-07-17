@@ -20,6 +20,19 @@
         "goVersion": {"type": "string", "minLength": 1},
         "supportedPatroni": {"const": ">=3.0.0,<5.0.0"},
         "machineSchema": {"const": "patroni.pgsty.com/v1alpha1"},
+        "application": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["name", "version", "commit", "buildTime", "goVersion", "supportedPatroni"],
+          "properties": {
+            "name": {"type": "string", "minLength": 1},
+            "version": {"type": "string", "minLength": 1},
+            "commit": {"type": "string", "minLength": 1},
+            "buildTime": {"type": "string", "minLength": 1},
+            "goVersion": {"type": "string", "minLength": 1},
+            "supportedPatroni": {"type": "string", "minLength": 1}
+          }
+        },
         "members": {
           "type": "array",
           "items": {

@@ -14,11 +14,19 @@ The repository is split into deliberately different abstraction levels:
 | `postgres` | Bounded one-shot and streaming SQL execution, optionally verified against a member role | DCS mutation or CLI prompting |
 | `control` | Adapter-neutral reads, prepared writes, preconditions, evidence, verification, and outcome classification | Cobra, terminal interaction, or human formatting |
 | `runtime` | Resolve configuration and assemble DCS, REST, PostgreSQL, and control clients | Command-specific prompting or rendering |
-| `internal/cli`, `cmd/patronictl` | Parse flags, prompt users, render human/machine output, and map exit status | Business logic that belongs in `control` |
+| `cli` | Public, thin composition facade for embedding the command suite and registering product-owned subcommands | Product-specific behavior or control algorithms |
+| `internal/cli`, `cmd/patronictl` | Implement flags, prompts, human/machine rendering, and exit mapping behind the public facade | Business logic that belongs in `control` |
 
 Dependencies MUST flow toward narrower contracts. In particular, reusable
 control logic MUST NOT depend on Cobra or terminal state, and the REST client
 MUST remain usable without a DCS implementation.
+
+The public `cli` facade MAY depend on Cobra because it is an opt-in adapter.
+Core packages (`model`, `config`, `dcs`, `postgres`, `control`, and `runtime`)
+MUST NOT depend on `cli` or Cobra. An embedding application MAY customize its
+display identity, runtime defaults, I/O, request-ID prefix, and top-level
+extensions. Extensions receive normalized root flag state and stable error
+mapping, but MUST implement reusable Patroni behavior in `control` first.
 
 ## Identity
 
@@ -50,6 +58,11 @@ These representations MUST NOT be collapsed merely because fields currently
 look similar. Unknown REST fields survive in `Response.Raw`; unknown or
 partially invalid DCS data is represented by `DecodeIssue`; stable machine
 output is governed separately by `schema/machine/v1alpha1`.
+
+Embedded command trees MUST retain the canonical
+`patroni.pgsty.com/v1alpha1` machine envelope. The `VersionInfo.application`
+object MAY identify the host binary; it is additive metadata and MUST NOT
+replace the SDK version, supported range, or machine-schema fields.
 
 ## Configuration and assembly
 

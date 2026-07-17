@@ -4835,6 +4835,41 @@
           "required": true
         },
         {
+          "path": "/data/application",
+          "type": "object",
+          "required": false
+        },
+        {
+          "path": "/data/application/buildTime",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/application/commit",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/application/goVersion",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/application/name",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/application/supportedPatroni",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/application/version",
+          "type": "string",
+          "required": false
+        },
+        {
           "path": "/data/buildTime",
           "type": "string",
           "required": true

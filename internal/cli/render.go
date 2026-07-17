@@ -162,7 +162,7 @@ func (application *adapter) renderCommandError(command interface{ Name() string 
 	}
 	category := categoryForExitError(err)
 	operation := command.Name()
-	if operation == "" || operation == "patronictl" {
+	if operation == "" || operation == application.application.Name {
 		operation = "cli"
 	}
 	scope := ""

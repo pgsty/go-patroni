@@ -3,9 +3,9 @@ package main
 import (
 	"os"
 
-	"github.com/pgsty/go-patroni/internal/cli"
+	"github.com/pgsty/go-patroni/cli"
 )
 
 func main() {
-	os.Exit(cli.Execute())
+	os.Exit(cli.Execute(cli.Options{}))
 }

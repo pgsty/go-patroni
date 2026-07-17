@@ -69,20 +69,15 @@ type runtimeFactory func(context.Context, runtimeInvocation) (*commandRuntime, e
 func resolveDefaultConfigPath() (string, error) { return config.DefaultConfigPath() }
 
 func (application *adapter) openRuntime(command *cobra.Command, request runtimeRequest) (*commandRuntime, error) {
-	root := command.Root()
-	dcsURL := application.root.dcsURL
-	dcsURLSet := root.Flags().Changed("dcs-url")
-	if root.Flags().Changed("dcs") {
-		if dcsURLSet && application.root.dcsAlias != dcsURL {
-			return nil, usageError("--dcs-url and --dcs specify different values")
-		}
-		dcsURL, dcsURLSet = application.root.dcsAlias, true
+	root, err := application.rootInvocation(command)
+	if err != nil {
+		return nil, err
 	}
 	invocation := runtimeInvocation{
-		configPathSet: root.Flags().Changed("config-file"), configPath: application.root.configFile,
-		dcsURLSet: dcsURLSet, dcsURL: dcsURL,
-		insecureSet: root.Flags().Changed("insecure"), insecure: application.root.insecure,
-		context: application.root.context, request: request,
+		configPathSet: root.ConfigFileSet, configPath: root.ConfigFile,
+		dcsURLSet: root.DCSURLSet, dcsURL: root.DCSURL,
+		insecureSet: root.InsecureSet, insecure: root.Insecure,
+		context: root.Context, request: request,
 	}
 	runtime, err := application.factory(command.Context(), invocation)
 	if err != nil {
@@ -144,18 +139,35 @@ func runtimeErrorCategory(err error) control.Category {
 }
 
 func defaultRuntimeFactory(ctx context.Context, invocation runtimeInvocation) (*commandRuntime, error) {
-	load := config.LoadRequest{}
+	return openDefaultRuntime(ctx, app.EnvironmentOptions{}, invocation)
+}
+
+func runtimeFactoryWithOptions(options app.EnvironmentOptions) runtimeFactory {
+	options = cloneEnvironmentOptions(options)
+	return func(ctx context.Context, invocation runtimeInvocation) (*commandRuntime, error) {
+		return openDefaultRuntime(ctx, options, invocation)
+	}
+}
+
+func openDefaultRuntime(ctx context.Context, options app.EnvironmentOptions, invocation runtimeInvocation) (*commandRuntime, error) {
+	options = cloneEnvironmentOptions(options)
+	load := options.Load
 	if invocation.configPathSet {
 		load.Path = invocation.configPath
+		// An explicit CLI path has higher precedence than an injected parsed
+		// document, just as it does over an embedding application's load default.
+		options.Document = nil
 	}
-	overrides := config.Overrides{}
+	overrides := options.Overrides
 	if invocation.dcsURLSet {
 		overrides.DCSURL = &invocation.dcsURL
 	}
 	if invocation.insecureSet {
 		overrides.Insecure = &invocation.insecure
 	}
-	environment, err := app.NewEnvironment(ctx, app.EnvironmentOptions{Load: load, Overrides: overrides})
+	options.Load = load
+	options.Overrides = overrides
+	environment, err := app.NewEnvironment(ctx, options)
 	if err != nil {
 		return nil, err
 	}
@@ -181,6 +193,41 @@ func defaultRuntimeFactory(ctx context.Context, invocation runtimeInvocation) (*
 		service: runtime.Service, resolved: runtime.Resolved, target: runtime.Target, warnings: runtime.Warnings,
 		close: runtime.Close,
 	}, nil
+}
+
+func cloneEnvironmentOptions(options app.EnvironmentOptions) app.EnvironmentOptions {
+	options.Overrides = cloneOverrides(options.Overrides)
+	if options.SupportedPatroniRange != nil {
+		copyRange := *options.SupportedPatroniRange
+		options.SupportedPatroniRange = &copyRange
+	}
+	return options
+}
+
+func cloneOverrides(overrides config.Overrides) config.Overrides {
+	overrides.Context = cloneStringPointer(overrides.Context)
+	overrides.DCSURL = cloneStringPointer(overrides.DCSURL)
+	overrides.Namespace = cloneStringPointer(overrides.Namespace)
+	overrides.Scope = cloneStringPointer(overrides.Scope)
+	overrides.Group = cloneIntPointer(overrides.Group)
+	overrides.Insecure = cloneBoolPointer(overrides.Insecure)
+	return overrides
+}
+
+func cloneStringPointer(value *string) *string {
+	if value == nil {
+		return nil
+	}
+	copyValue := *value
+	return &copyValue
+}
+
+func cloneBoolPointer(value *bool) *bool {
+	if value == nil {
+		return nil
+	}
+	copyValue := *value
+	return &copyValue
 }
 
 func cloneIntPointer(value *int) *int {

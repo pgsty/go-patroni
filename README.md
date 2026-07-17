@@ -132,6 +132,36 @@ The high-level runtime currently implements Patroni's `etcd3` DCS backend. A
 consumer using another DCS can implement the narrow interfaces in `dcs` and
 assemble `control.Service` directly.
 
+## Embed the command suite
+
+Applications that want the complete `patronictl` command surface can compose
+it through the public `cli` package. Product commands are registered as
+extensions; Patroni parsing, prompting, rendering, and exit behavior stay in
+one SDK implementation:
+
+```go
+root := cli.NewRootCommand(cli.Options{
+    Application: cli.Application{
+        Name: "my-app", Short: "My Patroni control plane", Version: buildVersion,
+        RequestIDPrefix: "my-app-cli",
+    },
+    Environment: patroniruntime.EnvironmentOptions{
+        Load: config.LoadRequest{Path: "/infra/conf/patronictl.yml"},
+        UserAgent: "my-app/" + buildVersion,
+    },
+    Extensions: []cli.Extension{newServeCommand},
+})
+if err := root.ExecuteContext(ctx); err != nil {
+    return err
+}
+```
+
+An extension receives normalized root state through
+`ExtensionContext.Invocation`, so explicit `--config-file`, `--dcs-url`/`--dcs`,
+`--insecure`, `--context`, and `--output` values do not need to be reparsed.
+Applications such as Pig that already own a command framework can instead use
+`control` and `runtime` directly; importing `cli` is optional.
+
 ## Configuration
 
 The CLI accepts Patroni's standard `PATRONICTL_CONFIG_FILE`, `DCS_URL`, `-c`,
@@ -199,6 +229,7 @@ declared CLI deviations from the pinned Patroni 4.1.4 command contract.
 | `postgres`       | One-shot role-checked PostgreSQL query client                                |
 | `control`        | Adapter-neutral, `patronictl`-compatible control operations                  |
 | `runtime`        | Configuration-to-client assembly for applications and CLIs                   |
+| `cli`            | Public composition facade for the complete command suite and extensions      |
 | `cmd/patronictl` | Standalone native Go command-line client                                     |
 
 ## Safety model

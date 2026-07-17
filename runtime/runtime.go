@@ -26,11 +26,19 @@ type EnvironmentOptions struct {
 	Load      config.LoadRequest
 	Overrides config.Overrides
 	Document  *config.Document
+	// UserAgent identifies an embedding application on Patroni REST requests.
+	// Empty uses go-patroni/<version>.
+	UserAgent string
+	// ProductVersion is returned by the high-level local version operation.
+	// Empty uses the complete go-patroni build version string.
+	ProductVersion string
 }
 
 type Environment struct {
-	document  *config.Document
-	overrides config.Overrides
+	document       *config.Document
+	overrides      config.Overrides
+	userAgent      string
+	productVersion string
 }
 
 type RuntimeOptions struct {
@@ -65,7 +73,18 @@ func NewEnvironment(ctx context.Context, options EnvironmentOptions) (*Environme
 			return nil, err
 		}
 	}
-	return &Environment{document: document, overrides: options.Overrides}, nil
+	userAgent := strings.TrimSpace(options.UserAgent)
+	if userAgent == "" {
+		userAgent = "go-patroni/" + version.Current().Version
+	}
+	productVersion := strings.TrimSpace(options.ProductVersion)
+	if productVersion == "" {
+		productVersion = version.String()
+	}
+	return &Environment{
+		document: document, overrides: options.Overrides,
+		userAgent: userAgent, productVersion: productVersion,
+	}, nil
 }
 
 func (environment *Environment) ContextNames() []string {
@@ -200,7 +219,7 @@ func (environment *Environment) Open(ctx context.Context, options RuntimeOptions
 		authorizer = patroni.NewBasicAuth(resolved.REST.Username, resolved.REST.Password.Reveal())
 	}
 	restClient, err := patroni.NewClient(patroni.ClientOptions{
-		Transport: restTransport, Authorizer: authorizer, UserAgent: "go-patroni/" + version.Current().Version,
+		Transport: restTransport, Authorizer: authorizer, UserAgent: environment.userAgent,
 		Timeout: resolved.Network.PatroniTimeout,
 	})
 	if err != nil {
@@ -214,7 +233,7 @@ func (environment *Environment) Open(ctx context.Context, options RuntimeOptions
 	}
 	service, err := control.NewService(control.ServiceOptions{
 		Snapshots: store, Discovery: store, Patroni: restClient, Postgres: queryClient,
-		Config: store, Failover: store, Remover: store, ProductVersion: version.String(),
+		Config: store, Failover: store, Remover: store, ProductVersion: environment.productVersion,
 	})
 	if err != nil {
 		return nil, err

@@ -1,0 +1,42 @@
+{
+  "operationId": "op-fixture",
+  "outcome": "UNKNOWN",
+  "target": {
+    "context": "default",
+    "namespace": "/service",
+    "scope": "alpha",
+    "member": "node-1"
+  },
+  "path": "rest",
+  "data": {},
+  "evidence": [
+    {
+      "source": "PATRONI",
+      "observedAt": "2026-07-13T08:00:00.000000123Z",
+      "summary": "request body sent; response unavailable",
+      "path": "/restart",
+      "sendState": "MAYBE_SENT"
+    }
+  ],
+  "error": {
+    "category": "UNKNOWN",
+    "operation": "restart",
+    "target": {
+      "context": "default",
+      "namespace": "/service",
+      "scope": "alpha",
+      "member": "node-1"
+    },
+    "retryable": false,
+    "message": "restart outcome is unknown; verify the member before retrying",
+    "evidence": [
+      {
+        "source": "PATRONI",
+        "observedAt": "2026-07-13T08:00:00.000000123Z",
+        "summary": "request body sent; response unavailable",
+        "path": "/restart",
+        "sendState": "MAYBE_SENT"
+      }
+    ]
+  }
+}

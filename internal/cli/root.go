@@ -480,6 +480,11 @@ func exitCode(err error) int {
 	return 1
 }
 
+// ExitCode exposes stable process mapping to the public CLI facade.
+func ExitCode(err error) int {
+	return exitCode(err)
+}
+
 func errorWasRendered(err error) bool {
 	var typed *exitError
 	return errors.As(err, &typed) && typed.rendered

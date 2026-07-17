@@ -115,6 +115,11 @@ func ExecuteContext(ctx context.Context, options Options) int {
 	return internalcli.ExecuteContext(ctx, internalOptions(options))
 }
 
+// ExitCode returns the process status that Execute would use for err.
+func ExitCode(err error) int {
+	return internalcli.ExitCode(err)
+}
+
 func internalOptions(options Options) internalcli.CommandOptions {
 	converted := internalcli.CommandOptions{
 		Stdin: options.Stdin, Stdout: options.Stdout, Stderr: options.Stderr,

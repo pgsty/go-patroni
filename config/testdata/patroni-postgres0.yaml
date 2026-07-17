@@ -1,0 +1,55 @@
+# Derived from Patroni postgres0.yml at pinned commit b247bfac, Apache-2.0.
+# Credentials are explicit non-production fixtures.
+scope: batman
+namespace: /service/
+name: postgresql0
+
+restapi:
+  listen: 127.0.0.1:8008
+  connect_address: 127.0.0.1:8008
+
+# BOAR must tolerate a valid Patroni config using a non-MVP DCS, while an
+# operation that needs DCS later reports that etcd3 is required.
+etcd:
+  host: 127.0.0.1:2379
+
+bootstrap:
+  dcs:
+    ttl: 30
+    loop_wait: 10
+    retry_timeout: 10
+    maximum_lag_on_failover: 1048576
+    postgresql:
+      use_pg_rewind: true
+      pg_hba:
+        - host replication replicator 127.0.0.1/32 md5
+        - host all all 0.0.0.0/0 md5
+      parameters:
+        max_connections: 100
+  initdb:
+    - encoding: UTF8
+    - data-checksums
+
+postgresql:
+  listen: 127.0.0.1:5432
+  connect_address: 127.0.0.1:5432
+  data_dir: data/postgresql0
+  pgpass: /tmp/pgpass0
+  authentication:
+    replication:
+      username: replicator
+      password: __BOAR_TEST_ONLY_REPLICATION_PASSWORD__
+    superuser:
+      username: postgres
+      password: __BOAR_TEST_ONLY_SUPERUSER_PASSWORD__
+    rewind:
+      username: rewind_user
+      password: __BOAR_TEST_ONLY_REWIND_PASSWORD__
+  parameters:
+    unix_socket_directories: '..'
+
+tags:
+  noloadbalance: false
+  clonefrom: false
+  nostream: false
+

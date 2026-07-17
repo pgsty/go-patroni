@@ -1,0 +1,34 @@
+---
+namespace: /pg/
+scope: pg-meta
+etcd3:
+  hosts: '10.0.0.10:2379,10.0.0.11:2379'
+  protocol: https
+  cacert: /test/pki/ca.crt
+  cert: /test/pki/client.crt
+  key: /test/pki/client.key
+  username: test-admin
+  password: __BOAR_TEST_ONLY_ETCD_PASSWORD__
+restapi:
+  listen: 0.0.0.0:8008
+  connect_address: 10.0.0.20:8008
+  cafile: /test/pki/rest-ca.crt
+  certfile: /test/pki/rest-client.crt
+  keyfile: /test/pki/rest-client.key
+  authentication:
+    username: test-rest-admin
+    password: __BOAR_TEST_ONLY_REST_PASSWORD__
+ctl:
+  insecure: false
+  cacert: /test/pki/ctl-ca.crt
+  certfile: /test/pki/ctl-client.crt
+  keyfile: /test/pki/ctl-client.key
+postgresql:
+  authentication:
+    superuser:
+      username: postgres
+      password: __BOAR_TEST_ONLY_PG_PASSWORD__
+unknown_future_section:
+  nested:
+    enabled: true
+

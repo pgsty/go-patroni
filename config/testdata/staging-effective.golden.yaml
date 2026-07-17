@@ -1,0 +1,11 @@
+custom:
+    list:
+        - stage-only
+    preserved: true
+etcd3:
+    hosts:
+        - stage-only:2379
+    password: null
+    protocol: https
+namespace: /stage/
+scope: stage-scope

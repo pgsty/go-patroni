@@ -1,0 +1,29 @@
+namespace: /service/
+scope: root-scope
+etcd3:
+  hosts: [root-a:2379, root-b:2379]
+  protocol: https
+  password: __BOAR_TEST_ONLY_ROOT_PASSWORD__
+custom:
+  list: [root-a, root-b]
+  preserved: true
+boar:
+  default_context: default
+  contexts:
+    default:
+      scope: default-overlay
+    staging:
+      extends: default
+      namespace: /stage/
+      scope: stage-scope
+      etcd3:
+        hosts: [stage-only:2379]
+        password: null
+      custom:
+        list: [stage-only]
+    isolated:
+      namespace: /isolated/
+      scope: isolated-scope
+      etcd3:
+        host: isolated:2379
+

@@ -411,7 +411,7 @@ func TestNamedContextErrorsArePrecise(t *testing.T) {
 			name:    "missing selected context",
 			yaml:    "scope: root\n",
 			context: "absent",
-			field:   "boar.contexts.absent",
+			field:   "go_patroni.contexts.absent",
 		},
 	}
 	for _, test := range tests {
@@ -426,6 +426,42 @@ func TestNamedContextErrorsArePrecise(t *testing.T) {
 				t.Fatalf("context error mismatch: %#v", err)
 			}
 		})
+	}
+}
+
+func TestPublicConfigExtensionAndLegacyContextEnvironment(t *testing.T) {
+	document, err := config.Parse([]byte(`scope: root
+go_patroni:
+  default_context: staging
+  contexts:
+    staging:
+      scope: staging
+    production:
+      scope: production
+  network:
+    patroni_timeout: 17s
+`), "public.yaml")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if document.DefaultContext() != "staging" {
+		t.Fatalf("default context=%q", document.DefaultContext())
+	}
+	resolved, err := document.Resolve(config.ResolveRequest{Environment: config.MapEnvironment{
+		"GO_PATRONI_CONTEXT": "production",
+		"BOAR_CONTEXT":       "staging",
+	}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if resolved.Context != "production" || resolved.Scope != "production" || resolved.Network.PatroniTimeout.String() != "17s" {
+		t.Fatalf("public extension projection mismatch: %#v", resolved)
+	}
+
+	_, err = config.Parse([]byte("go_patroni: {}\nboar: {}\n"), "ambiguous.yaml")
+	var configErr *config.Error
+	if !errors.As(err, &configErr) || configErr.Field != "go_patroni" {
+		t.Fatalf("ambiguous extension error=%#v", err)
 	}
 }
 

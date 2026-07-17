@@ -115,9 +115,20 @@ type Document struct {
 	root           map[string]any
 	contexts       map[string]map[string]any
 	network        any
-	server         any
+	extensionName  string
 	defaultContext string
 	sourceName     string
+}
+
+func (document *Document) extensionField(suffix string) string {
+	name := "go_patroni"
+	if document != nil && document.extensionName != "" {
+		name = document.extensionName
+	}
+	if suffix == "" {
+		return name
+	}
+	return name + "." + suffix
 }
 
 type Resolved struct {

@@ -18,8 +18,11 @@ func (document *Document) Resolve(request ResolveRequest) (Resolved, error) {
 		environment = osEnvironment{}
 	}
 	contextName := document.DefaultContext()
-	if selected, ok := environment.Lookup("BOAR_CONTEXT"); ok && strings.TrimSpace(selected) != "" {
-		contextName = strings.TrimSpace(selected)
+	for _, key := range []string{"GO_PATRONI_CONTEXT", "BOAR_CONTEXT"} {
+		if selected, ok := environment.Lookup(key); ok && strings.TrimSpace(selected) != "" {
+			contextName = strings.TrimSpace(selected)
+			break
+		}
 	}
 	if strings.TrimSpace(request.Context) != "" {
 		contextName = strings.TrimSpace(request.Context)
@@ -101,7 +104,7 @@ func (document *Document) Resolve(request ResolveRequest) (Resolved, error) {
 func (document *Document) contextLayers(name string, stack []string) ([]resolutionLayer, error) {
 	for _, existing := range stack {
 		if existing == name {
-			return nil, newError(ErrorContext, "boar.contexts."+name+".extends", document.sourceName, "context inheritance cycle", nil)
+			return nil, newError(ErrorContext, document.extensionField("contexts."+name+".extends"), document.sourceName, "context inheritance cycle", nil)
 		}
 	}
 	if name == "default" {
@@ -110,7 +113,7 @@ func (document *Document) contextLayers(name string, stack []string) ([]resoluti
 		}}
 		if overlay, ok := document.contexts["default"]; ok {
 			if extends, present := overlay["extends"]; present && extends != nil {
-				return nil, newError(ErrorContext, "boar.contexts.default.extends", document.sourceName, "default context cannot extend another context", nil)
+				return nil, newError(ErrorContext, document.extensionField("contexts.default.extends"), document.sourceName, "default context cannot extend another context", nil)
 			}
 			layers = append(layers, resolutionLayer{values: withoutExtends(overlay), source: Source{Layer: LayerContext, Name: "default"}})
 		}
@@ -118,13 +121,13 @@ func (document *Document) contextLayers(name string, stack []string) ([]resoluti
 	}
 	contextMap, ok := document.contexts[name]
 	if !ok {
-		return nil, newError(ErrorContext, "boar.contexts."+name, document.sourceName, "named context does not exist", nil)
+		return nil, newError(ErrorContext, document.extensionField("contexts."+name), document.sourceName, "named context does not exist", nil)
 	}
 	layers := []resolutionLayer{}
 	if rawParent, present := contextMap["extends"]; present && rawParent != nil {
 		parent, ok := rawParent.(string)
 		if !ok || strings.TrimSpace(parent) == "" {
-			return nil, newError(ErrorContext, "boar.contexts."+name+".extends", document.sourceName, "must be a non-empty context name", nil)
+			return nil, newError(ErrorContext, document.extensionField("contexts."+name+".extends"), document.sourceName, "must be a non-empty context name", nil)
 		}
 		parentLayers, err := document.contextLayers(strings.TrimSpace(parent), append(stack, name))
 		if err != nil {

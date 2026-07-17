@@ -16,8 +16,8 @@ const (
 )
 
 // NetworkConfig is the secret-free, operation-wide deadline projection from
-// boar.network. Each value is an upper bound that is further constrained by a
-// shorter caller deadline.
+// go_patroni.network (or legacy boar.network). Each value is an upper bound
+// that is further constrained by a shorter caller deadline.
 type NetworkConfig struct {
 	DNSLookupTimeout     time.Duration
 	DCSDialTimeout       time.Duration
@@ -35,12 +35,12 @@ func (configuration NetworkConfig) String() string {
 
 func (configuration NetworkConfig) GoString() string { return configuration.String() }
 
-// NetworkConfig projects boar.network while tolerating unknown fields. The
+// NetworkConfig projects the SDK network extension while tolerating unknown fields. The
 // returned defaults are part of the inspect-config contract and are never
 // inferred independently by an adapter.
 func (document *Document) NetworkConfig() (NetworkConfig, error) {
 	if document == nil {
-		return NetworkConfig{}, newError(ErrorProjection, "boar.network", "", "document is nil", nil)
+		return NetworkConfig{}, newError(ErrorProjection, "go_patroni.network", "", "document is nil", nil)
 	}
 	projected := NetworkConfig{
 		DNSLookupTimeout: defaultDNSLookupTimeout, DCSDialTimeout: defaultDCSDialTimeout,
@@ -52,19 +52,19 @@ func (document *Document) NetworkConfig() (NetworkConfig, error) {
 	}
 	network, ok := document.network.(map[string]any)
 	if !ok {
-		return NetworkConfig{}, document.networkError("boar.network", "must be a mapping")
+		return NetworkConfig{}, document.networkError(document.extensionField("network"), "must be a mapping")
 	}
 	fields := []struct {
 		key         string
 		field       string
 		destination *time.Duration
 	}{
-		{key: "dns_timeout", field: "boar.network.dns_timeout", destination: &projected.DNSLookupTimeout},
-		{key: "dcs_dial_timeout", field: "boar.network.dcs_dial_timeout", destination: &projected.DCSDialTimeout},
-		{key: "dcs_request_timeout", field: "boar.network.dcs_request_timeout", destination: &projected.DCSRequestTimeout},
-		{key: "patroni_timeout", field: "boar.network.patroni_timeout", destination: &projected.PatroniTimeout},
-		{key: "postgres_timeout", field: "boar.network.postgres_timeout", destination: &projected.PostgresTimeout},
-		{key: "postgres_close_timeout", field: "boar.network.postgres_close_timeout", destination: &projected.PostgresCloseTimeout},
+		{key: "dns_timeout", field: document.extensionField("network.dns_timeout"), destination: &projected.DNSLookupTimeout},
+		{key: "dcs_dial_timeout", field: document.extensionField("network.dcs_dial_timeout"), destination: &projected.DCSDialTimeout},
+		{key: "dcs_request_timeout", field: document.extensionField("network.dcs_request_timeout"), destination: &projected.DCSRequestTimeout},
+		{key: "patroni_timeout", field: document.extensionField("network.patroni_timeout"), destination: &projected.PatroniTimeout},
+		{key: "postgres_timeout", field: document.extensionField("network.postgres_timeout"), destination: &projected.PostgresTimeout},
+		{key: "postgres_close_timeout", field: document.extensionField("network.postgres_close_timeout"), destination: &projected.PostgresCloseTimeout},
 	}
 	for _, item := range fields {
 		value, exists := network[item.key]

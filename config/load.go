@@ -97,9 +97,9 @@ func Parse(data []byte, sourceName string) (*Document, error) {
 	}
 	document := &Document{
 		raw: cloneYAMLNode(&raw, make(map[*yaml.Node]*yaml.Node)), root: cloneMap(root),
-		contexts: make(map[string]map[string]any), defaultContext: "default", sourceName: sourceName,
+		contexts: make(map[string]map[string]any), extensionName: "go_patroni", defaultContext: "default", sourceName: sourceName,
 	}
-	if err := document.extractBOARConfig(); err != nil {
+	if err := document.extractSDKConfig(); err != nil {
 		return nil, err
 	}
 	return document, nil
@@ -109,42 +109,50 @@ func emptyDocumentNode() yaml.Node {
 	return yaml.Node{Kind: yaml.DocumentNode, Content: []*yaml.Node{{Kind: yaml.MappingNode, Tag: "!!map"}}}
 }
 
-func (document *Document) extractBOARConfig() error {
-	value, ok := document.root["boar"]
+func (document *Document) extractSDKConfig() error {
+	publicValue, publicOK := document.root["go_patroni"]
+	legacyValue, legacyOK := document.root["boar"]
+	if publicOK && publicValue != nil && legacyOK && legacyValue != nil {
+		return newError(ErrorProjection, "go_patroni", document.sourceName, "cannot be combined with the legacy boar extension", nil)
+	}
+	name, value, ok := "go_patroni", publicValue, publicOK
+	if (!ok || value == nil) && legacyOK {
+		name, value, ok = "boar", legacyValue, true
+	}
+	document.extensionName = name
 	if !ok || value == nil {
+		delete(document.root, "go_patroni")
 		delete(document.root, "boar")
 		return nil
 	}
-	boar, ok := value.(map[string]any)
+	extension, ok := value.(map[string]any)
 	if !ok {
-		return newError(ErrorProjection, "boar", document.sourceName, "must be a mapping", nil)
+		return newError(ErrorProjection, name, document.sourceName, "must be a mapping", nil)
 	}
-	if value, ok := boar["default_context"]; ok && value != nil {
+	if value, ok := extension["default_context"]; ok && value != nil {
 		name, ok := value.(string)
 		if !ok || name == "" {
-			return newError(ErrorProjection, "boar.default_context", document.sourceName, "must be a non-empty string", nil)
+			return newError(ErrorProjection, document.extensionField("default_context"), document.sourceName, "must be a non-empty string", nil)
 		}
 		document.defaultContext = name
 	}
-	if value, ok := boar["contexts"]; ok && value != nil {
+	if value, ok := extension["contexts"]; ok && value != nil {
 		contexts, ok := value.(map[string]any)
 		if !ok {
-			return newError(ErrorProjection, "boar.contexts", document.sourceName, "must be a mapping", nil)
+			return newError(ErrorProjection, document.extensionField("contexts"), document.sourceName, "must be a mapping", nil)
 		}
 		for name, rawContext := range contexts {
 			contextMap, ok := rawContext.(map[string]any)
 			if !ok {
-				return newError(ErrorProjection, "boar.contexts."+name, document.sourceName, "must be a mapping", nil)
+				return newError(ErrorProjection, document.extensionField("contexts."+name), document.sourceName, "must be a mapping", nil)
 			}
 			document.contexts[name] = cloneMap(contextMap)
 		}
 	}
-	if value, ok := boar["server"]; ok {
-		document.server = cloneValue(value)
-	}
-	if value, ok := boar["network"]; ok {
+	if value, ok := extension["network"]; ok {
 		document.network = cloneValue(value)
 	}
+	delete(document.root, "go_patroni")
 	delete(document.root, "boar")
 	return nil
 }

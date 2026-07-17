@@ -1,0 +1,93 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://patroni.pgsty.com/schema/machine/v1alpha1/effective-configuration.schema.json",
+  "title": "Go patronictl v1alpha1 effective configuration envelope",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["apiVersion", "kind", "metadata", "data"],
+  "properties": {
+    "apiVersion": {"const": "patroni.pgsty.com/v1alpha1"},
+    "kind": {"const": "EffectiveConfiguration"},
+    "metadata": {"$ref": "#/$defs/metadata"},
+    "data": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["target", "effective", "networkTimeouts", "sources", "warnings"],
+      "properties": {
+        "target": {"$ref": "#/$defs/target"},
+        "effective": {"type": "object"},
+        "networkTimeouts": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "dnsLookupMilliseconds",
+            "dcsDialMilliseconds",
+            "dcsRequestMilliseconds",
+            "patroniRequestMilliseconds",
+            "postgresQueryMilliseconds",
+            "postgresCloseMilliseconds"
+          ],
+          "properties": {
+            "dnsLookupMilliseconds": {"type": "integer", "minimum": 1},
+            "dcsDialMilliseconds": {"type": "integer", "minimum": 1},
+            "dcsRequestMilliseconds": {"type": "integer", "minimum": 1},
+            "patroniRequestMilliseconds": {"type": "integer", "minimum": 1},
+            "postgresQueryMilliseconds": {"type": "integer", "minimum": 1},
+            "postgresCloseMilliseconds": {"type": "integer", "minimum": 1}
+          }
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["field", "layer", "name"],
+            "properties": {
+              "field": {"type": "string", "minLength": 1},
+              "layer": {"enum": ["default", "file", "context", "environment", "flag"]},
+              "name": {"type": "string", "minLength": 1}
+            }
+          }
+        },
+        "warnings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["code", "field", "message"],
+            "properties": {
+              "code": {"enum": ["SCHEMELESS_DCS_URL", "INSECURE_REST_TLS"]},
+              "field": {"type": "string", "minLength": 1},
+              "message": {"type": "string", "minLength": 1}
+            }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["requestId", "observedAt", "warnings"],
+      "properties": {
+        "requestId": {"type": "string", "minLength": 1},
+        "observedAt": {"type": "string", "format": "date-time"},
+        "revision": {"oneOf": [{"type": "integer"}, {"type": "string", "minLength": 1}]},
+        "warnings": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["context", "namespace", "scope"],
+      "properties": {
+        "context": {"type": "string", "minLength": 1},
+        "namespace": {"type": "string", "pattern": "^/"},
+        "scope": {"type": "string"},
+        "group": {"type": "integer", "minimum": 0},
+        "member": {"type": "string", "minLength": 1}
+      }
+    }
+  }
+}

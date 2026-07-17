@@ -1,0 +1,5257 @@
+{
+  "schemaVersion": "patroni.pgsty.com/machine-contract/v1alpha1",
+  "apiVersion": "patroni.pgsty.com/v1alpha1",
+  "generatedBy": "tools/machineschema",
+  "kinds": [
+    {
+      "kind": "ClusterDiscovery",
+      "dataType": "cli.machineDiscovery",
+      "golden": "internal/cli/testdata/machine-success/cluster-discovery.golden.json",
+      "fields": [
+        {
+          "path": "/apiVersion",
+          "type": "string",
+          "required": true,
+          "const": "patroni.pgsty.com/v1alpha1"
+        },
+        {
+          "path": "/data",
+          "type": "object",
+          "required": true
+        },
+        {
+          "path": "/data/clusters",
+          "type": "array",
+          "required": true
+        },
+        {
+          "path": "/data/clusters/*/discoveryState",
+          "type": "string",
+          "required": true,
+          "enum": [
+            "DISCOVERED",
+            "CONFIGURED_ONLY",
+            "ABSENT"
+          ]
+        },
+        {
+          "path": "/data/clusters/*/healthState",
+          "type": "string",
+          "required": true,
+          "enum": [
+            "HEALTHY",
+            "DEGRADED",
+            "UNHEALTHY",
+            "UNKNOWN"
+          ]
+        },
+        {
+          "path": "/data/clusters/*/leader",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/clusters/*/managementState",
+          "type": "string",
+          "required": true,
+          "enum": [
+            "EXPLICIT",
+            "ALL_SELECTED",
+            "UNMANAGED"
+          ]
+        },
+        {
+          "path": "/data/clusters/*/memberCount",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "path": "/data/clusters/*/reachabilityState",
+          "type": "string",
+          "required": true,
+          "enum": [
+            "REACHABLE",
+            "PARTIALLY_REACHABLE",
+            "UNREACHABLE",
+            "UNKNOWN"
+          ]
+        },
+        {
+          "path": "/data/clusters/*/revision",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "path": "/data/clusters/*/target",
+          "type": "object",
+          "required": true
+        },
+        {
+          "path": "/data/clusters/*/target/context",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/data/clusters/*/target/group",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "path": "/data/clusters/*/target/member",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/clusters/*/target/namespace",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/data/clusters/*/target/scope",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/kind",
+          "type": "string",
+          "required": true,
+          "const": "ClusterDiscovery"
+        },
+        {
+          "path": "/metadata",
+          "type": "object",
+          "required": true
+        },
+        {
+          "path": "/metadata/observedAt",
+          "type": "string",
+          "required": true,
+          "format": "date-time"
+        },
+        {
+          "path": "/metadata/requestId",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/metadata/revision",
+          "type": "integer|string",
+          "required": false
+        },
+        {
+          "path": "/metadata/warnings",
+          "type": "array",
+          "required": true
+        }
+      ]
+    },
+    {
+      "kind": "ClusterHistory",
+      "dataType": "control.HistoryData",
+      "golden": "internal/cli/testdata/machine-success/cluster-history.golden.json",
+      "fields": [
+        {
+          "path": "/apiVersion",
+          "type": "string",
+          "required": true,
+          "const": "patroni.pgsty.com/v1alpha1"
+        },
+        {
+          "path": "/data",
+          "type": "object",
+          "required": true
+        },
+        {
+          "path": "/data/entries",
+          "type": "array",
+          "required": true
+        },
+        {
+          "path": "/data/entries/*/lsn",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "path": "/data/entries/*/newLeader",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/entries/*/reason",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/data/entries/*/timeline",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "path": "/data/entries/*/timestamp",
+          "type": "string",
+          "required": false,
+          "format": "date-time"
+        },
+        {
+          "path": "/data/target",
+          "type": "object",
+          "required": true
+        },
+        {
+          "path": "/data/target/context",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/data/target/group",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "path": "/data/target/member",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/target/namespace",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/data/target/scope",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/kind",
+          "type": "string",
+          "required": true,
+          "const": "ClusterHistory"
+        },
+        {
+          "path": "/metadata",
+          "type": "object",
+          "required": true
+        },
+        {
+          "path": "/metadata/observedAt",
+          "type": "string",
+          "required": true,
+          "format": "date-time"
+        },
+        {
+          "path": "/metadata/requestId",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/metadata/revision",
+          "type": "integer|string",
+          "required": false
+        },
+        {
+          "path": "/metadata/warnings",
+          "type": "array",
+          "required": true
+        }
+      ]
+    },
+    {
+      "kind": "ClusterList",
+      "dataType": "cli.machineClusterList",
+      "golden": "internal/cli/testdata/machine-success/cluster-list.golden.json",
+      "fields": [
+        {
+          "path": "/apiVersion",
+          "type": "string",
+          "required": true,
+          "const": "patroni.pgsty.com/v1alpha1"
+        },
+        {
+          "path": "/data",
+          "type": "object",
+          "required": true
+        },
+        {
+          "path": "/data/clusters",
+          "type": "array",
+          "required": true
+        },
+        {
+          "path": "/data/clusters/*/discoveryState",
+          "type": "string",
+          "required": true,
+          "enum": [
+            "DISCOVERED",
+            "CONFIGURED_ONLY",
+            "ABSENT"
+          ]
+        },
+        {
+          "path": "/data/clusters/*/healthState",
+          "type": "string",
+          "required": true,
+          "enum": [
+            "HEALTHY",
+            "DEGRADED",
+            "UNHEALTHY",
+            "UNKNOWN"
+          ]
+        },
+        {
+          "path": "/data/clusters/*/initialize",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/clusters/*/leader",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/clusters/*/managementState",
+          "type": "string",
+          "required": true,
+          "enum": [
+            "EXPLICIT",
+            "ALL_SELECTED",
+            "UNMANAGED"
+          ]
+        },
+        {
+          "path": "/data/clusters/*/members",
+          "type": "array",
+          "required": true
+        },
+        {
+          "path": "/data/clusters/*/members/*/apiUrl",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/clusters/*/members/*/host",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/clusters/*/members/*/name",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/data/clusters/*/members/*/patroniVersion",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/clusters/*/members/*/pendingRestart",
+          "type": "boolean",
+          "required": false
+        },
+        {
+          "path": "/data/clusters/*/members/*/pendingRestartReason",
+          "type": "object-map",
+          "required": false
+        },
+        {
+          "path": "/data/clusters/*/members/*/port",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "path": "/data/clusters/*/members/*/receiveLagBytes",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "path": "/data/clusters/*/members/*/receiveLsn",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/clusters/*/members/*/replayLagBytes",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "path": "/data/clusters/*/members/*/replayLsn",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/clusters/*/members/*/role",
+          "type": "string",
+          "required": true,
+          "enum": [
+            "leader",
+            "standby_leader",
+            "sync_standby",
+            "quorum_standby",
+            "replica"
+          ]
+        },
+        {
+          "path": "/data/clusters/*/members/*/scheduledRestart",
+          "type": "object",
+          "required": false
+        },
+        {
+          "path": "/data/clusters/*/members/*/scheduledRestart/postgresVersion",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/clusters/*/members/*/scheduledRestart/schedule",
+          "type": "string",
+          "required": false,
+          "format": "date-time"
+        },
+        {
+          "path": "/data/clusters/*/members/*/state",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/clusters/*/members/*/tags",
+          "type": "object-map",
+          "required": false
+        },
+        {
+          "path": "/data/clusters/*/members/*/target",
+          "type": "object",
+          "required": true
+        },
+        {
+          "path": "/data/clusters/*/members/*/target/context",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/data/clusters/*/members/*/target/group",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "path": "/data/clusters/*/members/*/target/member",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/clusters/*/members/*/target/namespace",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/data/clusters/*/members/*/target/scope",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/data/clusters/*/members/*/timeline",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "path": "/data/clusters/*/paused",
+          "type": "boolean",
+          "required": true
+        },
+        {
+          "path": "/data/clusters/*/reachabilityState",
+          "type": "string",
+          "required": true,
+          "enum": [
+            "REACHABLE",
+            "PARTIALLY_REACHABLE",
+            "UNREACHABLE",
+            "UNKNOWN"
+          ]
+        },
+        {
+          "path": "/data/clusters/*/revision",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "path": "/data/clusters/*/scheduledSwitchover",
+          "type": "object",
+          "required": false
+        },
+        {
+          "path": "/data/clusters/*/scheduledSwitchover/at",
+          "type": "string",
+          "required": false,
+          "format": "date-time"
+        },
+        {
+          "path": "/data/clusters/*/scheduledSwitchover/from",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/clusters/*/scheduledSwitchover/to",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/clusters/*/target",
+          "type": "object",
+          "required": true
+        },
+        {
+          "path": "/data/clusters/*/target/context",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/data/clusters/*/target/group",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "path": "/data/clusters/*/target/member",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/clusters/*/target/namespace",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/data/clusters/*/target/scope",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/kind",
+          "type": "string",
+          "required": true,
+          "const": "ClusterList"
+        },
+        {
+          "path": "/metadata",
+          "type": "object",
+          "required": true
+        },
+        {
+          "path": "/metadata/observedAt",
+          "type": "string",
+          "required": true,
+          "format": "date-time"
+        },
+        {
+          "path": "/metadata/requestId",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/metadata/revision",
+          "type": "integer|string",
+          "required": false
+        },
+        {
+          "path": "/metadata/warnings",
+          "type": "array",
+          "required": true
+        }
+      ]
+    },
+    {
+      "kind": "ClusterTopology",
+      "dataType": "control.TopologyData",
+      "golden": "internal/cli/testdata/machine-success/cluster-topology.golden.json",
+      "fields": [
+        {
+          "path": "/apiVersion",
+          "type": "string",
+          "required": true,
+          "const": "patroni.pgsty.com/v1alpha1"
+        },
+        {
+          "path": "/data",
+          "type": "object",
+          "required": true
+        },
+        {
+          "path": "/data/cluster",
+          "type": "object",
+          "required": true
+        },
+        {
+          "path": "/data/cluster/discoveryState",
+          "type": "string",
+          "required": true,
+          "enum": [
+            "DISCOVERED",
+            "CONFIGURED_ONLY",
+            "ABSENT"
+          ]
+        },
+        {
+          "path": "/data/cluster/healthState",
+          "type": "string",
+          "required": true,
+          "enum": [
+            "HEALTHY",
+            "DEGRADED",
+            "UNHEALTHY",
+            "UNKNOWN"
+          ]
+        },
+        {
+          "path": "/data/cluster/initialize",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/cluster/leader",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/cluster/managementState",
+          "type": "string",
+          "required": true,
+          "enum": [
+            "EXPLICIT",
+            "ALL_SELECTED",
+            "UNMANAGED"
+          ]
+        },
+        {
+          "path": "/data/cluster/members",
+          "type": "array",
+          "required": true
+        },
+        {
+          "path": "/data/cluster/members/*/apiUrl",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/cluster/members/*/host",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/cluster/members/*/name",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/data/cluster/members/*/patroniVersion",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/cluster/members/*/pendingRestart",
+          "type": "boolean",
+          "required": false
+        },
+        {
+          "path": "/data/cluster/members/*/pendingRestartReason",
+          "type": "object-map",
+          "required": false
+        },
+        {
+          "path": "/data/cluster/members/*/port",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "path": "/data/cluster/members/*/receiveLagBytes",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "path": "/data/cluster/members/*/receiveLsn",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/cluster/members/*/replayLagBytes",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "path": "/data/cluster/members/*/replayLsn",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/cluster/members/*/role",
+          "type": "string",
+          "required": true,
+          "enum": [
+            "leader",
+            "standby_leader",
+            "sync_standby",
+            "quorum_standby",
+            "replica"
+          ]
+        },
+        {
+          "path": "/data/cluster/members/*/scheduledRestart",
+          "type": "object",
+          "required": false
+        },
+        {
+          "path": "/data/cluster/members/*/scheduledRestart/postgresVersion",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/cluster/members/*/scheduledRestart/schedule",
+          "type": "string",
+          "required": false,
+          "format": "date-time"
+        },
+        {
+          "path": "/data/cluster/members/*/state",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/cluster/members/*/tags",
+          "type": "object-map",
+          "required": false
+        },
+        {
+          "path": "/data/cluster/members/*/target",
+          "type": "object",
+          "required": true
+        },
+        {
+          "path": "/data/cluster/members/*/target/context",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/data/cluster/members/*/target/group",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "path": "/data/cluster/members/*/target/member",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/cluster/members/*/target/namespace",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/data/cluster/members/*/target/scope",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/data/cluster/members/*/timeline",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "path": "/data/cluster/paused",
+          "type": "boolean",
+          "required": true
+        },
+        {
+          "path": "/data/cluster/reachabilityState",
+          "type": "string",
+          "required": true,
+          "enum": [
+            "REACHABLE",
+            "PARTIALLY_REACHABLE",
+            "UNREACHABLE",
+            "UNKNOWN"
+          ]
+        },
+        {
+          "path": "/data/cluster/revision",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "path": "/data/cluster/scheduledSwitchover",
+          "type": "object",
+          "required": false
+        },
+        {
+          "path": "/data/cluster/scheduledSwitchover/at",
+          "type": "string",
+          "required": false,
+          "format": "date-time"
+        },
+        {
+          "path": "/data/cluster/scheduledSwitchover/from",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/cluster/scheduledSwitchover/to",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/cluster/target",
+          "type": "object",
+          "required": true
+        },
+        {
+          "path": "/data/cluster/target/context",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/data/cluster/target/group",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "path": "/data/cluster/target/member",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/cluster/target/namespace",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/data/cluster/target/scope",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/data/members",
+          "type": "array",
+          "required": true
+        },
+        {
+          "path": "/data/members/*/depth",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "path": "/data/members/*/member",
+          "type": "object",
+          "required": true
+        },
+        {
+          "path": "/data/members/*/member/apiUrl",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/member/host",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/member/name",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/data/members/*/member/patroniVersion",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/member/pendingRestart",
+          "type": "boolean",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/member/pendingRestartReason",
+          "type": "object-map",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/member/port",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/member/receiveLagBytes",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/member/receiveLsn",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/member/replayLagBytes",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/member/replayLsn",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/member/role",
+          "type": "string",
+          "required": true,
+          "enum": [
+            "leader",
+            "standby_leader",
+            "sync_standby",
+            "quorum_standby",
+            "replica"
+          ]
+        },
+        {
+          "path": "/data/members/*/member/scheduledRestart",
+          "type": "object",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/member/scheduledRestart/postgresVersion",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/member/scheduledRestart/schedule",
+          "type": "string",
+          "required": false,
+          "format": "date-time"
+        },
+        {
+          "path": "/data/members/*/member/state",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/member/tags",
+          "type": "object-map",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/member/target",
+          "type": "object",
+          "required": true
+        },
+        {
+          "path": "/data/members/*/member/target/context",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/data/members/*/member/target/group",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/member/target/member",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/member/target/namespace",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/data/members/*/member/target/scope",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/data/members/*/member/timeline",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/parent",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/kind",
+          "type": "string",
+          "required": true,
+          "const": "ClusterTopology"
+        },
+        {
+          "path": "/metadata",
+          "type": "object",
+          "required": true
+        },
+        {
+          "path": "/metadata/observedAt",
+          "type": "string",
+          "required": true,
+          "format": "date-time"
+        },
+        {
+          "path": "/metadata/requestId",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/metadata/revision",
+          "type": "integer|string",
+          "required": false
+        },
+        {
+          "path": "/metadata/warnings",
+          "type": "array",
+          "required": true
+        }
+      ]
+    },
+    {
+      "kind": "ClusterTopologyList",
+      "dataType": "cli.machineTopologyList",
+      "golden": "internal/cli/testdata/machine-success/cluster-topology-list.golden.json",
+      "fields": [
+        {
+          "path": "/apiVersion",
+          "type": "string",
+          "required": true,
+          "const": "patroni.pgsty.com/v1alpha1"
+        },
+        {
+          "path": "/data",
+          "type": "object",
+          "required": true
+        },
+        {
+          "path": "/data/topologies",
+          "type": "array",
+          "required": true
+        },
+        {
+          "path": "/data/topologies/*/cluster",
+          "type": "object",
+          "required": true
+        },
+        {
+          "path": "/data/topologies/*/cluster/discoveryState",
+          "type": "string",
+          "required": true,
+          "enum": [
+            "DISCOVERED",
+            "CONFIGURED_ONLY",
+            "ABSENT"
+          ]
+        },
+        {
+          "path": "/data/topologies/*/cluster/healthState",
+          "type": "string",
+          "required": true,
+          "enum": [
+            "HEALTHY",
+            "DEGRADED",
+            "UNHEALTHY",
+            "UNKNOWN"
+          ]
+        },
+        {
+          "path": "/data/topologies/*/cluster/initialize",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/topologies/*/cluster/leader",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/topologies/*/cluster/managementState",
+          "type": "string",
+          "required": true,
+          "enum": [
+            "EXPLICIT",
+            "ALL_SELECTED",
+            "UNMANAGED"
+          ]
+        },
+        {
+          "path": "/data/topologies/*/cluster/members",
+          "type": "array",
+          "required": true
+        },
+        {
+          "path": "/data/topologies/*/cluster/members/*/apiUrl",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/topologies/*/cluster/members/*/host",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/topologies/*/cluster/members/*/name",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/data/topologies/*/cluster/members/*/patroniVersion",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/topologies/*/cluster/members/*/pendingRestart",
+          "type": "boolean",
+          "required": false
+        },
+        {
+          "path": "/data/topologies/*/cluster/members/*/pendingRestartReason",
+          "type": "object-map",
+          "required": false
+        },
+        {
+          "path": "/data/topologies/*/cluster/members/*/port",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "path": "/data/topologies/*/cluster/members/*/receiveLagBytes",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "path": "/data/topologies/*/cluster/members/*/receiveLsn",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/topologies/*/cluster/members/*/replayLagBytes",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "path": "/data/topologies/*/cluster/members/*/replayLsn",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/topologies/*/cluster/members/*/role",
+          "type": "string",
+          "required": true,
+          "enum": [
+            "leader",
+            "standby_leader",
+            "sync_standby",
+            "quorum_standby",
+            "replica"
+          ]
+        },
+        {
+          "path": "/data/topologies/*/cluster/members/*/scheduledRestart",
+          "type": "object",
+          "required": false
+        },
+        {
+          "path": "/data/topologies/*/cluster/members/*/scheduledRestart/postgresVersion",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/topologies/*/cluster/members/*/scheduledRestart/schedule",
+          "type": "string",
+          "required": false,
+          "format": "date-time"
+        },
+        {
+          "path": "/data/topologies/*/cluster/members/*/state",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/topologies/*/cluster/members/*/tags",
+          "type": "object-map",
+          "required": false
+        },
+        {
+          "path": "/data/topologies/*/cluster/members/*/target",
+          "type": "object",
+          "required": true
+        },
+        {
+          "path": "/data/topologies/*/cluster/members/*/target/context",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/data/topologies/*/cluster/members/*/target/group",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "path": "/data/topologies/*/cluster/members/*/target/member",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/topologies/*/cluster/members/*/target/namespace",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/data/topologies/*/cluster/members/*/target/scope",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/data/topologies/*/cluster/members/*/timeline",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "path": "/data/topologies/*/cluster/paused",
+          "type": "boolean",
+          "required": true
+        },
+        {
+          "path": "/data/topologies/*/cluster/reachabilityState",
+          "type": "string",
+          "required": true,
+          "enum": [
+            "REACHABLE",
+            "PARTIALLY_REACHABLE",
+            "UNREACHABLE",
+            "UNKNOWN"
+          ]
+        },
+        {
+          "path": "/data/topologies/*/cluster/revision",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "path": "/data/topologies/*/cluster/scheduledSwitchover",
+          "type": "object",
+          "required": false
+        },
+        {
+          "path": "/data/topologies/*/cluster/scheduledSwitchover/at",
+          "type": "string",
+          "required": false,
+          "format": "date-time"
+        },
+        {
+          "path": "/data/topologies/*/cluster/scheduledSwitchover/from",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/topologies/*/cluster/scheduledSwitchover/to",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/topologies/*/cluster/target",
+          "type": "object",
+          "required": true
+        },
+        {
+          "path": "/data/topologies/*/cluster/target/context",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/data/topologies/*/cluster/target/group",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "path": "/data/topologies/*/cluster/target/member",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/topologies/*/cluster/target/namespace",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/data/topologies/*/cluster/target/scope",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/data/topologies/*/members",
+          "type": "array",
+          "required": true
+        },
+        {
+          "path": "/data/topologies/*/members/*/depth",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "path": "/data/topologies/*/members/*/member",
+          "type": "object",
+          "required": true
+        },
+        {
+          "path": "/data/topologies/*/members/*/member/apiUrl",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/topologies/*/members/*/member/host",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/topologies/*/members/*/member/name",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/data/topologies/*/members/*/member/patroniVersion",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/topologies/*/members/*/member/pendingRestart",
+          "type": "boolean",
+          "required": false
+        },
+        {
+          "path": "/data/topologies/*/members/*/member/pendingRestartReason",
+          "type": "object-map",
+          "required": false
+        },
+        {
+          "path": "/data/topologies/*/members/*/member/port",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "path": "/data/topologies/*/members/*/member/receiveLagBytes",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "path": "/data/topologies/*/members/*/member/receiveLsn",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/topologies/*/members/*/member/replayLagBytes",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "path": "/data/topologies/*/members/*/member/replayLsn",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/topologies/*/members/*/member/role",
+          "type": "string",
+          "required": true,
+          "enum": [
+            "leader",
+            "standby_leader",
+            "sync_standby",
+            "quorum_standby",
+            "replica"
+          ]
+        },
+        {
+          "path": "/data/topologies/*/members/*/member/scheduledRestart",
+          "type": "object",
+          "required": false
+        },
+        {
+          "path": "/data/topologies/*/members/*/member/scheduledRestart/postgresVersion",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/topologies/*/members/*/member/scheduledRestart/schedule",
+          "type": "string",
+          "required": false,
+          "format": "date-time"
+        },
+        {
+          "path": "/data/topologies/*/members/*/member/state",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/topologies/*/members/*/member/tags",
+          "type": "object-map",
+          "required": false
+        },
+        {
+          "path": "/data/topologies/*/members/*/member/target",
+          "type": "object",
+          "required": true
+        },
+        {
+          "path": "/data/topologies/*/members/*/member/target/context",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/data/topologies/*/members/*/member/target/group",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "path": "/data/topologies/*/members/*/member/target/member",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/topologies/*/members/*/member/target/namespace",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/data/topologies/*/members/*/member/target/scope",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/data/topologies/*/members/*/member/timeline",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "path": "/data/topologies/*/members/*/parent",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/kind",
+          "type": "string",
+          "required": true,
+          "const": "ClusterTopologyList"
+        },
+        {
+          "path": "/metadata",
+          "type": "object",
+          "required": true
+        },
+        {
+          "path": "/metadata/observedAt",
+          "type": "string",
+          "required": true,
+          "format": "date-time"
+        },
+        {
+          "path": "/metadata/requestId",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/metadata/revision",
+          "type": "integer|string",
+          "required": false
+        },
+        {
+          "path": "/metadata/warnings",
+          "type": "array",
+          "required": true
+        }
+      ]
+    },
+    {
+      "kind": "ConfigEditResult",
+      "dataType": "control.ConfigEditData",
+      "golden": "internal/cli/testdata/machine-success/config-edit-result.golden.json",
+      "fields": [
+        {
+          "path": "/apiVersion",
+          "type": "string",
+          "required": true,
+          "const": "patroni.pgsty.com/v1alpha1"
+        },
+        {
+          "path": "/data",
+          "type": "object",
+          "required": true
+        },
+        {
+          "path": "/data/beforeRevision",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "path": "/data/changedPaths",
+          "type": "array",
+          "required": true
+        },
+        {
+          "path": "/data/dcsRevision",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "path": "/data/dcsSendState",
+          "type": "string",
+          "required": true,
+          "enum": [
+            "NOT_SENT",
+            "MAYBE_SENT",
+            "ACCEPTED"
+          ]
+        },
+        {
+          "path": "/data/noop",
+          "type": "boolean",
+          "required": true
+        },
+        {
+          "path": "/data/verification",
+          "type": "string",
+          "required": true,
+          "enum": [
+            "UNVERIFIED",
+            "VERIFIED_SUCCEEDED",
+            "VERIFIED_FAILED"
+          ]
+        },
+        {
+          "path": "/kind",
+          "type": "string",
+          "required": true,
+          "const": "ConfigEditResult"
+        },
+        {
+          "path": "/metadata",
+          "type": "object",
+          "required": true
+        },
+        {
+          "path": "/metadata/observedAt",
+          "type": "string",
+          "required": true,
+          "format": "date-time"
+        },
+        {
+          "path": "/metadata/requestId",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/metadata/revision",
+          "type": "integer|string",
+          "required": false
+        },
+        {
+          "path": "/metadata/warnings",
+          "type": "array",
+          "required": true
+        }
+      ]
+    },
+    {
+      "kind": "DSN",
+      "dataType": "control.DSNData",
+      "golden": "internal/cli/testdata/machine-success/dsn.golden.json",
+      "fields": [
+        {
+          "path": "/apiVersion",
+          "type": "string",
+          "required": true,
+          "const": "patroni.pgsty.com/v1alpha1"
+        },
+        {
+          "path": "/data",
+          "type": "object",
+          "required": true
+        },
+        {
+          "path": "/data/host",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/data/member",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/data/port",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "path": "/data/role",
+          "type": "string",
+          "required": true,
+          "enum": [
+            "leader",
+            "primary",
+            "standby-leader",
+            "replica",
+            "standby",
+            "any"
+          ]
+        },
+        {
+          "path": "/data/target",
+          "type": "object",
+          "required": true
+        },
+        {
+          "path": "/data/target/context",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/data/target/group",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "path": "/data/target/member",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/target/namespace",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/data/target/scope",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/kind",
+          "type": "string",
+          "required": true,
+          "const": "DSN"
+        },
+        {
+          "path": "/metadata",
+          "type": "object",
+          "required": true
+        },
+        {
+          "path": "/metadata/observedAt",
+          "type": "string",
+          "required": true,
+          "format": "date-time"
+        },
+        {
+          "path": "/metadata/requestId",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/metadata/revision",
+          "type": "integer|string",
+          "required": false
+        },
+        {
+          "path": "/metadata/warnings",
+          "type": "array",
+          "required": true
+        }
+      ]
+    },
+    {
+      "kind": "DemoteClusterResult",
+      "dataType": "control.ClusterRoleData",
+      "golden": "internal/cli/testdata/machine-success/demote-cluster-result.golden.json",
+      "fields": [
+        {
+          "path": "/apiVersion",
+          "type": "string",
+          "required": true,
+          "const": "patroni.pgsty.com/v1alpha1"
+        },
+        {
+          "path": "/data",
+          "type": "object",
+          "required": true
+        },
+        {
+          "path": "/data/dcsRevision",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "path": "/data/desiredRole",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/data/httpStatus",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "path": "/data/leader",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/noop",
+          "type": "boolean",
+          "required": true
+        },
+        {
+          "path": "/data/pendingConditions",
+          "type": "array",
+          "required": false
+        },
+        {
+          "path": "/data/previousLeader",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/data/restSendState",
+          "type": "string",
+          "required": true,
+          "enum": [
+            "NOT_SENT",
+            "MAYBE_SENT",
+            "ACCEPTED"
+          ]
+        },
+        {
+          "path": "/data/verification",
+          "type": "string",
+          "required": true,
+          "enum": [
+            "UNVERIFIED",
+            "VERIFIED_SUCCEEDED",
+            "VERIFIED_FAILED"
+          ]
+        },
+        {
+          "path": "/kind",
+          "type": "string",
+          "required": true,
+          "const": "DemoteClusterResult"
+        },
+        {
+          "path": "/metadata",
+          "type": "object",
+          "required": true
+        },
+        {
+          "path": "/metadata/observedAt",
+          "type": "string",
+          "required": true,
+          "format": "date-time"
+        },
+        {
+          "path": "/metadata/requestId",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/metadata/revision",
+          "type": "integer|string",
+          "required": false
+        },
+        {
+          "path": "/metadata/warnings",
+          "type": "array",
+          "required": true
+        }
+      ]
+    },
+    {
+      "kind": "DynamicConfig",
+      "dataType": "control.ConfigData",
+      "golden": "internal/cli/testdata/machine-success/dynamic-config.golden.json",
+      "fields": [
+        {
+          "path": "/apiVersion",
+          "type": "string",
+          "required": true,
+          "const": "patroni.pgsty.com/v1alpha1"
+        },
+        {
+          "path": "/data",
+          "type": "object",
+          "required": true
+        },
+        {
+          "path": "/data/config",
+          "type": "object-map",
+          "required": true
+        },
+        {
+          "path": "/data/revision",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "path": "/data/target",
+          "type": "object",
+          "required": true
+        },
+        {
+          "path": "/data/target/context",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/data/target/group",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "path": "/data/target/member",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/target/namespace",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/data/target/scope",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/kind",
+          "type": "string",
+          "required": true,
+          "const": "DynamicConfig"
+        },
+        {
+          "path": "/metadata",
+          "type": "object",
+          "required": true
+        },
+        {
+          "path": "/metadata/observedAt",
+          "type": "string",
+          "required": true,
+          "format": "date-time"
+        },
+        {
+          "path": "/metadata/requestId",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/metadata/revision",
+          "type": "integer|string",
+          "required": false
+        },
+        {
+          "path": "/metadata/warnings",
+          "type": "array",
+          "required": true
+        }
+      ]
+    },
+    {
+      "kind": "EffectiveConfiguration",
+      "dataType": "control.ConfigurationInspection",
+      "golden": "internal/cli/testdata/machine-success/effective-configuration.golden.json",
+      "fields": [
+        {
+          "path": "/apiVersion",
+          "type": "string",
+          "required": true,
+          "const": "patroni.pgsty.com/v1alpha1"
+        },
+        {
+          "path": "/data",
+          "type": "object",
+          "required": true
+        },
+        {
+          "path": "/data/effective",
+          "type": "object-map",
+          "required": true
+        },
+        {
+          "path": "/data/sources",
+          "type": "array",
+          "required": true
+        },
+        {
+          "path": "/data/sources/*/field",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/data/sources/*/layer",
+          "type": "string",
+          "required": true,
+          "enum": [
+            "default",
+            "file",
+            "context",
+            "environment",
+            "flag"
+          ]
+        },
+        {
+          "path": "/data/sources/*/name",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/data/target",
+          "type": "object",
+          "required": true
+        },
+        {
+          "path": "/data/target/context",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/data/target/group",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "path": "/data/target/member",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/target/namespace",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/data/target/scope",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/data/warnings",
+          "type": "array",
+          "required": true
+        },
+        {
+          "path": "/data/warnings/*/code",
+          "type": "string",
+          "required": true,
+          "enum": [
+            "SCHEMELESS_DCS_URL",
+            "INSECURE_REST_TLS"
+          ]
+        },
+        {
+          "path": "/data/warnings/*/field",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/data/warnings/*/message",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/kind",
+          "type": "string",
+          "required": true,
+          "const": "EffectiveConfiguration"
+        },
+        {
+          "path": "/metadata",
+          "type": "object",
+          "required": true
+        },
+        {
+          "path": "/metadata/observedAt",
+          "type": "string",
+          "required": true,
+          "format": "date-time"
+        },
+        {
+          "path": "/metadata/requestId",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/metadata/revision",
+          "type": "integer|string",
+          "required": false
+        },
+        {
+          "path": "/metadata/warnings",
+          "type": "array",
+          "required": true
+        }
+      ]
+    },
+    {
+      "kind": "Error",
+      "dataType": "cli.machineError",
+      "golden": "internal/cli/testdata/machine-runtime-error.golden.json",
+      "fields": [
+        {
+          "path": "/apiVersion",
+          "type": "string",
+          "required": true,
+          "const": "patroni.pgsty.com/v1alpha1"
+        },
+        {
+          "path": "/error",
+          "type": "object",
+          "required": true
+        },
+        {
+          "path": "/error/category",
+          "type": "string",
+          "required": true,
+          "enum": [
+            "USAGE",
+            "CONFIG",
+            "UNSUPPORTED",
+            "AUTH",
+            "TLS",
+            "NOT_FOUND",
+            "CONFLICT",
+            "UNREACHABLE",
+            "FAILED",
+            "UNKNOWN",
+            "INTERNAL"
+          ]
+        },
+        {
+          "path": "/error/cause",
+          "type": "string",
+          "required": true,
+          "enum": [
+            "INVALID_INPUT",
+            "INVALID_CONFIGURATION",
+            "UNSUPPORTED_PATRONI_VERSION",
+            "AUTHENTICATION_REJECTED",
+            "TLS_CONFIGURATION_OR_VERIFICATION_FAILED",
+            "TARGET_NOT_FOUND",
+            "CONCURRENT_STATE_CONFLICT",
+            "UPSTREAM_UNREACHABLE",
+            "OPERATION_REJECTED",
+            "OUTCOME_UNCONFIRMED",
+            "INTERNAL_INVARIANT"
+          ]
+        },
+        {
+          "path": "/error/evidence",
+          "type": "array",
+          "required": true
+        },
+        {
+          "path": "/error/evidence/*/observedAt",
+          "type": "string",
+          "required": true,
+          "format": "date-time"
+        },
+        {
+          "path": "/error/evidence/*/path",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/error/evidence/*/revision",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/error/evidence/*/sendState",
+          "type": "string",
+          "required": false,
+          "enum": [
+            "NOT_SENT",
+            "MAYBE_SENT",
+            "ACCEPTED"
+          ]
+        },
+        {
+          "path": "/error/evidence/*/source",
+          "type": "string",
+          "required": true,
+          "enum": [
+            "LOCAL",
+            "DCS",
+            "PATRONI",
+            "POSTGRES",
+            "CONTROL"
+          ]
+        },
+        {
+          "path": "/error/evidence/*/summary",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/error/message",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/error/nextActions",
+          "type": "array",
+          "required": true
+        },
+        {
+          "path": "/error/operation",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/error/retryable",
+          "type": "boolean",
+          "required": true
+        },
+        {
+          "path": "/error/target",
+          "type": "object",
+          "required": true
+        },
+        {
+          "path": "/error/target/context",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/error/target/group",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "path": "/error/target/member",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/error/target/namespace",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/error/target/scope",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/kind",
+          "type": "string",
+          "required": true,
+          "const": "Error"
+        },
+        {
+          "path": "/metadata",
+          "type": "object",
+          "required": true
+        },
+        {
+          "path": "/metadata/observedAt",
+          "type": "string",
+          "required": true,
+          "format": "date-time"
+        },
+        {
+          "path": "/metadata/requestId",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/metadata/revision",
+          "type": "integer|string",
+          "required": false
+        },
+        {
+          "path": "/metadata/warnings",
+          "type": "array",
+          "required": true
+        }
+      ]
+    },
+    {
+      "kind": "FailoverResult",
+      "dataType": "control.ClusterWriteData",
+      "golden": "internal/cli/testdata/machine-success/failover-result.golden.json",
+      "fields": [
+        {
+          "path": "/apiVersion",
+          "type": "string",
+          "required": true,
+          "const": "patroni.pgsty.com/v1alpha1"
+        },
+        {
+          "path": "/data",
+          "type": "object",
+          "required": true
+        },
+        {
+          "path": "/data/candidate",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/dcsRevision",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "path": "/data/dcsSendState",
+          "type": "string",
+          "required": false,
+          "enum": [
+            "NOT_SENT",
+            "MAYBE_SENT",
+            "ACCEPTED"
+          ]
+        },
+        {
+          "path": "/data/httpStatus",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "path": "/data/leader",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/legacyEndpoint",
+          "type": "boolean",
+          "required": true
+        },
+        {
+          "path": "/data/restSendState",
+          "type": "string",
+          "required": true,
+          "enum": [
+            "NOT_SENT",
+            "MAYBE_SENT",
+            "ACCEPTED"
+          ]
+        },
+        {
+          "path": "/data/scheduledAt",
+          "type": "string",
+          "required": false,
+          "format": "date-time"
+        },
+        {
+          "path": "/data/verification",
+          "type": "string",
+          "required": true,
+          "enum": [
+            "UNVERIFIED",
+            "VERIFIED_SUCCEEDED",
+            "VERIFIED_FAILED"
+          ]
+        },
+        {
+          "path": "/kind",
+          "type": "string",
+          "required": true,
+          "const": "FailoverResult"
+        },
+        {
+          "path": "/metadata",
+          "type": "object",
+          "required": true
+        },
+        {
+          "path": "/metadata/observedAt",
+          "type": "string",
+          "required": true,
+          "format": "date-time"
+        },
+        {
+          "path": "/metadata/requestId",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/metadata/revision",
+          "type": "integer|string",
+          "required": false
+        },
+        {
+          "path": "/metadata/warnings",
+          "type": "array",
+          "required": true
+        }
+      ]
+    },
+    {
+      "kind": "FlushResult",
+      "dataType": "control.FlushData",
+      "golden": "internal/cli/testdata/machine-success/flush-result.golden.json",
+      "fields": [
+        {
+          "path": "/apiVersion",
+          "type": "string",
+          "required": true,
+          "const": "patroni.pgsty.com/v1alpha1"
+        },
+        {
+          "path": "/data",
+          "type": "object",
+          "required": true
+        },
+        {
+          "path": "/data/dcsRevision",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "path": "/data/dcsSendState",
+          "type": "string",
+          "required": false,
+          "enum": [
+            "NOT_SENT",
+            "MAYBE_SENT",
+            "ACCEPTED"
+          ]
+        },
+        {
+          "path": "/data/event",
+          "type": "string",
+          "required": true,
+          "enum": [
+            "restart",
+            "switchover"
+          ]
+        },
+        {
+          "path": "/data/noop",
+          "type": "boolean",
+          "required": true
+        },
+        {
+          "path": "/data/restSendState",
+          "type": "string",
+          "required": true,
+          "enum": [
+            "NOT_SENT",
+            "MAYBE_SENT",
+            "ACCEPTED"
+          ]
+        },
+        {
+          "path": "/data/results",
+          "type": "array",
+          "required": false
+        },
+        {
+          "path": "/data/results/*/error",
+          "type": "object",
+          "required": false
+        },
+        {
+          "path": "/data/results/*/error/category",
+          "type": "string",
+          "required": false,
+          "enum": [
+            "USAGE",
+            "CONFIG",
+            "UNSUPPORTED",
+            "AUTH",
+            "TLS",
+            "NOT_FOUND",
+            "CONFLICT",
+            "UNREACHABLE",
+            "FAILED",
+            "UNKNOWN",
+            "INTERNAL"
+          ]
+        },
+        {
+          "path": "/data/results/*/error/evidence",
+          "type": "array",
+          "required": false
+        },
+        {
+          "path": "/data/results/*/error/evidence/*/observedAt",
+          "type": "string",
+          "required": false,
+          "format": "date-time"
+        },
+        {
+          "path": "/data/results/*/error/evidence/*/path",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/results/*/error/evidence/*/revision",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/results/*/error/evidence/*/sendState",
+          "type": "string",
+          "required": false,
+          "enum": [
+            "NOT_SENT",
+            "MAYBE_SENT",
+            "ACCEPTED"
+          ]
+        },
+        {
+          "path": "/data/results/*/error/evidence/*/source",
+          "type": "string",
+          "required": false,
+          "enum": [
+            "LOCAL",
+            "DCS",
+            "PATRONI",
+            "POSTGRES",
+            "CONTROL"
+          ]
+        },
+        {
+          "path": "/data/results/*/error/evidence/*/summary",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/results/*/error/message",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/results/*/error/operation",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/results/*/error/retryable",
+          "type": "boolean",
+          "required": false
+        },
+        {
+          "path": "/data/results/*/error/target",
+          "type": "object",
+          "required": false
+        },
+        {
+          "path": "/data/results/*/error/target/context",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/results/*/error/target/group",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "path": "/data/results/*/error/target/member",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/results/*/error/target/namespace",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/results/*/error/target/scope",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/results/*/evidence",
+          "type": "array",
+          "required": false
+        },
+        {
+          "path": "/data/results/*/evidence/*/observedAt",
+          "type": "string",
+          "required": false,
+          "format": "date-time"
+        },
+        {
+          "path": "/data/results/*/evidence/*/path",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/results/*/evidence/*/revision",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/results/*/evidence/*/sendState",
+          "type": "string",
+          "required": false,
+          "enum": [
+            "NOT_SENT",
+            "MAYBE_SENT",
+            "ACCEPTED"
+          ]
+        },
+        {
+          "path": "/data/results/*/evidence/*/source",
+          "type": "string",
+          "required": false,
+          "enum": [
+            "LOCAL",
+            "DCS",
+            "PATRONI",
+            "POSTGRES",
+            "CONTROL"
+          ]
+        },
+        {
+          "path": "/data/results/*/evidence/*/summary",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/results/*/httpStatus",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "path": "/data/results/*/outcome",
+          "type": "string",
+          "required": false,
+          "enum": [
+            "SUCCEEDED",
+            "FAILED",
+            "UNKNOWN"
+          ]
+        },
+        {
+          "path": "/data/results/*/sendState",
+          "type": "string",
+          "required": false,
+          "enum": [
+            "NOT_SENT",
+            "MAYBE_SENT",
+            "ACCEPTED"
+          ]
+        },
+        {
+          "path": "/data/results/*/summary",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/results/*/target",
+          "type": "object",
+          "required": false
+        },
+        {
+          "path": "/data/results/*/target/context",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/results/*/target/group",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "path": "/data/results/*/target/member",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/results/*/target/namespace",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/results/*/target/scope",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/results/*/verification",
+          "type": "string",
+          "required": false,
+          "enum": [
+            "UNVERIFIED",
+            "VERIFIED_SUCCEEDED",
+            "VERIFIED_FAILED"
+          ]
+        },
+        {
+          "path": "/data/verification",
+          "type": "string",
+          "required": true,
+          "enum": [
+            "UNVERIFIED",
+            "VERIFIED_SUCCEEDED",
+            "VERIFIED_FAILED"
+          ]
+        },
+        {
+          "path": "/kind",
+          "type": "string",
+          "required": true,
+          "const": "FlushResult"
+        },
+        {
+          "path": "/metadata",
+          "type": "object",
+          "required": true
+        },
+        {
+          "path": "/metadata/observedAt",
+          "type": "string",
+          "required": true,
+          "format": "date-time"
+        },
+        {
+          "path": "/metadata/requestId",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/metadata/revision",
+          "type": "integer|string",
+          "required": false
+        },
+        {
+          "path": "/metadata/warnings",
+          "type": "array",
+          "required": true
+        }
+      ]
+    },
+    {
+      "kind": "PauseResult",
+      "dataType": "control.PauseData",
+      "golden": "internal/cli/testdata/machine-success/pause-result.golden.json",
+      "fields": [
+        {
+          "path": "/apiVersion",
+          "type": "string",
+          "required": true,
+          "const": "patroni.pgsty.com/v1alpha1"
+        },
+        {
+          "path": "/data",
+          "type": "object",
+          "required": true
+        },
+        {
+          "path": "/data/dcsRevision",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "path": "/data/noop",
+          "type": "boolean",
+          "required": true
+        },
+        {
+          "path": "/data/paused",
+          "type": "boolean",
+          "required": true
+        },
+        {
+          "path": "/data/pendingMembers",
+          "type": "array",
+          "required": false
+        },
+        {
+          "path": "/data/restSendState",
+          "type": "string",
+          "required": true,
+          "enum": [
+            "NOT_SENT",
+            "MAYBE_SENT",
+            "ACCEPTED"
+          ]
+        },
+        {
+          "path": "/data/results",
+          "type": "array",
+          "required": false
+        },
+        {
+          "path": "/data/results/*/error",
+          "type": "object",
+          "required": false
+        },
+        {
+          "path": "/data/results/*/error/category",
+          "type": "string",
+          "required": false,
+          "enum": [
+            "USAGE",
+            "CONFIG",
+            "UNSUPPORTED",
+            "AUTH",
+            "TLS",
+            "NOT_FOUND",
+            "CONFLICT",
+            "UNREACHABLE",
+            "FAILED",
+            "UNKNOWN",
+            "INTERNAL"
+          ]
+        },
+        {
+          "path": "/data/results/*/error/evidence",
+          "type": "array",
+          "required": false
+        },
+        {
+          "path": "/data/results/*/error/evidence/*/observedAt",
+          "type": "string",
+          "required": false,
+          "format": "date-time"
+        },
+        {
+          "path": "/data/results/*/error/evidence/*/path",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/results/*/error/evidence/*/revision",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/results/*/error/evidence/*/sendState",
+          "type": "string",
+          "required": false,
+          "enum": [
+            "NOT_SENT",
+            "MAYBE_SENT",
+            "ACCEPTED"
+          ]
+        },
+        {
+          "path": "/data/results/*/error/evidence/*/source",
+          "type": "string",
+          "required": false,
+          "enum": [
+            "LOCAL",
+            "DCS",
+            "PATRONI",
+            "POSTGRES",
+            "CONTROL"
+          ]
+        },
+        {
+          "path": "/data/results/*/error/evidence/*/summary",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/results/*/error/message",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/results/*/error/operation",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/results/*/error/retryable",
+          "type": "boolean",
+          "required": false
+        },
+        {
+          "path": "/data/results/*/error/target",
+          "type": "object",
+          "required": false
+        },
+        {
+          "path": "/data/results/*/error/target/context",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/results/*/error/target/group",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "path": "/data/results/*/error/target/member",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/results/*/error/target/namespace",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/results/*/error/target/scope",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/results/*/evidence",
+          "type": "array",
+          "required": false
+        },
+        {
+          "path": "/data/results/*/evidence/*/observedAt",
+          "type": "string",
+          "required": false,
+          "format": "date-time"
+        },
+        {
+          "path": "/data/results/*/evidence/*/path",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/results/*/evidence/*/revision",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/results/*/evidence/*/sendState",
+          "type": "string",
+          "required": false,
+          "enum": [
+            "NOT_SENT",
+            "MAYBE_SENT",
+            "ACCEPTED"
+          ]
+        },
+        {
+          "path": "/data/results/*/evidence/*/source",
+          "type": "string",
+          "required": false,
+          "enum": [
+            "LOCAL",
+            "DCS",
+            "PATRONI",
+            "POSTGRES",
+            "CONTROL"
+          ]
+        },
+        {
+          "path": "/data/results/*/evidence/*/summary",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/results/*/httpStatus",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "path": "/data/results/*/outcome",
+          "type": "string",
+          "required": false,
+          "enum": [
+            "SUCCEEDED",
+            "FAILED",
+            "UNKNOWN"
+          ]
+        },
+        {
+          "path": "/data/results/*/sendState",
+          "type": "string",
+          "required": false,
+          "enum": [
+            "NOT_SENT",
+            "MAYBE_SENT",
+            "ACCEPTED"
+          ]
+        },
+        {
+          "path": "/data/results/*/summary",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/results/*/target",
+          "type": "object",
+          "required": false
+        },
+        {
+          "path": "/data/results/*/target/context",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/results/*/target/group",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "path": "/data/results/*/target/member",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/results/*/target/namespace",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/results/*/target/scope",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/results/*/verification",
+          "type": "string",
+          "required": false,
+          "enum": [
+            "UNVERIFIED",
+            "VERIFIED_SUCCEEDED",
+            "VERIFIED_FAILED"
+          ]
+        },
+        {
+          "path": "/data/verification",
+          "type": "string",
+          "required": true,
+          "enum": [
+            "UNVERIFIED",
+            "VERIFIED_SUCCEEDED",
+            "VERIFIED_FAILED"
+          ]
+        },
+        {
+          "path": "/data/wait",
+          "type": "boolean",
+          "required": true
+        },
+        {
+          "path": "/kind",
+          "type": "string",
+          "required": true,
+          "const": "PauseResult"
+        },
+        {
+          "path": "/metadata",
+          "type": "object",
+          "required": true
+        },
+        {
+          "path": "/metadata/observedAt",
+          "type": "string",
+          "required": true,
+          "format": "date-time"
+        },
+        {
+          "path": "/metadata/requestId",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/metadata/revision",
+          "type": "integer|string",
+          "required": false
+        },
+        {
+          "path": "/metadata/warnings",
+          "type": "array",
+          "required": true
+        }
+      ]
+    },
+    {
+      "kind": "PromoteClusterResult",
+      "dataType": "control.ClusterRoleData",
+      "golden": "internal/cli/testdata/machine-success/promote-cluster-result.golden.json",
+      "fields": [
+        {
+          "path": "/apiVersion",
+          "type": "string",
+          "required": true,
+          "const": "patroni.pgsty.com/v1alpha1"
+        },
+        {
+          "path": "/data",
+          "type": "object",
+          "required": true
+        },
+        {
+          "path": "/data/dcsRevision",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "path": "/data/desiredRole",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/data/httpStatus",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "path": "/data/leader",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/noop",
+          "type": "boolean",
+          "required": true
+        },
+        {
+          "path": "/data/pendingConditions",
+          "type": "array",
+          "required": false
+        },
+        {
+          "path": "/data/previousLeader",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/data/restSendState",
+          "type": "string",
+          "required": true,
+          "enum": [
+            "NOT_SENT",
+            "MAYBE_SENT",
+            "ACCEPTED"
+          ]
+        },
+        {
+          "path": "/data/verification",
+          "type": "string",
+          "required": true,
+          "enum": [
+            "UNVERIFIED",
+            "VERIFIED_SUCCEEDED",
+            "VERIFIED_FAILED"
+          ]
+        },
+        {
+          "path": "/kind",
+          "type": "string",
+          "required": true,
+          "const": "PromoteClusterResult"
+        },
+        {
+          "path": "/metadata",
+          "type": "object",
+          "required": true
+        },
+        {
+          "path": "/metadata/observedAt",
+          "type": "string",
+          "required": true,
+          "format": "date-time"
+        },
+        {
+          "path": "/metadata/requestId",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/metadata/revision",
+          "type": "integer|string",
+          "required": false
+        },
+        {
+          "path": "/metadata/warnings",
+          "type": "array",
+          "required": true
+        }
+      ]
+    },
+    {
+      "kind": "QueryResult",
+      "dataType": "control.QueryData",
+      "golden": "internal/cli/testdata/machine-success/query-result.golden.json",
+      "fields": [
+        {
+          "path": "/apiVersion",
+          "type": "string",
+          "required": true,
+          "const": "patroni.pgsty.com/v1alpha1"
+        },
+        {
+          "path": "/data",
+          "type": "object",
+          "required": true
+        },
+        {
+          "path": "/data/error",
+          "type": "object",
+          "required": false
+        },
+        {
+          "path": "/data/error/kind",
+          "type": "string",
+          "required": false,
+          "enum": [
+            "NO_CONNECTION",
+            "DATABASE",
+            "ROLE_MISMATCH"
+          ]
+        },
+        {
+          "path": "/data/error/message",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/error/sqlState",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/member",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/result",
+          "type": "object",
+          "required": true
+        },
+        {
+          "path": "/data/result/sets",
+          "type": "array",
+          "required": true
+        },
+        {
+          "path": "/data/result/sets/*/columns",
+          "type": "array",
+          "required": true
+        },
+        {
+          "path": "/data/result/sets/*/columns/*/dataTypeOID",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "path": "/data/result/sets/*/columns/*/dataTypeSize",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "path": "/data/result/sets/*/columns/*/format",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "path": "/data/result/sets/*/columns/*/name",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/data/result/sets/*/columns/*/tableAttributeNumber",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "path": "/data/result/sets/*/columns/*/tableOID",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "path": "/data/result/sets/*/columns/*/typeModifier",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "path": "/data/result/sets/*/commandTag",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/data/result/sets/*/index",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "path": "/data/result/sets/*/rows",
+          "type": "array",
+          "required": true
+        },
+        {
+          "path": "/data/result/sets/*/rows/*/*/bytes",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "path": "/data/result/sets/*/rows/*/*/null",
+          "type": "boolean",
+          "required": true
+        },
+        {
+          "path": "/data/result/sets/*/rows/*/*/text",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/result/sets/*/rowsAffected",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "path": "/data/result/sets/*/truncated",
+          "type": "boolean",
+          "required": true
+        },
+        {
+          "path": "/data/result/summary",
+          "type": "object",
+          "required": true
+        },
+        {
+          "path": "/data/result/summary/emittedBytes",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "path": "/data/result/summary/emittedRows",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "path": "/data/result/summary/observedBytes",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "path": "/data/result/summary/observedRows",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "path": "/data/result/summary/results",
+          "type": "array",
+          "required": true
+        },
+        {
+          "path": "/data/result/summary/results/*/columns",
+          "type": "array",
+          "required": true
+        },
+        {
+          "path": "/data/result/summary/results/*/columns/*/dataTypeOID",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "path": "/data/result/summary/results/*/columns/*/dataTypeSize",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "path": "/data/result/summary/results/*/columns/*/format",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "path": "/data/result/summary/results/*/columns/*/name",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/data/result/summary/results/*/columns/*/tableAttributeNumber",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "path": "/data/result/summary/results/*/columns/*/tableOID",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "path": "/data/result/summary/results/*/columns/*/typeModifier",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "path": "/data/result/summary/results/*/commandTag",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/data/result/summary/results/*/emittedBytes",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "path": "/data/result/summary/results/*/emittedRows",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "path": "/data/result/summary/results/*/index",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "path": "/data/result/summary/results/*/observedBytes",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "path": "/data/result/summary/results/*/observedRows",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "path": "/data/result/summary/results/*/rowsAffected",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "path": "/data/result/summary/results/*/truncated",
+          "type": "boolean",
+          "required": true
+        },
+        {
+          "path": "/data/result/summary/truncated",
+          "type": "boolean",
+          "required": true
+        },
+        {
+          "path": "/data/target",
+          "type": "object",
+          "required": true
+        },
+        {
+          "path": "/data/target/context",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/data/target/group",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "path": "/data/target/member",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/target/namespace",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/data/target/scope",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/kind",
+          "type": "string",
+          "required": true,
+          "const": "QueryResult"
+        },
+        {
+          "path": "/metadata",
+          "type": "object",
+          "required": true
+        },
+        {
+          "path": "/metadata/observedAt",
+          "type": "string",
+          "required": true,
+          "format": "date-time"
+        },
+        {
+          "path": "/metadata/requestId",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/metadata/revision",
+          "type": "integer|string",
+          "required": false
+        },
+        {
+          "path": "/metadata/warnings",
+          "type": "array",
+          "required": true
+        }
+      ]
+    },
+    {
+      "kind": "ReinitializeResult",
+      "dataType": "control.BatchWriteData",
+      "golden": "internal/cli/testdata/machine-success/reinitialize-result.golden.json",
+      "fields": [
+        {
+          "path": "/apiVersion",
+          "type": "string",
+          "required": true,
+          "const": "patroni.pgsty.com/v1alpha1"
+        },
+        {
+          "path": "/data",
+          "type": "object",
+          "required": true
+        },
+        {
+          "path": "/data/members",
+          "type": "array",
+          "required": true
+        },
+        {
+          "path": "/data/members/*/error",
+          "type": "object",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/error/category",
+          "type": "string",
+          "required": false,
+          "enum": [
+            "USAGE",
+            "CONFIG",
+            "UNSUPPORTED",
+            "AUTH",
+            "TLS",
+            "NOT_FOUND",
+            "CONFLICT",
+            "UNREACHABLE",
+            "FAILED",
+            "UNKNOWN",
+            "INTERNAL"
+          ]
+        },
+        {
+          "path": "/data/members/*/error/evidence",
+          "type": "array",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/error/evidence/*/observedAt",
+          "type": "string",
+          "required": false,
+          "format": "date-time"
+        },
+        {
+          "path": "/data/members/*/error/evidence/*/path",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/error/evidence/*/revision",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/error/evidence/*/sendState",
+          "type": "string",
+          "required": false,
+          "enum": [
+            "NOT_SENT",
+            "MAYBE_SENT",
+            "ACCEPTED"
+          ]
+        },
+        {
+          "path": "/data/members/*/error/evidence/*/source",
+          "type": "string",
+          "required": false,
+          "enum": [
+            "LOCAL",
+            "DCS",
+            "PATRONI",
+            "POSTGRES",
+            "CONTROL"
+          ]
+        },
+        {
+          "path": "/data/members/*/error/evidence/*/summary",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/error/message",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/error/operation",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/error/retryable",
+          "type": "boolean",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/error/target",
+          "type": "object",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/error/target/context",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/error/target/group",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/error/target/member",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/error/target/namespace",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/error/target/scope",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/evidence",
+          "type": "array",
+          "required": true
+        },
+        {
+          "path": "/data/members/*/evidence/*/observedAt",
+          "type": "string",
+          "required": true,
+          "format": "date-time"
+        },
+        {
+          "path": "/data/members/*/evidence/*/path",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/evidence/*/revision",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/evidence/*/sendState",
+          "type": "string",
+          "required": false,
+          "enum": [
+            "NOT_SENT",
+            "MAYBE_SENT",
+            "ACCEPTED"
+          ]
+        },
+        {
+          "path": "/data/members/*/evidence/*/source",
+          "type": "string",
+          "required": true,
+          "enum": [
+            "LOCAL",
+            "DCS",
+            "PATRONI",
+            "POSTGRES",
+            "CONTROL"
+          ]
+        },
+        {
+          "path": "/data/members/*/evidence/*/summary",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/data/members/*/httpStatus",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/outcome",
+          "type": "string",
+          "required": true,
+          "enum": [
+            "SUCCEEDED",
+            "FAILED",
+            "UNKNOWN"
+          ]
+        },
+        {
+          "path": "/data/members/*/sendState",
+          "type": "string",
+          "required": true,
+          "enum": [
+            "NOT_SENT",
+            "MAYBE_SENT",
+            "ACCEPTED"
+          ]
+        },
+        {
+          "path": "/data/members/*/summary",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/data/members/*/target",
+          "type": "object",
+          "required": true
+        },
+        {
+          "path": "/data/members/*/target/context",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/data/members/*/target/group",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/target/member",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/target/namespace",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/data/members/*/target/scope",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/data/members/*/verification",
+          "type": "string",
+          "required": true,
+          "enum": [
+            "UNVERIFIED",
+            "VERIFIED_SUCCEEDED",
+            "VERIFIED_FAILED"
+          ]
+        },
+        {
+          "path": "/kind",
+          "type": "string",
+          "required": true,
+          "const": "ReinitializeResult"
+        },
+        {
+          "path": "/metadata",
+          "type": "object",
+          "required": true
+        },
+        {
+          "path": "/metadata/observedAt",
+          "type": "string",
+          "required": true,
+          "format": "date-time"
+        },
+        {
+          "path": "/metadata/requestId",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/metadata/revision",
+          "type": "integer|string",
+          "required": false
+        },
+        {
+          "path": "/metadata/warnings",
+          "type": "array",
+          "required": true
+        }
+      ]
+    },
+    {
+      "kind": "ReloadResult",
+      "dataType": "control.BatchWriteData",
+      "golden": "internal/cli/testdata/machine-success/reload-result.golden.json",
+      "fields": [
+        {
+          "path": "/apiVersion",
+          "type": "string",
+          "required": true,
+          "const": "patroni.pgsty.com/v1alpha1"
+        },
+        {
+          "path": "/data",
+          "type": "object",
+          "required": true
+        },
+        {
+          "path": "/data/members",
+          "type": "array",
+          "required": true
+        },
+        {
+          "path": "/data/members/*/error",
+          "type": "object",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/error/category",
+          "type": "string",
+          "required": false,
+          "enum": [
+            "USAGE",
+            "CONFIG",
+            "UNSUPPORTED",
+            "AUTH",
+            "TLS",
+            "NOT_FOUND",
+            "CONFLICT",
+            "UNREACHABLE",
+            "FAILED",
+            "UNKNOWN",
+            "INTERNAL"
+          ]
+        },
+        {
+          "path": "/data/members/*/error/evidence",
+          "type": "array",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/error/evidence/*/observedAt",
+          "type": "string",
+          "required": false,
+          "format": "date-time"
+        },
+        {
+          "path": "/data/members/*/error/evidence/*/path",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/error/evidence/*/revision",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/error/evidence/*/sendState",
+          "type": "string",
+          "required": false,
+          "enum": [
+            "NOT_SENT",
+            "MAYBE_SENT",
+            "ACCEPTED"
+          ]
+        },
+        {
+          "path": "/data/members/*/error/evidence/*/source",
+          "type": "string",
+          "required": false,
+          "enum": [
+            "LOCAL",
+            "DCS",
+            "PATRONI",
+            "POSTGRES",
+            "CONTROL"
+          ]
+        },
+        {
+          "path": "/data/members/*/error/evidence/*/summary",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/error/message",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/error/operation",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/error/retryable",
+          "type": "boolean",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/error/target",
+          "type": "object",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/error/target/context",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/error/target/group",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/error/target/member",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/error/target/namespace",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/error/target/scope",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/evidence",
+          "type": "array",
+          "required": true
+        },
+        {
+          "path": "/data/members/*/evidence/*/observedAt",
+          "type": "string",
+          "required": true,
+          "format": "date-time"
+        },
+        {
+          "path": "/data/members/*/evidence/*/path",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/evidence/*/revision",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/evidence/*/sendState",
+          "type": "string",
+          "required": false,
+          "enum": [
+            "NOT_SENT",
+            "MAYBE_SENT",
+            "ACCEPTED"
+          ]
+        },
+        {
+          "path": "/data/members/*/evidence/*/source",
+          "type": "string",
+          "required": true,
+          "enum": [
+            "LOCAL",
+            "DCS",
+            "PATRONI",
+            "POSTGRES",
+            "CONTROL"
+          ]
+        },
+        {
+          "path": "/data/members/*/evidence/*/summary",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/data/members/*/httpStatus",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/outcome",
+          "type": "string",
+          "required": true,
+          "enum": [
+            "SUCCEEDED",
+            "FAILED",
+            "UNKNOWN"
+          ]
+        },
+        {
+          "path": "/data/members/*/sendState",
+          "type": "string",
+          "required": true,
+          "enum": [
+            "NOT_SENT",
+            "MAYBE_SENT",
+            "ACCEPTED"
+          ]
+        },
+        {
+          "path": "/data/members/*/summary",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/data/members/*/target",
+          "type": "object",
+          "required": true
+        },
+        {
+          "path": "/data/members/*/target/context",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/data/members/*/target/group",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/target/member",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/target/namespace",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/data/members/*/target/scope",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/data/members/*/verification",
+          "type": "string",
+          "required": true,
+          "enum": [
+            "UNVERIFIED",
+            "VERIFIED_SUCCEEDED",
+            "VERIFIED_FAILED"
+          ]
+        },
+        {
+          "path": "/kind",
+          "type": "string",
+          "required": true,
+          "const": "ReloadResult"
+        },
+        {
+          "path": "/metadata",
+          "type": "object",
+          "required": true
+        },
+        {
+          "path": "/metadata/observedAt",
+          "type": "string",
+          "required": true,
+          "format": "date-time"
+        },
+        {
+          "path": "/metadata/requestId",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/metadata/revision",
+          "type": "integer|string",
+          "required": false
+        },
+        {
+          "path": "/metadata/warnings",
+          "type": "array",
+          "required": true
+        }
+      ]
+    },
+    {
+      "kind": "RemoveResult",
+      "dataType": "control.RemoveData",
+      "golden": "internal/cli/testdata/machine-success/remove-result.golden.json",
+      "fields": [
+        {
+          "path": "/apiVersion",
+          "type": "string",
+          "required": true,
+          "const": "patroni.pgsty.com/v1alpha1"
+        },
+        {
+          "path": "/data",
+          "type": "object",
+          "required": true
+        },
+        {
+          "path": "/data/dcsRevision",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "path": "/data/dcsSendState",
+          "type": "string",
+          "required": true,
+          "enum": [
+            "NOT_SENT",
+            "MAYBE_SENT",
+            "ACCEPTED"
+          ]
+        },
+        {
+          "path": "/data/deleted",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "path": "/data/expectedKeys",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "path": "/data/noop",
+          "type": "boolean",
+          "required": true
+        },
+        {
+          "path": "/data/remainingKeys",
+          "type": "array",
+          "required": false
+        },
+        {
+          "path": "/data/verification",
+          "type": "string",
+          "required": true,
+          "enum": [
+            "UNVERIFIED",
+            "VERIFIED_SUCCEEDED",
+            "VERIFIED_FAILED"
+          ]
+        },
+        {
+          "path": "/kind",
+          "type": "string",
+          "required": true,
+          "const": "RemoveResult"
+        },
+        {
+          "path": "/metadata",
+          "type": "object",
+          "required": true
+        },
+        {
+          "path": "/metadata/observedAt",
+          "type": "string",
+          "required": true,
+          "format": "date-time"
+        },
+        {
+          "path": "/metadata/requestId",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/metadata/revision",
+          "type": "integer|string",
+          "required": false
+        },
+        {
+          "path": "/metadata/warnings",
+          "type": "array",
+          "required": true
+        }
+      ]
+    },
+    {
+      "kind": "RestartResult",
+      "dataType": "control.BatchWriteData",
+      "golden": "internal/cli/testdata/machine-success/restart-result.golden.json",
+      "fields": [
+        {
+          "path": "/apiVersion",
+          "type": "string",
+          "required": true,
+          "const": "patroni.pgsty.com/v1alpha1"
+        },
+        {
+          "path": "/data",
+          "type": "object",
+          "required": true
+        },
+        {
+          "path": "/data/members",
+          "type": "array",
+          "required": true
+        },
+        {
+          "path": "/data/members/*/error",
+          "type": "object",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/error/category",
+          "type": "string",
+          "required": false,
+          "enum": [
+            "USAGE",
+            "CONFIG",
+            "UNSUPPORTED",
+            "AUTH",
+            "TLS",
+            "NOT_FOUND",
+            "CONFLICT",
+            "UNREACHABLE",
+            "FAILED",
+            "UNKNOWN",
+            "INTERNAL"
+          ]
+        },
+        {
+          "path": "/data/members/*/error/evidence",
+          "type": "array",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/error/evidence/*/observedAt",
+          "type": "string",
+          "required": false,
+          "format": "date-time"
+        },
+        {
+          "path": "/data/members/*/error/evidence/*/path",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/error/evidence/*/revision",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/error/evidence/*/sendState",
+          "type": "string",
+          "required": false,
+          "enum": [
+            "NOT_SENT",
+            "MAYBE_SENT",
+            "ACCEPTED"
+          ]
+        },
+        {
+          "path": "/data/members/*/error/evidence/*/source",
+          "type": "string",
+          "required": false,
+          "enum": [
+            "LOCAL",
+            "DCS",
+            "PATRONI",
+            "POSTGRES",
+            "CONTROL"
+          ]
+        },
+        {
+          "path": "/data/members/*/error/evidence/*/summary",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/error/message",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/error/operation",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/error/retryable",
+          "type": "boolean",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/error/target",
+          "type": "object",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/error/target/context",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/error/target/group",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/error/target/member",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/error/target/namespace",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/error/target/scope",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/evidence",
+          "type": "array",
+          "required": true
+        },
+        {
+          "path": "/data/members/*/evidence/*/observedAt",
+          "type": "string",
+          "required": true,
+          "format": "date-time"
+        },
+        {
+          "path": "/data/members/*/evidence/*/path",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/evidence/*/revision",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/evidence/*/sendState",
+          "type": "string",
+          "required": false,
+          "enum": [
+            "NOT_SENT",
+            "MAYBE_SENT",
+            "ACCEPTED"
+          ]
+        },
+        {
+          "path": "/data/members/*/evidence/*/source",
+          "type": "string",
+          "required": true,
+          "enum": [
+            "LOCAL",
+            "DCS",
+            "PATRONI",
+            "POSTGRES",
+            "CONTROL"
+          ]
+        },
+        {
+          "path": "/data/members/*/evidence/*/summary",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/data/members/*/httpStatus",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/outcome",
+          "type": "string",
+          "required": true,
+          "enum": [
+            "SUCCEEDED",
+            "FAILED",
+            "UNKNOWN"
+          ]
+        },
+        {
+          "path": "/data/members/*/sendState",
+          "type": "string",
+          "required": true,
+          "enum": [
+            "NOT_SENT",
+            "MAYBE_SENT",
+            "ACCEPTED"
+          ]
+        },
+        {
+          "path": "/data/members/*/summary",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/data/members/*/target",
+          "type": "object",
+          "required": true
+        },
+        {
+          "path": "/data/members/*/target/context",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/data/members/*/target/group",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/target/member",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/target/namespace",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/data/members/*/target/scope",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/data/members/*/verification",
+          "type": "string",
+          "required": true,
+          "enum": [
+            "UNVERIFIED",
+            "VERIFIED_SUCCEEDED",
+            "VERIFIED_FAILED"
+          ]
+        },
+        {
+          "path": "/kind",
+          "type": "string",
+          "required": true,
+          "const": "RestartResult"
+        },
+        {
+          "path": "/metadata",
+          "type": "object",
+          "required": true
+        },
+        {
+          "path": "/metadata/observedAt",
+          "type": "string",
+          "required": true,
+          "format": "date-time"
+        },
+        {
+          "path": "/metadata/requestId",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/metadata/revision",
+          "type": "integer|string",
+          "required": false
+        },
+        {
+          "path": "/metadata/warnings",
+          "type": "array",
+          "required": true
+        }
+      ]
+    },
+    {
+      "kind": "ResumeResult",
+      "dataType": "control.PauseData",
+      "golden": "internal/cli/testdata/machine-success/resume-result.golden.json",
+      "fields": [
+        {
+          "path": "/apiVersion",
+          "type": "string",
+          "required": true,
+          "const": "patroni.pgsty.com/v1alpha1"
+        },
+        {
+          "path": "/data",
+          "type": "object",
+          "required": true
+        },
+        {
+          "path": "/data/dcsRevision",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "path": "/data/noop",
+          "type": "boolean",
+          "required": true
+        },
+        {
+          "path": "/data/paused",
+          "type": "boolean",
+          "required": true
+        },
+        {
+          "path": "/data/pendingMembers",
+          "type": "array",
+          "required": false
+        },
+        {
+          "path": "/data/restSendState",
+          "type": "string",
+          "required": true,
+          "enum": [
+            "NOT_SENT",
+            "MAYBE_SENT",
+            "ACCEPTED"
+          ]
+        },
+        {
+          "path": "/data/results",
+          "type": "array",
+          "required": false
+        },
+        {
+          "path": "/data/results/*/error",
+          "type": "object",
+          "required": false
+        },
+        {
+          "path": "/data/results/*/error/category",
+          "type": "string",
+          "required": false,
+          "enum": [
+            "USAGE",
+            "CONFIG",
+            "UNSUPPORTED",
+            "AUTH",
+            "TLS",
+            "NOT_FOUND",
+            "CONFLICT",
+            "UNREACHABLE",
+            "FAILED",
+            "UNKNOWN",
+            "INTERNAL"
+          ]
+        },
+        {
+          "path": "/data/results/*/error/evidence",
+          "type": "array",
+          "required": false
+        },
+        {
+          "path": "/data/results/*/error/evidence/*/observedAt",
+          "type": "string",
+          "required": false,
+          "format": "date-time"
+        },
+        {
+          "path": "/data/results/*/error/evidence/*/path",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/results/*/error/evidence/*/revision",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/results/*/error/evidence/*/sendState",
+          "type": "string",
+          "required": false,
+          "enum": [
+            "NOT_SENT",
+            "MAYBE_SENT",
+            "ACCEPTED"
+          ]
+        },
+        {
+          "path": "/data/results/*/error/evidence/*/source",
+          "type": "string",
+          "required": false,
+          "enum": [
+            "LOCAL",
+            "DCS",
+            "PATRONI",
+            "POSTGRES",
+            "CONTROL"
+          ]
+        },
+        {
+          "path": "/data/results/*/error/evidence/*/summary",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/results/*/error/message",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/results/*/error/operation",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/results/*/error/retryable",
+          "type": "boolean",
+          "required": false
+        },
+        {
+          "path": "/data/results/*/error/target",
+          "type": "object",
+          "required": false
+        },
+        {
+          "path": "/data/results/*/error/target/context",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/results/*/error/target/group",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "path": "/data/results/*/error/target/member",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/results/*/error/target/namespace",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/results/*/error/target/scope",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/results/*/evidence",
+          "type": "array",
+          "required": false
+        },
+        {
+          "path": "/data/results/*/evidence/*/observedAt",
+          "type": "string",
+          "required": false,
+          "format": "date-time"
+        },
+        {
+          "path": "/data/results/*/evidence/*/path",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/results/*/evidence/*/revision",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/results/*/evidence/*/sendState",
+          "type": "string",
+          "required": false,
+          "enum": [
+            "NOT_SENT",
+            "MAYBE_SENT",
+            "ACCEPTED"
+          ]
+        },
+        {
+          "path": "/data/results/*/evidence/*/source",
+          "type": "string",
+          "required": false,
+          "enum": [
+            "LOCAL",
+            "DCS",
+            "PATRONI",
+            "POSTGRES",
+            "CONTROL"
+          ]
+        },
+        {
+          "path": "/data/results/*/evidence/*/summary",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/results/*/httpStatus",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "path": "/data/results/*/outcome",
+          "type": "string",
+          "required": false,
+          "enum": [
+            "SUCCEEDED",
+            "FAILED",
+            "UNKNOWN"
+          ]
+        },
+        {
+          "path": "/data/results/*/sendState",
+          "type": "string",
+          "required": false,
+          "enum": [
+            "NOT_SENT",
+            "MAYBE_SENT",
+            "ACCEPTED"
+          ]
+        },
+        {
+          "path": "/data/results/*/summary",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/results/*/target",
+          "type": "object",
+          "required": false
+        },
+        {
+          "path": "/data/results/*/target/context",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/results/*/target/group",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "path": "/data/results/*/target/member",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/results/*/target/namespace",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/results/*/target/scope",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/results/*/verification",
+          "type": "string",
+          "required": false,
+          "enum": [
+            "UNVERIFIED",
+            "VERIFIED_SUCCEEDED",
+            "VERIFIED_FAILED"
+          ]
+        },
+        {
+          "path": "/data/verification",
+          "type": "string",
+          "required": true,
+          "enum": [
+            "UNVERIFIED",
+            "VERIFIED_SUCCEEDED",
+            "VERIFIED_FAILED"
+          ]
+        },
+        {
+          "path": "/data/wait",
+          "type": "boolean",
+          "required": true
+        },
+        {
+          "path": "/kind",
+          "type": "string",
+          "required": true,
+          "const": "ResumeResult"
+        },
+        {
+          "path": "/metadata",
+          "type": "object",
+          "required": true
+        },
+        {
+          "path": "/metadata/observedAt",
+          "type": "string",
+          "required": true,
+          "format": "date-time"
+        },
+        {
+          "path": "/metadata/requestId",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/metadata/revision",
+          "type": "integer|string",
+          "required": false
+        },
+        {
+          "path": "/metadata/warnings",
+          "type": "array",
+          "required": true
+        }
+      ]
+    },
+    {
+      "kind": "SwitchoverResult",
+      "dataType": "control.ClusterWriteData",
+      "golden": "internal/cli/testdata/machine-success/switchover-result.golden.json",
+      "fields": [
+        {
+          "path": "/apiVersion",
+          "type": "string",
+          "required": true,
+          "const": "patroni.pgsty.com/v1alpha1"
+        },
+        {
+          "path": "/data",
+          "type": "object",
+          "required": true
+        },
+        {
+          "path": "/data/candidate",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/dcsRevision",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "path": "/data/dcsSendState",
+          "type": "string",
+          "required": false,
+          "enum": [
+            "NOT_SENT",
+            "MAYBE_SENT",
+            "ACCEPTED"
+          ]
+        },
+        {
+          "path": "/data/httpStatus",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "path": "/data/leader",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/legacyEndpoint",
+          "type": "boolean",
+          "required": true
+        },
+        {
+          "path": "/data/restSendState",
+          "type": "string",
+          "required": true,
+          "enum": [
+            "NOT_SENT",
+            "MAYBE_SENT",
+            "ACCEPTED"
+          ]
+        },
+        {
+          "path": "/data/scheduledAt",
+          "type": "string",
+          "required": false,
+          "format": "date-time"
+        },
+        {
+          "path": "/data/verification",
+          "type": "string",
+          "required": true,
+          "enum": [
+            "UNVERIFIED",
+            "VERIFIED_SUCCEEDED",
+            "VERIFIED_FAILED"
+          ]
+        },
+        {
+          "path": "/kind",
+          "type": "string",
+          "required": true,
+          "const": "SwitchoverResult"
+        },
+        {
+          "path": "/metadata",
+          "type": "object",
+          "required": true
+        },
+        {
+          "path": "/metadata/observedAt",
+          "type": "string",
+          "required": true,
+          "format": "date-time"
+        },
+        {
+          "path": "/metadata/requestId",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/metadata/revision",
+          "type": "integer|string",
+          "required": false
+        },
+        {
+          "path": "/metadata/warnings",
+          "type": "array",
+          "required": true
+        }
+      ]
+    },
+    {
+      "kind": "VersionInfo",
+      "dataType": "cli.machineVersionInfo",
+      "golden": "internal/cli/testdata/machine-success/version-info.golden.json",
+      "fields": [
+        {
+          "path": "/apiVersion",
+          "type": "string",
+          "required": true,
+          "const": "patroni.pgsty.com/v1alpha1"
+        },
+        {
+          "path": "/data",
+          "type": "object",
+          "required": true
+        },
+        {
+          "path": "/data/buildTime",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/data/commit",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/data/goVersion",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/data/machineSchema",
+          "type": "string",
+          "required": true,
+          "const": "patroni.pgsty.com/v1alpha1"
+        },
+        {
+          "path": "/data/members",
+          "type": "array",
+          "required": true
+        },
+        {
+          "path": "/data/members/*/error",
+          "type": "object",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/error/category",
+          "type": "string",
+          "required": false,
+          "enum": [
+            "USAGE",
+            "CONFIG",
+            "UNSUPPORTED",
+            "AUTH",
+            "TLS",
+            "NOT_FOUND",
+            "CONFLICT",
+            "UNREACHABLE",
+            "FAILED",
+            "UNKNOWN",
+            "INTERNAL"
+          ]
+        },
+        {
+          "path": "/data/members/*/error/cause",
+          "type": "string",
+          "required": false,
+          "enum": [
+            "INVALID_INPUT",
+            "INVALID_CONFIGURATION",
+            "UNSUPPORTED_PATRONI_VERSION",
+            "AUTHENTICATION_REJECTED",
+            "TLS_CONFIGURATION_OR_VERIFICATION_FAILED",
+            "TARGET_NOT_FOUND",
+            "CONCURRENT_STATE_CONFLICT",
+            "UPSTREAM_UNREACHABLE",
+            "OPERATION_REJECTED",
+            "OUTCOME_UNCONFIRMED",
+            "INTERNAL_INVARIANT"
+          ]
+        },
+        {
+          "path": "/data/members/*/error/evidence",
+          "type": "array",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/error/evidence/*/observedAt",
+          "type": "string",
+          "required": false,
+          "format": "date-time"
+        },
+        {
+          "path": "/data/members/*/error/evidence/*/path",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/error/evidence/*/revision",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/error/evidence/*/sendState",
+          "type": "string",
+          "required": false,
+          "enum": [
+            "NOT_SENT",
+            "MAYBE_SENT",
+            "ACCEPTED"
+          ]
+        },
+        {
+          "path": "/data/members/*/error/evidence/*/source",
+          "type": "string",
+          "required": false,
+          "enum": [
+            "LOCAL",
+            "DCS",
+            "PATRONI",
+            "POSTGRES",
+            "CONTROL"
+          ]
+        },
+        {
+          "path": "/data/members/*/error/evidence/*/summary",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/error/message",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/error/nextActions",
+          "type": "array",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/error/operation",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/error/retryable",
+          "type": "boolean",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/error/target",
+          "type": "object",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/error/target/context",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/error/target/group",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/error/target/member",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/error/target/namespace",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/error/target/scope",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/httpStatus",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/patroniVersion",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/postgresVersion",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/target",
+          "type": "object",
+          "required": true
+        },
+        {
+          "path": "/data/members/*/target/context",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/data/members/*/target/group",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/target/member",
+          "type": "string",
+          "required": false
+        },
+        {
+          "path": "/data/members/*/target/namespace",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/data/members/*/target/scope",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/data/supportedPatroni",
+          "type": "string",
+          "required": true,
+          "const": "\u003e=3.0.0,\u003c5.0.0"
+        },
+        {
+          "path": "/data/version",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/kind",
+          "type": "string",
+          "required": true,
+          "const": "VersionInfo"
+        },
+        {
+          "path": "/metadata",
+          "type": "object",
+          "required": true
+        },
+        {
+          "path": "/metadata/observedAt",
+          "type": "string",
+          "required": true,
+          "format": "date-time"
+        },
+        {
+          "path": "/metadata/requestId",
+          "type": "string",
+          "required": true
+        },
+        {
+          "path": "/metadata/revision",
+          "type": "integer|string",
+          "required": false
+        },
+        {
+          "path": "/metadata/warnings",
+          "type": "array",
+          "required": true
+        }
+      ]
+    }
+  ],
+  "enums": [
+    {
+      "type": "config.Layer",
+      "values": [
+        "default",
+        "file",
+        "context",
+        "environment",
+        "flag"
+      ]
+    },
+    {
+      "type": "config.WarningCode",
+      "values": [
+        "SCHEMELESS_DCS_URL",
+        "INSECURE_REST_TLS"
+      ]
+    },
+    {
+      "type": "control.Category",
+      "values": [
+        "USAGE",
+        "CONFIG",
+        "UNSUPPORTED",
+        "AUTH",
+        "TLS",
+        "NOT_FOUND",
+        "CONFLICT",
+        "UNREACHABLE",
+        "FAILED",
+        "UNKNOWN",
+        "INTERNAL"
+      ]
+    },
+    {
+      "type": "control.EvidenceSource",
+      "values": [
+        "LOCAL",
+        "DCS",
+        "PATRONI",
+        "POSTGRES",
+        "CONTROL"
+      ]
+    },
+    {
+      "type": "control.FlushEvent",
+      "values": [
+        "restart",
+        "switchover"
+      ]
+    },
+    {
+      "type": "control.Outcome",
+      "values": [
+        "SUCCEEDED",
+        "FAILED",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "type": "control.Path",
+      "values": [
+        "local",
+        "dcs",
+        "rest",
+        "postgres",
+        "rest-\u003edcs"
+      ]
+    },
+    {
+      "type": "control.QueryErrorKind",
+      "values": [
+        "NO_CONNECTION",
+        "DATABASE",
+        "ROLE_MISMATCH"
+      ]
+    },
+    {
+      "type": "control.Role",
+      "values": [
+        "leader",
+        "primary",
+        "standby-leader",
+        "replica",
+        "standby",
+        "any"
+      ]
+    },
+    {
+      "type": "control.SendState",
+      "values": [
+        "NOT_SENT",
+        "MAYBE_SENT",
+        "ACCEPTED"
+      ]
+    },
+    {
+      "type": "control.Verification",
+      "values": [
+        "UNVERIFIED",
+        "VERIFIED_SUCCEEDED",
+        "VERIFIED_FAILED"
+      ]
+    },
+    {
+      "type": "model.DiscoveryState",
+      "values": [
+        "DISCOVERED",
+        "CONFIGURED_ONLY",
+        "ABSENT"
+      ]
+    },
+    {
+      "type": "model.HealthState",
+      "values": [
+        "HEALTHY",
+        "DEGRADED",
+        "UNHEALTHY",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "type": "model.ManagementState",
+      "values": [
+        "EXPLICIT",
+        "ALL_SELECTED",
+        "UNMANAGED"
+      ]
+    },
+    {
+      "type": "model.MemberRole",
+      "values": [
+        "leader",
+        "standby_leader",
+        "sync_standby",
+        "quorum_standby",
+        "replica"
+      ]
+    },
+    {
+      "type": "model.ReachabilityState",
+      "values": [
+        "REACHABLE",
+        "PARTIALLY_REACHABLE",
+        "UNREACHABLE",
+        "UNKNOWN"
+      ]
+    }
+  ],
+  "exitCodes": [
+    {
+      "category": "SUCCESS",
+      "code": 0
+    },
+    {
+      "category": "FAILED",
+      "code": 1
+    },
+    {
+      "category": "USAGE",
+      "code": 2
+    },
+    {
+      "category": "CONFIG",
+      "code": 2
+    },
+    {
+      "category": "UNSUPPORTED",
+      "code": 3
+    },
+    {
+      "category": "AUTH",
+      "code": 4
+    },
+    {
+      "category": "TLS",
+      "code": 4
+    },
+    {
+      "category": "NOT_FOUND",
+      "code": 5
+    },
+    {
+      "category": "CONFLICT",
+      "code": 6
+    },
+    {
+      "category": "UNREACHABLE",
+      "code": 7
+    },
+    {
+      "category": "UNKNOWN",
+      "code": 8
+    },
+    {
+      "category": "INTERNAL",
+      "code": 9
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://patroni.pgsty.com/schema/machine/v1alpha1/cluster-discovery.schema.json",
+  "title": "Go patronictl v1alpha1 cluster discovery",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["apiVersion", "kind", "metadata", "data"],
+  "properties": {
+    "apiVersion": {"const": "patroni.pgsty.com/v1alpha1"},
+    "kind": {"const": "ClusterDiscovery"},
+    "metadata": {"$ref": "result.schema.json#/$defs/metadata"},
+    "data": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["clusters"],
+      "properties": {
+        "clusters": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["target", "discoveryState", "managementState", "reachabilityState", "healthState", "revision", "memberCount"],
+            "properties": {
+              "target": {"$ref": "error.schema.json#/$defs/target"},
+              "discoveryState": {"enum": ["DISCOVERED", "CONFIGURED_ONLY", "ABSENT"]},
+              "managementState": {"enum": ["EXPLICIT", "ALL_SELECTED", "UNMANAGED"]},
+              "reachabilityState": {"enum": ["REACHABLE", "PARTIALLY_REACHABLE", "UNREACHABLE", "UNKNOWN"]},
+              "healthState": {"enum": ["HEALTHY", "DEGRADED", "UNHEALTHY", "UNKNOWN"]},
+              "revision": {"type": "integer", "minimum": 0},
+              "memberCount": {"type": "integer", "minimum": 0},
+              "leader": {"type": "string"}
+            }
+          }
+        }
+      }
+    }
+  }
+}

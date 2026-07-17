@@ -1,0 +1,1 @@
+{"apiVersion":"patroni.pgsty.com/v1alpha1","kind":"RemoveResult","metadata":{"requestId":"machine-schema-example","observedAt":"2026-07-13T12:34:56Z","warnings":[]},"data":{"expectedKeys":1,"deleted":1,"remainingKeys":["example"],"dcsSendState":"ACCEPTED","verification":"VERIFIED_SUCCEEDED","dcsRevision":1,"noop":false}}

@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://patroni.pgsty.com/schema/machine/v1alpha1/cluster-topology-list.schema.json",
+  "title": "Go patronictl v1alpha1 cluster topology list",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["apiVersion", "kind", "metadata", "data"],
+  "properties": {
+    "apiVersion": {"const": "patroni.pgsty.com/v1alpha1"},
+    "kind": {"const": "ClusterTopologyList"},
+    "metadata": {"$ref": "result.schema.json#/$defs/metadata"},
+    "data": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["topologies"],
+      "properties": {
+        "topologies": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["cluster", "members"],
+            "properties": {
+              "cluster": {"$ref": "cluster-list.schema.json#/properties/data/properties/clusters/items"},
+              "members": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["member", "depth"],
+                  "properties": {
+                    "member": {"type": "object"},
+                    "parent": {"type": "string"},
+                    "depth": {"type": "integer", "minimum": 0}
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

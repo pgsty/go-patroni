@@ -17,7 +17,7 @@ import (
 	"go.yaml.in/yaml/v3"
 )
 
-const machineAPIVersion = "boar.pgsty.com/v1alpha1"
+const machineAPIVersion = "patroni.pgsty.com/v1alpha1"
 
 type machineMetadata struct {
 	RequestID  string   `json:"requestId" yaml:"requestId"`
@@ -101,7 +101,7 @@ func machineNextActions(category control.Category) []string {
 	case control.CategoryConflict:
 		return []string{"Re-read authoritative cluster state and prepare a new plan"}
 	case control.CategoryUnsupported:
-		return []string{"Use Patroni >=4.0.0,<5.0.0 or limit the command to an explicitly allowed read"}
+		return []string{"Use a supported Patroni version (>=3.0.0,<5.0.0) or limit the command to a feature available in the connected version"}
 	case control.CategoryUnreachable:
 		return []string{"Verify endpoint reachability and retry only when evidence shows the request was not sent"}
 	default:

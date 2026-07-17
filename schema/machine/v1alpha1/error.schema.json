@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://patroni.pgsty.com/schema/machine/v1alpha1/error.schema.json",
+  "title": "Go patronictl v1alpha1 error envelope",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["apiVersion", "kind", "metadata", "error"],
+  "properties": {
+    "apiVersion": {"const": "patroni.pgsty.com/v1alpha1"},
+    "kind": {"const": "Error"},
+    "metadata": {"$ref": "result.schema.json#/$defs/metadata"},
+    "error": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["category", "operation", "target", "retryable", "cause", "message", "evidence", "nextActions"],
+      "properties": {
+        "category": {
+          "enum": ["USAGE", "CONFIG", "UNSUPPORTED", "AUTH", "TLS", "NOT_FOUND", "CONFLICT", "UNREACHABLE", "FAILED", "UNKNOWN", "INTERNAL"]
+        },
+        "operation": {"type": "string", "minLength": 1},
+        "target": {"$ref": "#/$defs/target"},
+        "retryable": {"type": "boolean"},
+        "message": {"type": "string", "minLength": 1},
+        "cause": {
+          "enum": [
+            "INVALID_INPUT",
+            "INVALID_CONFIGURATION",
+            "UNSUPPORTED_PATRONI_VERSION",
+            "AUTHENTICATION_REJECTED",
+            "TLS_CONFIGURATION_OR_VERIFICATION_FAILED",
+            "TARGET_NOT_FOUND",
+            "CONCURRENT_STATE_CONFLICT",
+            "UPSTREAM_UNREACHABLE",
+            "OPERATION_REJECTED",
+            "OUTCOME_UNCONFIRMED",
+            "INTERNAL_INVARIANT"
+          ]
+        },
+        "evidence": {"type": "array", "items": {"$ref": "#/$defs/evidence"}},
+        "nextActions": {"type": "array", "items": {"type": "string", "minLength": 1}}
+      }
+    }
+  },
+  "$defs": {
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["context", "namespace", "scope"],
+      "properties": {
+        "context": {"type": "string", "minLength": 1},
+        "namespace": {"type": "string", "minLength": 1},
+        "scope": {"type": "string"},
+        "group": {"type": ["integer", "null"]},
+        "member": {"type": "string"}
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "observedAt", "summary"],
+      "properties": {
+        "source": {"enum": ["LOCAL", "DCS", "PATRONI", "POSTGRES", "CONTROL"]},
+        "observedAt": {"type": "string", "format": "date-time"},
+        "summary": {"type": "string", "minLength": 1},
+        "revision": {"oneOf": [{"type": "integer"}, {"type": "string", "minLength": 1}]},
+        "path": {"type": "string"},
+        "sendState": {"enum": ["NOT_SENT", "MAYBE_SENT", "ACCEPTED"]}
+      }
+    }
+  }
+}

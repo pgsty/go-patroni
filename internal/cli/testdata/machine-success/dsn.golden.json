@@ -1,0 +1,1 @@
+{"apiVersion":"patroni.pgsty.com/v1alpha1","kind":"DSN","metadata":{"requestId":"machine-schema-example","observedAt":"2026-07-13T12:34:56Z","warnings":[]},"data":{"target":{"context":"default","namespace":"/service","scope":"alpha","group":1,"member":"node-a"},"member":"node-a","role":"leader","host":"node-a.example.invalid","port":1}}

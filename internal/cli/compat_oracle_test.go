@@ -273,8 +273,8 @@ func TestPatronictlSemanticParity(t *testing.T) {
 		env  string
 		want string
 	}{
-		{name: "patroni-4.0", env: "BOAR_PATRONICTL_ORACLE_40", want: "4.0.7"},
-		{name: "patroni-4.1", env: "BOAR_PATRONICTL_ORACLE_41", want: "4.1.0"},
+		{name: "patroni-4.0", env: "GO_PATRONI_PATRONICTL_ORACLE_40", want: "4.0.7"},
+		{name: "patroni-4.1", env: "GO_PATRONI_PATRONICTL_ORACLE_41", want: "4.1.3"},
 	}
 	for _, version := range paths {
 		version := version
@@ -284,7 +284,7 @@ func TestPatronictlSemanticParity(t *testing.T) {
 				t.Fatalf("oracle version = %q, want %q", document.PatroniVersion, version.want)
 			}
 			wantCases := 26
-			if version.want == "4.1.0" {
+			if version.want == "4.1.3" {
 				wantCases = 29
 			}
 			if len(document.Cases) != wantCases {

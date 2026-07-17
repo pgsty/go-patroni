@@ -1,0 +1,1 @@
+{"apiVersion":"patroni.pgsty.com/v1alpha1","kind":"ConfigEditResult","metadata":{"requestId":"machine-schema-example","observedAt":"2026-07-13T12:34:56Z","warnings":[]},"data":{"changedPaths":["example"],"beforeRevision":1,"dcsRevision":1,"dcsSendState":"ACCEPTED","verification":"VERIFIED_SUCCEEDED","noop":false}}

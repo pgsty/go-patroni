@@ -1,0 +1,2135 @@
+{
+  "schemaVersion": "patroni.pgsty.com/compatibility/v1alpha1",
+  "kind": "PatroniRESTCompatibility",
+  "generatedBy": "tools/compatgen + test/compat/oracle/extract_inventory.py",
+  "source": {
+    "commit": "d35409952f970d7f33d36d8f868eb20fc1e2a7f7",
+    "version": "4.1.3",
+    "file": "patroni/api.py"
+  },
+  "supportedRange": ">=3.0.0,<5.0.0",
+  "healthAliases": [
+    "/",
+    "/primary",
+    "/master",
+    "/read-write",
+    "/leader",
+    "/standby-leader",
+    "/standby_leader",
+    "/replica",
+    "/read-only",
+    "/quorum",
+    "/read-only-quorum",
+    "/sync",
+    "/synchronous",
+    "/read-only-sync",
+    "/read-only-synchronous",
+    "/async",
+    "/asynchronous",
+    "/health"
+  ],
+  "expectedEndpointCount": 75,
+  "endpoints": [
+    {
+      "id": "get-root",
+      "method": "GET",
+      "path": "/",
+      "handler": "do_GET",
+      "risk": "read",
+      "request": "none",
+      "response": "status-json",
+      "since": "3.0.0",
+      "rawResponse": true,
+      "sourceRef": "patroni/api.py:245",
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestRESTInventory"
+        ],
+        "contract": [
+          "client_test.go#TestEveryCatalogEndpointHasCallableWireContract",
+          "client_test.go#TestDecodeErrorPreservesStatusHeadersAndRaw",
+          "client_test.go#TestWriteTransportNeverRetries",
+          "tls_test.go#TestTLSMutualAuthenticationEncryptedKeyAndRotationCache"
+        ],
+        "integration": [
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "scripts/test-patroni-integration.sh#v3.3.8-v4.0.7-v4.1.3-matrix"
+        ]
+      },
+      "status": "complete"
+    },
+    {
+      "id": "head-root",
+      "method": "HEAD",
+      "path": "/",
+      "handler": "do_HEAD",
+      "risk": "read",
+      "request": "none",
+      "response": "status-only",
+      "since": "3.0.0",
+      "rawResponse": true,
+      "sourceRef": "patroni/api.py:426",
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestRESTInventory"
+        ],
+        "contract": [
+          "client_test.go#TestEveryCatalogEndpointHasCallableWireContract",
+          "client_test.go#TestDecodeErrorPreservesStatusHeadersAndRaw",
+          "client_test.go#TestWriteTransportNeverRetries",
+          "tls_test.go#TestTLSMutualAuthenticationEncryptedKeyAndRotationCache"
+        ],
+        "integration": [
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "scripts/test-patroni-integration.sh#v3.3.8-v4.0.7-v4.1.3-matrix"
+        ]
+      },
+      "status": "complete"
+    },
+    {
+      "id": "options-root",
+      "method": "OPTIONS",
+      "path": "/",
+      "handler": "do_OPTIONS",
+      "risk": "read",
+      "request": "none",
+      "response": "status-only",
+      "since": "3.0.0",
+      "rawResponse": true,
+      "sourceRef": "patroni/api.py:418",
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestRESTInventory"
+        ],
+        "contract": [
+          "client_test.go#TestEveryCatalogEndpointHasCallableWireContract",
+          "client_test.go#TestDecodeErrorPreservesStatusHeadersAndRaw",
+          "client_test.go#TestWriteTransportNeverRetries",
+          "tls_test.go#TestTLSMutualAuthenticationEncryptedKeyAndRotationCache"
+        ],
+        "integration": [
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "scripts/test-patroni-integration.sh#v3.3.8-v4.0.7-v4.1.3-matrix"
+        ]
+      },
+      "status": "complete"
+    },
+    {
+      "id": "get-primary",
+      "method": "GET",
+      "path": "/primary",
+      "handler": "do_GET",
+      "risk": "read",
+      "request": "none",
+      "response": "status-json",
+      "since": "3.0.0",
+      "rawResponse": true,
+      "sourceRef": "patroni/api.py:245",
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestRESTInventory"
+        ],
+        "contract": [
+          "client_test.go#TestEveryCatalogEndpointHasCallableWireContract",
+          "client_test.go#TestDecodeErrorPreservesStatusHeadersAndRaw",
+          "client_test.go#TestWriteTransportNeverRetries",
+          "tls_test.go#TestTLSMutualAuthenticationEncryptedKeyAndRotationCache"
+        ],
+        "integration": [
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "scripts/test-patroni-integration.sh#v3.3.8-v4.0.7-v4.1.3-matrix"
+        ]
+      },
+      "status": "complete"
+    },
+    {
+      "id": "head-primary",
+      "method": "HEAD",
+      "path": "/primary",
+      "handler": "do_HEAD",
+      "risk": "read",
+      "request": "none",
+      "response": "status-only",
+      "since": "3.0.0",
+      "rawResponse": true,
+      "sourceRef": "patroni/api.py:426",
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestRESTInventory"
+        ],
+        "contract": [
+          "client_test.go#TestEveryCatalogEndpointHasCallableWireContract",
+          "client_test.go#TestDecodeErrorPreservesStatusHeadersAndRaw",
+          "client_test.go#TestWriteTransportNeverRetries",
+          "tls_test.go#TestTLSMutualAuthenticationEncryptedKeyAndRotationCache"
+        ],
+        "integration": [
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "scripts/test-patroni-integration.sh#v3.3.8-v4.0.7-v4.1.3-matrix"
+        ]
+      },
+      "status": "complete"
+    },
+    {
+      "id": "options-primary",
+      "method": "OPTIONS",
+      "path": "/primary",
+      "handler": "do_OPTIONS",
+      "risk": "read",
+      "request": "none",
+      "response": "status-only",
+      "since": "3.0.0",
+      "rawResponse": true,
+      "sourceRef": "patroni/api.py:418",
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestRESTInventory"
+        ],
+        "contract": [
+          "client_test.go#TestEveryCatalogEndpointHasCallableWireContract",
+          "client_test.go#TestDecodeErrorPreservesStatusHeadersAndRaw",
+          "client_test.go#TestWriteTransportNeverRetries",
+          "tls_test.go#TestTLSMutualAuthenticationEncryptedKeyAndRotationCache"
+        ],
+        "integration": [
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "scripts/test-patroni-integration.sh#v3.3.8-v4.0.7-v4.1.3-matrix"
+        ]
+      },
+      "status": "complete"
+    },
+    {
+      "id": "get-master",
+      "method": "GET",
+      "path": "/master",
+      "handler": "do_GET",
+      "risk": "read",
+      "request": "none",
+      "response": "status-json",
+      "since": "3.0.0",
+      "rawResponse": true,
+      "sourceRef": "patroni/api.py:245",
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestRESTInventory"
+        ],
+        "contract": [
+          "client_test.go#TestEveryCatalogEndpointHasCallableWireContract",
+          "client_test.go#TestDecodeErrorPreservesStatusHeadersAndRaw",
+          "client_test.go#TestWriteTransportNeverRetries",
+          "tls_test.go#TestTLSMutualAuthenticationEncryptedKeyAndRotationCache"
+        ],
+        "integration": [
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "scripts/test-patroni-integration.sh#v3.3.8-v4.0.7-v4.1.3-matrix"
+        ]
+      },
+      "status": "complete"
+    },
+    {
+      "id": "head-master",
+      "method": "HEAD",
+      "path": "/master",
+      "handler": "do_HEAD",
+      "risk": "read",
+      "request": "none",
+      "response": "status-only",
+      "since": "3.0.0",
+      "rawResponse": true,
+      "sourceRef": "patroni/api.py:426",
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestRESTInventory"
+        ],
+        "contract": [
+          "client_test.go#TestEveryCatalogEndpointHasCallableWireContract",
+          "client_test.go#TestDecodeErrorPreservesStatusHeadersAndRaw",
+          "client_test.go#TestWriteTransportNeverRetries",
+          "tls_test.go#TestTLSMutualAuthenticationEncryptedKeyAndRotationCache"
+        ],
+        "integration": [
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "scripts/test-patroni-integration.sh#v3.3.8-v4.0.7-v4.1.3-matrix"
+        ]
+      },
+      "status": "complete"
+    },
+    {
+      "id": "options-master",
+      "method": "OPTIONS",
+      "path": "/master",
+      "handler": "do_OPTIONS",
+      "risk": "read",
+      "request": "none",
+      "response": "status-only",
+      "since": "3.0.0",
+      "rawResponse": true,
+      "sourceRef": "patroni/api.py:418",
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestRESTInventory"
+        ],
+        "contract": [
+          "client_test.go#TestEveryCatalogEndpointHasCallableWireContract",
+          "client_test.go#TestDecodeErrorPreservesStatusHeadersAndRaw",
+          "client_test.go#TestWriteTransportNeverRetries",
+          "tls_test.go#TestTLSMutualAuthenticationEncryptedKeyAndRotationCache"
+        ],
+        "integration": [
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "scripts/test-patroni-integration.sh#v3.3.8-v4.0.7-v4.1.3-matrix"
+        ]
+      },
+      "status": "complete"
+    },
+    {
+      "id": "get-read-write",
+      "method": "GET",
+      "path": "/read-write",
+      "handler": "do_GET",
+      "risk": "read",
+      "request": "none",
+      "response": "status-json",
+      "since": "3.0.0",
+      "rawResponse": true,
+      "sourceRef": "patroni/api.py:245",
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestRESTInventory"
+        ],
+        "contract": [
+          "client_test.go#TestEveryCatalogEndpointHasCallableWireContract",
+          "client_test.go#TestDecodeErrorPreservesStatusHeadersAndRaw",
+          "client_test.go#TestWriteTransportNeverRetries",
+          "tls_test.go#TestTLSMutualAuthenticationEncryptedKeyAndRotationCache"
+        ],
+        "integration": [
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "scripts/test-patroni-integration.sh#v3.3.8-v4.0.7-v4.1.3-matrix"
+        ]
+      },
+      "status": "complete"
+    },
+    {
+      "id": "head-read-write",
+      "method": "HEAD",
+      "path": "/read-write",
+      "handler": "do_HEAD",
+      "risk": "read",
+      "request": "none",
+      "response": "status-only",
+      "since": "3.0.0",
+      "rawResponse": true,
+      "sourceRef": "patroni/api.py:426",
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestRESTInventory"
+        ],
+        "contract": [
+          "client_test.go#TestEveryCatalogEndpointHasCallableWireContract",
+          "client_test.go#TestDecodeErrorPreservesStatusHeadersAndRaw",
+          "client_test.go#TestWriteTransportNeverRetries",
+          "tls_test.go#TestTLSMutualAuthenticationEncryptedKeyAndRotationCache"
+        ],
+        "integration": [
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "scripts/test-patroni-integration.sh#v3.3.8-v4.0.7-v4.1.3-matrix"
+        ]
+      },
+      "status": "complete"
+    },
+    {
+      "id": "options-read-write",
+      "method": "OPTIONS",
+      "path": "/read-write",
+      "handler": "do_OPTIONS",
+      "risk": "read",
+      "request": "none",
+      "response": "status-only",
+      "since": "3.0.0",
+      "rawResponse": true,
+      "sourceRef": "patroni/api.py:418",
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestRESTInventory"
+        ],
+        "contract": [
+          "client_test.go#TestEveryCatalogEndpointHasCallableWireContract",
+          "client_test.go#TestDecodeErrorPreservesStatusHeadersAndRaw",
+          "client_test.go#TestWriteTransportNeverRetries",
+          "tls_test.go#TestTLSMutualAuthenticationEncryptedKeyAndRotationCache"
+        ],
+        "integration": [
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "scripts/test-patroni-integration.sh#v3.3.8-v4.0.7-v4.1.3-matrix"
+        ]
+      },
+      "status": "complete"
+    },
+    {
+      "id": "get-leader",
+      "method": "GET",
+      "path": "/leader",
+      "handler": "do_GET",
+      "risk": "read",
+      "request": "none",
+      "response": "status-json",
+      "since": "3.0.0",
+      "rawResponse": true,
+      "sourceRef": "patroni/api.py:245",
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestRESTInventory"
+        ],
+        "contract": [
+          "client_test.go#TestEveryCatalogEndpointHasCallableWireContract",
+          "client_test.go#TestDecodeErrorPreservesStatusHeadersAndRaw",
+          "client_test.go#TestWriteTransportNeverRetries",
+          "tls_test.go#TestTLSMutualAuthenticationEncryptedKeyAndRotationCache"
+        ],
+        "integration": [
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "scripts/test-patroni-integration.sh#v3.3.8-v4.0.7-v4.1.3-matrix"
+        ]
+      },
+      "status": "complete"
+    },
+    {
+      "id": "head-leader",
+      "method": "HEAD",
+      "path": "/leader",
+      "handler": "do_HEAD",
+      "risk": "read",
+      "request": "none",
+      "response": "status-only",
+      "since": "3.0.0",
+      "rawResponse": true,
+      "sourceRef": "patroni/api.py:426",
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestRESTInventory"
+        ],
+        "contract": [
+          "client_test.go#TestEveryCatalogEndpointHasCallableWireContract",
+          "client_test.go#TestDecodeErrorPreservesStatusHeadersAndRaw",
+          "client_test.go#TestWriteTransportNeverRetries",
+          "tls_test.go#TestTLSMutualAuthenticationEncryptedKeyAndRotationCache"
+        ],
+        "integration": [
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "scripts/test-patroni-integration.sh#v3.3.8-v4.0.7-v4.1.3-matrix"
+        ]
+      },
+      "status": "complete"
+    },
+    {
+      "id": "options-leader",
+      "method": "OPTIONS",
+      "path": "/leader",
+      "handler": "do_OPTIONS",
+      "risk": "read",
+      "request": "none",
+      "response": "status-only",
+      "since": "3.0.0",
+      "rawResponse": true,
+      "sourceRef": "patroni/api.py:418",
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestRESTInventory"
+        ],
+        "contract": [
+          "client_test.go#TestEveryCatalogEndpointHasCallableWireContract",
+          "client_test.go#TestDecodeErrorPreservesStatusHeadersAndRaw",
+          "client_test.go#TestWriteTransportNeverRetries",
+          "tls_test.go#TestTLSMutualAuthenticationEncryptedKeyAndRotationCache"
+        ],
+        "integration": [
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "scripts/test-patroni-integration.sh#v3.3.8-v4.0.7-v4.1.3-matrix"
+        ]
+      },
+      "status": "complete"
+    },
+    {
+      "id": "get-standby-leader",
+      "method": "GET",
+      "path": "/standby-leader",
+      "handler": "do_GET",
+      "risk": "read",
+      "request": "none",
+      "response": "status-json",
+      "since": "3.0.0",
+      "rawResponse": true,
+      "sourceRef": "patroni/api.py:245",
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestRESTInventory"
+        ],
+        "contract": [
+          "client_test.go#TestEveryCatalogEndpointHasCallableWireContract",
+          "client_test.go#TestDecodeErrorPreservesStatusHeadersAndRaw",
+          "client_test.go#TestWriteTransportNeverRetries",
+          "tls_test.go#TestTLSMutualAuthenticationEncryptedKeyAndRotationCache"
+        ],
+        "integration": [
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "scripts/test-patroni-integration.sh#v3.3.8-v4.0.7-v4.1.3-matrix"
+        ]
+      },
+      "status": "complete"
+    },
+    {
+      "id": "head-standby-leader",
+      "method": "HEAD",
+      "path": "/standby-leader",
+      "handler": "do_HEAD",
+      "risk": "read",
+      "request": "none",
+      "response": "status-only",
+      "since": "3.0.0",
+      "rawResponse": true,
+      "sourceRef": "patroni/api.py:426",
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestRESTInventory"
+        ],
+        "contract": [
+          "client_test.go#TestEveryCatalogEndpointHasCallableWireContract",
+          "client_test.go#TestDecodeErrorPreservesStatusHeadersAndRaw",
+          "client_test.go#TestWriteTransportNeverRetries",
+          "tls_test.go#TestTLSMutualAuthenticationEncryptedKeyAndRotationCache"
+        ],
+        "integration": [
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "scripts/test-patroni-integration.sh#v3.3.8-v4.0.7-v4.1.3-matrix"
+        ]
+      },
+      "status": "complete"
+    },
+    {
+      "id": "options-standby-leader",
+      "method": "OPTIONS",
+      "path": "/standby-leader",
+      "handler": "do_OPTIONS",
+      "risk": "read",
+      "request": "none",
+      "response": "status-only",
+      "since": "3.0.0",
+      "rawResponse": true,
+      "sourceRef": "patroni/api.py:418",
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestRESTInventory"
+        ],
+        "contract": [
+          "client_test.go#TestEveryCatalogEndpointHasCallableWireContract",
+          "client_test.go#TestDecodeErrorPreservesStatusHeadersAndRaw",
+          "client_test.go#TestWriteTransportNeverRetries",
+          "tls_test.go#TestTLSMutualAuthenticationEncryptedKeyAndRotationCache"
+        ],
+        "integration": [
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "scripts/test-patroni-integration.sh#v3.3.8-v4.0.7-v4.1.3-matrix"
+        ]
+      },
+      "status": "complete"
+    },
+    {
+      "id": "get-standby_leader",
+      "method": "GET",
+      "path": "/standby_leader",
+      "handler": "do_GET",
+      "risk": "read",
+      "request": "none",
+      "response": "status-json",
+      "since": "3.0.0",
+      "rawResponse": true,
+      "sourceRef": "patroni/api.py:245",
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestRESTInventory"
+        ],
+        "contract": [
+          "client_test.go#TestEveryCatalogEndpointHasCallableWireContract",
+          "client_test.go#TestDecodeErrorPreservesStatusHeadersAndRaw",
+          "client_test.go#TestWriteTransportNeverRetries",
+          "tls_test.go#TestTLSMutualAuthenticationEncryptedKeyAndRotationCache"
+        ],
+        "integration": [
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "scripts/test-patroni-integration.sh#v3.3.8-v4.0.7-v4.1.3-matrix"
+        ]
+      },
+      "status": "complete"
+    },
+    {
+      "id": "head-standby_leader",
+      "method": "HEAD",
+      "path": "/standby_leader",
+      "handler": "do_HEAD",
+      "risk": "read",
+      "request": "none",
+      "response": "status-only",
+      "since": "3.0.0",
+      "rawResponse": true,
+      "sourceRef": "patroni/api.py:426",
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestRESTInventory"
+        ],
+        "contract": [
+          "client_test.go#TestEveryCatalogEndpointHasCallableWireContract",
+          "client_test.go#TestDecodeErrorPreservesStatusHeadersAndRaw",
+          "client_test.go#TestWriteTransportNeverRetries",
+          "tls_test.go#TestTLSMutualAuthenticationEncryptedKeyAndRotationCache"
+        ],
+        "integration": [
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "scripts/test-patroni-integration.sh#v3.3.8-v4.0.7-v4.1.3-matrix"
+        ]
+      },
+      "status": "complete"
+    },
+    {
+      "id": "options-standby_leader",
+      "method": "OPTIONS",
+      "path": "/standby_leader",
+      "handler": "do_OPTIONS",
+      "risk": "read",
+      "request": "none",
+      "response": "status-only",
+      "since": "3.0.0",
+      "rawResponse": true,
+      "sourceRef": "patroni/api.py:418",
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestRESTInventory"
+        ],
+        "contract": [
+          "client_test.go#TestEveryCatalogEndpointHasCallableWireContract",
+          "client_test.go#TestDecodeErrorPreservesStatusHeadersAndRaw",
+          "client_test.go#TestWriteTransportNeverRetries",
+          "tls_test.go#TestTLSMutualAuthenticationEncryptedKeyAndRotationCache"
+        ],
+        "integration": [
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "scripts/test-patroni-integration.sh#v3.3.8-v4.0.7-v4.1.3-matrix"
+        ]
+      },
+      "status": "complete"
+    },
+    {
+      "id": "get-replica",
+      "method": "GET",
+      "path": "/replica",
+      "handler": "do_GET",
+      "risk": "read",
+      "request": "none",
+      "response": "status-json",
+      "since": "3.0.0",
+      "rawResponse": true,
+      "sourceRef": "patroni/api.py:245",
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestRESTInventory"
+        ],
+        "contract": [
+          "client_test.go#TestEveryCatalogEndpointHasCallableWireContract",
+          "client_test.go#TestDecodeErrorPreservesStatusHeadersAndRaw",
+          "client_test.go#TestWriteTransportNeverRetries",
+          "tls_test.go#TestTLSMutualAuthenticationEncryptedKeyAndRotationCache"
+        ],
+        "integration": [
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "scripts/test-patroni-integration.sh#v3.3.8-v4.0.7-v4.1.3-matrix"
+        ]
+      },
+      "status": "complete"
+    },
+    {
+      "id": "head-replica",
+      "method": "HEAD",
+      "path": "/replica",
+      "handler": "do_HEAD",
+      "risk": "read",
+      "request": "none",
+      "response": "status-only",
+      "since": "3.0.0",
+      "rawResponse": true,
+      "sourceRef": "patroni/api.py:426",
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestRESTInventory"
+        ],
+        "contract": [
+          "client_test.go#TestEveryCatalogEndpointHasCallableWireContract",
+          "client_test.go#TestDecodeErrorPreservesStatusHeadersAndRaw",
+          "client_test.go#TestWriteTransportNeverRetries",
+          "tls_test.go#TestTLSMutualAuthenticationEncryptedKeyAndRotationCache"
+        ],
+        "integration": [
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "scripts/test-patroni-integration.sh#v3.3.8-v4.0.7-v4.1.3-matrix"
+        ]
+      },
+      "status": "complete"
+    },
+    {
+      "id": "options-replica",
+      "method": "OPTIONS",
+      "path": "/replica",
+      "handler": "do_OPTIONS",
+      "risk": "read",
+      "request": "none",
+      "response": "status-only",
+      "since": "3.0.0",
+      "rawResponse": true,
+      "sourceRef": "patroni/api.py:418",
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestRESTInventory"
+        ],
+        "contract": [
+          "client_test.go#TestEveryCatalogEndpointHasCallableWireContract",
+          "client_test.go#TestDecodeErrorPreservesStatusHeadersAndRaw",
+          "client_test.go#TestWriteTransportNeverRetries",
+          "tls_test.go#TestTLSMutualAuthenticationEncryptedKeyAndRotationCache"
+        ],
+        "integration": [
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "scripts/test-patroni-integration.sh#v3.3.8-v4.0.7-v4.1.3-matrix"
+        ]
+      },
+      "status": "complete"
+    },
+    {
+      "id": "get-read-only",
+      "method": "GET",
+      "path": "/read-only",
+      "handler": "do_GET",
+      "risk": "read",
+      "request": "none",
+      "response": "status-json",
+      "since": "3.0.0",
+      "rawResponse": true,
+      "sourceRef": "patroni/api.py:245",
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestRESTInventory"
+        ],
+        "contract": [
+          "client_test.go#TestEveryCatalogEndpointHasCallableWireContract",
+          "client_test.go#TestDecodeErrorPreservesStatusHeadersAndRaw",
+          "client_test.go#TestWriteTransportNeverRetries",
+          "tls_test.go#TestTLSMutualAuthenticationEncryptedKeyAndRotationCache"
+        ],
+        "integration": [
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "scripts/test-patroni-integration.sh#v3.3.8-v4.0.7-v4.1.3-matrix"
+        ]
+      },
+      "status": "complete"
+    },
+    {
+      "id": "head-read-only",
+      "method": "HEAD",
+      "path": "/read-only",
+      "handler": "do_HEAD",
+      "risk": "read",
+      "request": "none",
+      "response": "status-only",
+      "since": "3.0.0",
+      "rawResponse": true,
+      "sourceRef": "patroni/api.py:426",
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestRESTInventory"
+        ],
+        "contract": [
+          "client_test.go#TestEveryCatalogEndpointHasCallableWireContract",
+          "client_test.go#TestDecodeErrorPreservesStatusHeadersAndRaw",
+          "client_test.go#TestWriteTransportNeverRetries",
+          "tls_test.go#TestTLSMutualAuthenticationEncryptedKeyAndRotationCache"
+        ],
+        "integration": [
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "scripts/test-patroni-integration.sh#v3.3.8-v4.0.7-v4.1.3-matrix"
+        ]
+      },
+      "status": "complete"
+    },
+    {
+      "id": "options-read-only",
+      "method": "OPTIONS",
+      "path": "/read-only",
+      "handler": "do_OPTIONS",
+      "risk": "read",
+      "request": "none",
+      "response": "status-only",
+      "since": "3.0.0",
+      "rawResponse": true,
+      "sourceRef": "patroni/api.py:418",
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestRESTInventory"
+        ],
+        "contract": [
+          "client_test.go#TestEveryCatalogEndpointHasCallableWireContract",
+          "client_test.go#TestDecodeErrorPreservesStatusHeadersAndRaw",
+          "client_test.go#TestWriteTransportNeverRetries",
+          "tls_test.go#TestTLSMutualAuthenticationEncryptedKeyAndRotationCache"
+        ],
+        "integration": [
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "scripts/test-patroni-integration.sh#v3.3.8-v4.0.7-v4.1.3-matrix"
+        ]
+      },
+      "status": "complete"
+    },
+    {
+      "id": "get-quorum",
+      "method": "GET",
+      "path": "/quorum",
+      "handler": "do_GET",
+      "risk": "read",
+      "request": "none",
+      "response": "status-json",
+      "since": "4.0.0",
+      "rawResponse": true,
+      "sourceRef": "patroni/api.py:245",
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestRESTInventory"
+        ],
+        "contract": [
+          "client_test.go#TestEveryCatalogEndpointHasCallableWireContract",
+          "client_test.go#TestDecodeErrorPreservesStatusHeadersAndRaw",
+          "client_test.go#TestWriteTransportNeverRetries",
+          "tls_test.go#TestTLSMutualAuthenticationEncryptedKeyAndRotationCache"
+        ],
+        "integration": [
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "scripts/test-patroni-integration.sh#v3.3.8-v4.0.7-v4.1.3-matrix"
+        ]
+      },
+      "status": "complete"
+    },
+    {
+      "id": "head-quorum",
+      "method": "HEAD",
+      "path": "/quorum",
+      "handler": "do_HEAD",
+      "risk": "read",
+      "request": "none",
+      "response": "status-only",
+      "since": "4.0.0",
+      "rawResponse": true,
+      "sourceRef": "patroni/api.py:426",
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestRESTInventory"
+        ],
+        "contract": [
+          "client_test.go#TestEveryCatalogEndpointHasCallableWireContract",
+          "client_test.go#TestDecodeErrorPreservesStatusHeadersAndRaw",
+          "client_test.go#TestWriteTransportNeverRetries",
+          "tls_test.go#TestTLSMutualAuthenticationEncryptedKeyAndRotationCache"
+        ],
+        "integration": [
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "scripts/test-patroni-integration.sh#v3.3.8-v4.0.7-v4.1.3-matrix"
+        ]
+      },
+      "status": "complete"
+    },
+    {
+      "id": "options-quorum",
+      "method": "OPTIONS",
+      "path": "/quorum",
+      "handler": "do_OPTIONS",
+      "risk": "read",
+      "request": "none",
+      "response": "status-only",
+      "since": "4.0.0",
+      "rawResponse": true,
+      "sourceRef": "patroni/api.py:418",
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestRESTInventory"
+        ],
+        "contract": [
+          "client_test.go#TestEveryCatalogEndpointHasCallableWireContract",
+          "client_test.go#TestDecodeErrorPreservesStatusHeadersAndRaw",
+          "client_test.go#TestWriteTransportNeverRetries",
+          "tls_test.go#TestTLSMutualAuthenticationEncryptedKeyAndRotationCache"
+        ],
+        "integration": [
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "scripts/test-patroni-integration.sh#v3.3.8-v4.0.7-v4.1.3-matrix"
+        ]
+      },
+      "status": "complete"
+    },
+    {
+      "id": "get-read-only-quorum",
+      "method": "GET",
+      "path": "/read-only-quorum",
+      "handler": "do_GET",
+      "risk": "read",
+      "request": "none",
+      "response": "status-json",
+      "since": "4.0.0",
+      "rawResponse": true,
+      "sourceRef": "patroni/api.py:245",
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestRESTInventory"
+        ],
+        "contract": [
+          "client_test.go#TestEveryCatalogEndpointHasCallableWireContract",
+          "client_test.go#TestDecodeErrorPreservesStatusHeadersAndRaw",
+          "client_test.go#TestWriteTransportNeverRetries",
+          "tls_test.go#TestTLSMutualAuthenticationEncryptedKeyAndRotationCache"
+        ],
+        "integration": [
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "scripts/test-patroni-integration.sh#v3.3.8-v4.0.7-v4.1.3-matrix"
+        ]
+      },
+      "status": "complete"
+    },
+    {
+      "id": "head-read-only-quorum",
+      "method": "HEAD",
+      "path": "/read-only-quorum",
+      "handler": "do_HEAD",
+      "risk": "read",
+      "request": "none",
+      "response": "status-only",
+      "since": "4.0.0",
+      "rawResponse": true,
+      "sourceRef": "patroni/api.py:426",
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestRESTInventory"
+        ],
+        "contract": [
+          "client_test.go#TestEveryCatalogEndpointHasCallableWireContract",
+          "client_test.go#TestDecodeErrorPreservesStatusHeadersAndRaw",
+          "client_test.go#TestWriteTransportNeverRetries",
+          "tls_test.go#TestTLSMutualAuthenticationEncryptedKeyAndRotationCache"
+        ],
+        "integration": [
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "scripts/test-patroni-integration.sh#v3.3.8-v4.0.7-v4.1.3-matrix"
+        ]
+      },
+      "status": "complete"
+    },
+    {
+      "id": "options-read-only-quorum",
+      "method": "OPTIONS",
+      "path": "/read-only-quorum",
+      "handler": "do_OPTIONS",
+      "risk": "read",
+      "request": "none",
+      "response": "status-only",
+      "since": "4.0.0",
+      "rawResponse": true,
+      "sourceRef": "patroni/api.py:418",
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestRESTInventory"
+        ],
+        "contract": [
+          "client_test.go#TestEveryCatalogEndpointHasCallableWireContract",
+          "client_test.go#TestDecodeErrorPreservesStatusHeadersAndRaw",
+          "client_test.go#TestWriteTransportNeverRetries",
+          "tls_test.go#TestTLSMutualAuthenticationEncryptedKeyAndRotationCache"
+        ],
+        "integration": [
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "scripts/test-patroni-integration.sh#v3.3.8-v4.0.7-v4.1.3-matrix"
+        ]
+      },
+      "status": "complete"
+    },
+    {
+      "id": "get-sync",
+      "method": "GET",
+      "path": "/sync",
+      "handler": "do_GET",
+      "risk": "read",
+      "request": "none",
+      "response": "status-json",
+      "since": "3.0.0",
+      "rawResponse": true,
+      "sourceRef": "patroni/api.py:245",
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestRESTInventory"
+        ],
+        "contract": [
+          "client_test.go#TestEveryCatalogEndpointHasCallableWireContract",
+          "client_test.go#TestDecodeErrorPreservesStatusHeadersAndRaw",
+          "client_test.go#TestWriteTransportNeverRetries",
+          "tls_test.go#TestTLSMutualAuthenticationEncryptedKeyAndRotationCache"
+        ],
+        "integration": [
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "scripts/test-patroni-integration.sh#v3.3.8-v4.0.7-v4.1.3-matrix"
+        ]
+      },
+      "status": "complete"
+    },
+    {
+      "id": "head-sync",
+      "method": "HEAD",
+      "path": "/sync",
+      "handler": "do_HEAD",
+      "risk": "read",
+      "request": "none",
+      "response": "status-only",
+      "since": "3.0.0",
+      "rawResponse": true,
+      "sourceRef": "patroni/api.py:426",
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestRESTInventory"
+        ],
+        "contract": [
+          "client_test.go#TestEveryCatalogEndpointHasCallableWireContract",
+          "client_test.go#TestDecodeErrorPreservesStatusHeadersAndRaw",
+          "client_test.go#TestWriteTransportNeverRetries",
+          "tls_test.go#TestTLSMutualAuthenticationEncryptedKeyAndRotationCache"
+        ],
+        "integration": [
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "scripts/test-patroni-integration.sh#v3.3.8-v4.0.7-v4.1.3-matrix"
+        ]
+      },
+      "status": "complete"
+    },
+    {
+      "id": "options-sync",
+      "method": "OPTIONS",
+      "path": "/sync",
+      "handler": "do_OPTIONS",
+      "risk": "read",
+      "request": "none",
+      "response": "status-only",
+      "since": "3.0.0",
+      "rawResponse": true,
+      "sourceRef": "patroni/api.py:418",
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestRESTInventory"
+        ],
+        "contract": [
+          "client_test.go#TestEveryCatalogEndpointHasCallableWireContract",
+          "client_test.go#TestDecodeErrorPreservesStatusHeadersAndRaw",
+          "client_test.go#TestWriteTransportNeverRetries",
+          "tls_test.go#TestTLSMutualAuthenticationEncryptedKeyAndRotationCache"
+        ],
+        "integration": [
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "scripts/test-patroni-integration.sh#v3.3.8-v4.0.7-v4.1.3-matrix"
+        ]
+      },
+      "status": "complete"
+    },
+    {
+      "id": "get-synchronous",
+      "method": "GET",
+      "path": "/synchronous",
+      "handler": "do_GET",
+      "risk": "read",
+      "request": "none",
+      "response": "status-json",
+      "since": "3.0.0",
+      "rawResponse": true,
+      "sourceRef": "patroni/api.py:245",
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestRESTInventory"
+        ],
+        "contract": [
+          "client_test.go#TestEveryCatalogEndpointHasCallableWireContract",
+          "client_test.go#TestDecodeErrorPreservesStatusHeadersAndRaw",
+          "client_test.go#TestWriteTransportNeverRetries",
+          "tls_test.go#TestTLSMutualAuthenticationEncryptedKeyAndRotationCache"
+        ],
+        "integration": [
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "scripts/test-patroni-integration.sh#v3.3.8-v4.0.7-v4.1.3-matrix"
+        ]
+      },
+      "status": "complete"
+    },
+    {
+      "id": "head-synchronous",
+      "method": "HEAD",
+      "path": "/synchronous",
+      "handler": "do_HEAD",
+      "risk": "read",
+      "request": "none",
+      "response": "status-only",
+      "since": "3.0.0",
+      "rawResponse": true,
+      "sourceRef": "patroni/api.py:426",
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestRESTInventory"
+        ],
+        "contract": [
+          "client_test.go#TestEveryCatalogEndpointHasCallableWireContract",
+          "client_test.go#TestDecodeErrorPreservesStatusHeadersAndRaw",
+          "client_test.go#TestWriteTransportNeverRetries",
+          "tls_test.go#TestTLSMutualAuthenticationEncryptedKeyAndRotationCache"
+        ],
+        "integration": [
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "scripts/test-patroni-integration.sh#v3.3.8-v4.0.7-v4.1.3-matrix"
+        ]
+      },
+      "status": "complete"
+    },
+    {
+      "id": "options-synchronous",
+      "method": "OPTIONS",
+      "path": "/synchronous",
+      "handler": "do_OPTIONS",
+      "risk": "read",
+      "request": "none",
+      "response": "status-only",
+      "since": "3.0.0",
+      "rawResponse": true,
+      "sourceRef": "patroni/api.py:418",
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestRESTInventory"
+        ],
+        "contract": [
+          "client_test.go#TestEveryCatalogEndpointHasCallableWireContract",
+          "client_test.go#TestDecodeErrorPreservesStatusHeadersAndRaw",
+          "client_test.go#TestWriteTransportNeverRetries",
+          "tls_test.go#TestTLSMutualAuthenticationEncryptedKeyAndRotationCache"
+        ],
+        "integration": [
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "scripts/test-patroni-integration.sh#v3.3.8-v4.0.7-v4.1.3-matrix"
+        ]
+      },
+      "status": "complete"
+    },
+    {
+      "id": "get-read-only-sync",
+      "method": "GET",
+      "path": "/read-only-sync",
+      "handler": "do_GET",
+      "risk": "read",
+      "request": "none",
+      "response": "status-json",
+      "since": "3.0.0",
+      "rawResponse": true,
+      "sourceRef": "patroni/api.py:245",
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestRESTInventory"
+        ],
+        "contract": [
+          "client_test.go#TestEveryCatalogEndpointHasCallableWireContract",
+          "client_test.go#TestDecodeErrorPreservesStatusHeadersAndRaw",
+          "client_test.go#TestWriteTransportNeverRetries",
+          "tls_test.go#TestTLSMutualAuthenticationEncryptedKeyAndRotationCache"
+        ],
+        "integration": [
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "scripts/test-patroni-integration.sh#v3.3.8-v4.0.7-v4.1.3-matrix"
+        ]
+      },
+      "status": "complete"
+    },
+    {
+      "id": "head-read-only-sync",
+      "method": "HEAD",
+      "path": "/read-only-sync",
+      "handler": "do_HEAD",
+      "risk": "read",
+      "request": "none",
+      "response": "status-only",
+      "since": "3.0.0",
+      "rawResponse": true,
+      "sourceRef": "patroni/api.py:426",
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestRESTInventory"
+        ],
+        "contract": [
+          "client_test.go#TestEveryCatalogEndpointHasCallableWireContract",
+          "client_test.go#TestDecodeErrorPreservesStatusHeadersAndRaw",
+          "client_test.go#TestWriteTransportNeverRetries",
+          "tls_test.go#TestTLSMutualAuthenticationEncryptedKeyAndRotationCache"
+        ],
+        "integration": [
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "scripts/test-patroni-integration.sh#v3.3.8-v4.0.7-v4.1.3-matrix"
+        ]
+      },
+      "status": "complete"
+    },
+    {
+      "id": "options-read-only-sync",
+      "method": "OPTIONS",
+      "path": "/read-only-sync",
+      "handler": "do_OPTIONS",
+      "risk": "read",
+      "request": "none",
+      "response": "status-only",
+      "since": "3.0.0",
+      "rawResponse": true,
+      "sourceRef": "patroni/api.py:418",
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestRESTInventory"
+        ],
+        "contract": [
+          "client_test.go#TestEveryCatalogEndpointHasCallableWireContract",
+          "client_test.go#TestDecodeErrorPreservesStatusHeadersAndRaw",
+          "client_test.go#TestWriteTransportNeverRetries",
+          "tls_test.go#TestTLSMutualAuthenticationEncryptedKeyAndRotationCache"
+        ],
+        "integration": [
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "scripts/test-patroni-integration.sh#v3.3.8-v4.0.7-v4.1.3-matrix"
+        ]
+      },
+      "status": "complete"
+    },
+    {
+      "id": "get-read-only-synchronous",
+      "method": "GET",
+      "path": "/read-only-synchronous",
+      "handler": "do_GET",
+      "risk": "read",
+      "request": "none",
+      "response": "status-json",
+      "since": "3.0.0",
+      "rawResponse": true,
+      "sourceRef": "patroni/api.py:245",
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestRESTInventory"
+        ],
+        "contract": [
+          "client_test.go#TestEveryCatalogEndpointHasCallableWireContract",
+          "client_test.go#TestDecodeErrorPreservesStatusHeadersAndRaw",
+          "client_test.go#TestWriteTransportNeverRetries",
+          "tls_test.go#TestTLSMutualAuthenticationEncryptedKeyAndRotationCache"
+        ],
+        "integration": [
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "scripts/test-patroni-integration.sh#v3.3.8-v4.0.7-v4.1.3-matrix"
+        ]
+      },
+      "status": "complete"
+    },
+    {
+      "id": "head-read-only-synchronous",
+      "method": "HEAD",
+      "path": "/read-only-synchronous",
+      "handler": "do_HEAD",
+      "risk": "read",
+      "request": "none",
+      "response": "status-only",
+      "since": "3.0.0",
+      "rawResponse": true,
+      "sourceRef": "patroni/api.py:426",
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestRESTInventory"
+        ],
+        "contract": [
+          "client_test.go#TestEveryCatalogEndpointHasCallableWireContract",
+          "client_test.go#TestDecodeErrorPreservesStatusHeadersAndRaw",
+          "client_test.go#TestWriteTransportNeverRetries",
+          "tls_test.go#TestTLSMutualAuthenticationEncryptedKeyAndRotationCache"
+        ],
+        "integration": [
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "scripts/test-patroni-integration.sh#v3.3.8-v4.0.7-v4.1.3-matrix"
+        ]
+      },
+      "status": "complete"
+    },
+    {
+      "id": "options-read-only-synchronous",
+      "method": "OPTIONS",
+      "path": "/read-only-synchronous",
+      "handler": "do_OPTIONS",
+      "risk": "read",
+      "request": "none",
+      "response": "status-only",
+      "since": "3.0.0",
+      "rawResponse": true,
+      "sourceRef": "patroni/api.py:418",
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestRESTInventory"
+        ],
+        "contract": [
+          "client_test.go#TestEveryCatalogEndpointHasCallableWireContract",
+          "client_test.go#TestDecodeErrorPreservesStatusHeadersAndRaw",
+          "client_test.go#TestWriteTransportNeverRetries",
+          "tls_test.go#TestTLSMutualAuthenticationEncryptedKeyAndRotationCache"
+        ],
+        "integration": [
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "scripts/test-patroni-integration.sh#v3.3.8-v4.0.7-v4.1.3-matrix"
+        ]
+      },
+      "status": "complete"
+    },
+    {
+      "id": "get-async",
+      "method": "GET",
+      "path": "/async",
+      "handler": "do_GET",
+      "risk": "read",
+      "request": "none",
+      "response": "status-json",
+      "since": "3.0.0",
+      "rawResponse": true,
+      "sourceRef": "patroni/api.py:245",
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestRESTInventory"
+        ],
+        "contract": [
+          "client_test.go#TestEveryCatalogEndpointHasCallableWireContract",
+          "client_test.go#TestDecodeErrorPreservesStatusHeadersAndRaw",
+          "client_test.go#TestWriteTransportNeverRetries",
+          "tls_test.go#TestTLSMutualAuthenticationEncryptedKeyAndRotationCache"
+        ],
+        "integration": [
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "scripts/test-patroni-integration.sh#v3.3.8-v4.0.7-v4.1.3-matrix"
+        ]
+      },
+      "status": "complete"
+    },
+    {
+      "id": "head-async",
+      "method": "HEAD",
+      "path": "/async",
+      "handler": "do_HEAD",
+      "risk": "read",
+      "request": "none",
+      "response": "status-only",
+      "since": "3.0.0",
+      "rawResponse": true,
+      "sourceRef": "patroni/api.py:426",
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestRESTInventory"
+        ],
+        "contract": [
+          "client_test.go#TestEveryCatalogEndpointHasCallableWireContract",
+          "client_test.go#TestDecodeErrorPreservesStatusHeadersAndRaw",
+          "client_test.go#TestWriteTransportNeverRetries",
+          "tls_test.go#TestTLSMutualAuthenticationEncryptedKeyAndRotationCache"
+        ],
+        "integration": [
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "scripts/test-patroni-integration.sh#v3.3.8-v4.0.7-v4.1.3-matrix"
+        ]
+      },
+      "status": "complete"
+    },
+    {
+      "id": "options-async",
+      "method": "OPTIONS",
+      "path": "/async",
+      "handler": "do_OPTIONS",
+      "risk": "read",
+      "request": "none",
+      "response": "status-only",
+      "since": "3.0.0",
+      "rawResponse": true,
+      "sourceRef": "patroni/api.py:418",
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestRESTInventory"
+        ],
+        "contract": [
+          "client_test.go#TestEveryCatalogEndpointHasCallableWireContract",
+          "client_test.go#TestDecodeErrorPreservesStatusHeadersAndRaw",
+          "client_test.go#TestWriteTransportNeverRetries",
+          "tls_test.go#TestTLSMutualAuthenticationEncryptedKeyAndRotationCache"
+        ],
+        "integration": [
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "scripts/test-patroni-integration.sh#v3.3.8-v4.0.7-v4.1.3-matrix"
+        ]
+      },
+      "status": "complete"
+    },
+    {
+      "id": "get-asynchronous",
+      "method": "GET",
+      "path": "/asynchronous",
+      "handler": "do_GET",
+      "risk": "read",
+      "request": "none",
+      "response": "status-json",
+      "since": "3.0.0",
+      "rawResponse": true,
+      "sourceRef": "patroni/api.py:245",
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestRESTInventory"
+        ],
+        "contract": [
+          "client_test.go#TestEveryCatalogEndpointHasCallableWireContract",
+          "client_test.go#TestDecodeErrorPreservesStatusHeadersAndRaw",
+          "client_test.go#TestWriteTransportNeverRetries",
+          "tls_test.go#TestTLSMutualAuthenticationEncryptedKeyAndRotationCache"
+        ],
+        "integration": [
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "scripts/test-patroni-integration.sh#v3.3.8-v4.0.7-v4.1.3-matrix"
+        ]
+      },
+      "status": "complete"
+    },
+    {
+      "id": "head-asynchronous",
+      "method": "HEAD",
+      "path": "/asynchronous",
+      "handler": "do_HEAD",
+      "risk": "read",
+      "request": "none",
+      "response": "status-only",
+      "since": "3.0.0",
+      "rawResponse": true,
+      "sourceRef": "patroni/api.py:426",
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestRESTInventory"
+        ],
+        "contract": [
+          "client_test.go#TestEveryCatalogEndpointHasCallableWireContract",
+          "client_test.go#TestDecodeErrorPreservesStatusHeadersAndRaw",
+          "client_test.go#TestWriteTransportNeverRetries",
+          "tls_test.go#TestTLSMutualAuthenticationEncryptedKeyAndRotationCache"
+        ],
+        "integration": [
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "scripts/test-patroni-integration.sh#v3.3.8-v4.0.7-v4.1.3-matrix"
+        ]
+      },
+      "status": "complete"
+    },
+    {
+      "id": "options-asynchronous",
+      "method": "OPTIONS",
+      "path": "/asynchronous",
+      "handler": "do_OPTIONS",
+      "risk": "read",
+      "request": "none",
+      "response": "status-only",
+      "since": "3.0.0",
+      "rawResponse": true,
+      "sourceRef": "patroni/api.py:418",
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestRESTInventory"
+        ],
+        "contract": [
+          "client_test.go#TestEveryCatalogEndpointHasCallableWireContract",
+          "client_test.go#TestDecodeErrorPreservesStatusHeadersAndRaw",
+          "client_test.go#TestWriteTransportNeverRetries",
+          "tls_test.go#TestTLSMutualAuthenticationEncryptedKeyAndRotationCache"
+        ],
+        "integration": [
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "scripts/test-patroni-integration.sh#v3.3.8-v4.0.7-v4.1.3-matrix"
+        ]
+      },
+      "status": "complete"
+    },
+    {
+      "id": "get-health",
+      "method": "GET",
+      "path": "/health",
+      "handler": "do_GET",
+      "risk": "read",
+      "request": "none",
+      "response": "status-json",
+      "since": "3.0.0",
+      "rawResponse": true,
+      "sourceRef": "patroni/api.py:245",
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestRESTInventory"
+        ],
+        "contract": [
+          "client_test.go#TestEveryCatalogEndpointHasCallableWireContract",
+          "client_test.go#TestDecodeErrorPreservesStatusHeadersAndRaw",
+          "client_test.go#TestWriteTransportNeverRetries",
+          "tls_test.go#TestTLSMutualAuthenticationEncryptedKeyAndRotationCache"
+        ],
+        "integration": [
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "scripts/test-patroni-integration.sh#v3.3.8-v4.0.7-v4.1.3-matrix"
+        ]
+      },
+      "status": "complete"
+    },
+    {
+      "id": "head-health",
+      "method": "HEAD",
+      "path": "/health",
+      "handler": "do_HEAD",
+      "risk": "read",
+      "request": "none",
+      "response": "status-only",
+      "since": "3.0.0",
+      "rawResponse": true,
+      "sourceRef": "patroni/api.py:426",
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestRESTInventory"
+        ],
+        "contract": [
+          "client_test.go#TestEveryCatalogEndpointHasCallableWireContract",
+          "client_test.go#TestDecodeErrorPreservesStatusHeadersAndRaw",
+          "client_test.go#TestWriteTransportNeverRetries",
+          "tls_test.go#TestTLSMutualAuthenticationEncryptedKeyAndRotationCache"
+        ],
+        "integration": [
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "scripts/test-patroni-integration.sh#v3.3.8-v4.0.7-v4.1.3-matrix"
+        ]
+      },
+      "status": "complete"
+    },
+    {
+      "id": "options-health",
+      "method": "OPTIONS",
+      "path": "/health",
+      "handler": "do_OPTIONS",
+      "risk": "read",
+      "request": "none",
+      "response": "status-only",
+      "since": "3.0.0",
+      "rawResponse": true,
+      "sourceRef": "patroni/api.py:418",
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestRESTInventory"
+        ],
+        "contract": [
+          "client_test.go#TestEveryCatalogEndpointHasCallableWireContract",
+          "client_test.go#TestDecodeErrorPreservesStatusHeadersAndRaw",
+          "client_test.go#TestWriteTransportNeverRetries",
+          "tls_test.go#TestTLSMutualAuthenticationEncryptedKeyAndRotationCache"
+        ],
+        "integration": [
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "scripts/test-patroni-integration.sh#v3.3.8-v4.0.7-v4.1.3-matrix"
+        ]
+      },
+      "status": "complete"
+    },
+    {
+      "id": "get-liveness",
+      "method": "GET",
+      "path": "/liveness",
+      "handler": "do_GET_liveness",
+      "risk": "read",
+      "request": "none",
+      "response": "status-only",
+      "since": "3.0.0",
+      "rawResponse": true,
+      "sourceRef": "patroni/api.py:434",
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestRESTInventory"
+        ],
+        "contract": [
+          "client_test.go#TestEveryCatalogEndpointHasCallableWireContract",
+          "client_test.go#TestDecodeErrorPreservesStatusHeadersAndRaw",
+          "client_test.go#TestWriteTransportNeverRetries",
+          "tls_test.go#TestTLSMutualAuthenticationEncryptedKeyAndRotationCache"
+        ],
+        "integration": [
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "scripts/test-patroni-integration.sh#v3.3.8-v4.0.7-v4.1.3-matrix"
+        ]
+      },
+      "status": "complete"
+    },
+    {
+      "id": "get-readiness",
+      "method": "GET",
+      "path": "/readiness",
+      "handler": "do_GET_readiness",
+      "risk": "read",
+      "request": "none",
+      "response": "status-only",
+      "since": "3.0.0",
+      "rawResponse": true,
+      "sourceRef": "patroni/api.py:501",
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestRESTInventory"
+        ],
+        "contract": [
+          "client_test.go#TestEveryCatalogEndpointHasCallableWireContract",
+          "client_test.go#TestDecodeErrorPreservesStatusHeadersAndRaw",
+          "client_test.go#TestWriteTransportNeverRetries",
+          "tls_test.go#TestTLSMutualAuthenticationEncryptedKeyAndRotationCache"
+        ],
+        "integration": [
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "scripts/test-patroni-integration.sh#v3.3.8-v4.0.7-v4.1.3-matrix"
+        ]
+      },
+      "status": "complete"
+    },
+    {
+      "id": "get-patroni",
+      "method": "GET",
+      "path": "/patroni",
+      "handler": "do_GET_patroni",
+      "risk": "read",
+      "request": "none",
+      "response": "status-json",
+      "since": "3.0.0",
+      "rawResponse": true,
+      "sourceRef": "patroni/api.py:529",
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestRESTInventory"
+        ],
+        "contract": [
+          "client_test.go#TestEveryCatalogEndpointHasCallableWireContract",
+          "client_test.go#TestDecodeErrorPreservesStatusHeadersAndRaw",
+          "client_test.go#TestWriteTransportNeverRetries",
+          "tls_test.go#TestTLSMutualAuthenticationEncryptedKeyAndRotationCache"
+        ],
+        "integration": [
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "scripts/test-patroni-integration.sh#v3.3.8-v4.0.7-v4.1.3-matrix"
+        ]
+      },
+      "status": "complete"
+    },
+    {
+      "id": "get-cluster",
+      "method": "GET",
+      "path": "/cluster",
+      "handler": "do_GET_cluster",
+      "risk": "read",
+      "request": "none",
+      "response": "cluster-json",
+      "since": "3.0.0",
+      "rawResponse": true,
+      "sourceRef": "patroni/api.py:539",
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestRESTInventory"
+        ],
+        "contract": [
+          "client_test.go#TestEveryCatalogEndpointHasCallableWireContract",
+          "client_test.go#TestDecodeErrorPreservesStatusHeadersAndRaw",
+          "client_test.go#TestWriteTransportNeverRetries",
+          "tls_test.go#TestTLSMutualAuthenticationEncryptedKeyAndRotationCache"
+        ],
+        "integration": [
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "scripts/test-patroni-integration.sh#v3.3.8-v4.0.7-v4.1.3-matrix"
+        ]
+      },
+      "status": "complete"
+    },
+    {
+      "id": "get-history",
+      "method": "GET",
+      "path": "/history",
+      "handler": "do_GET_history",
+      "risk": "read",
+      "request": "none",
+      "response": "history-json",
+      "since": "3.0.0",
+      "rawResponse": true,
+      "sourceRef": "patroni/api.py:551",
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestRESTInventory"
+        ],
+        "contract": [
+          "client_test.go#TestEveryCatalogEndpointHasCallableWireContract",
+          "client_test.go#TestDecodeErrorPreservesStatusHeadersAndRaw",
+          "client_test.go#TestWriteTransportNeverRetries",
+          "tls_test.go#TestTLSMutualAuthenticationEncryptedKeyAndRotationCache"
+        ],
+        "integration": [
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "scripts/test-patroni-integration.sh#v3.3.8-v4.0.7-v4.1.3-matrix"
+        ]
+      },
+      "status": "complete"
+    },
+    {
+      "id": "get-config",
+      "method": "GET",
+      "path": "/config",
+      "handler": "do_GET_config",
+      "risk": "read",
+      "request": "none",
+      "response": "config-json",
+      "since": "3.0.0",
+      "rawResponse": true,
+      "sourceRef": "patroni/api.py:570",
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestRESTInventory"
+        ],
+        "contract": [
+          "client_test.go#TestEveryCatalogEndpointHasCallableWireContract",
+          "client_test.go#TestDecodeErrorPreservesStatusHeadersAndRaw",
+          "client_test.go#TestWriteTransportNeverRetries",
+          "tls_test.go#TestTLSMutualAuthenticationEncryptedKeyAndRotationCache"
+        ],
+        "integration": [
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "scripts/test-patroni-integration.sh#v3.3.8-v4.0.7-v4.1.3-matrix"
+        ]
+      },
+      "status": "complete"
+    },
+    {
+      "id": "get-metrics",
+      "method": "GET",
+      "path": "/metrics",
+      "handler": "do_GET_metrics",
+      "risk": "read",
+      "request": "none",
+      "response": "prometheus-text",
+      "since": "3.0.0",
+      "rawResponse": true,
+      "sourceRef": "patroni/api.py:585",
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestRESTInventory"
+        ],
+        "contract": [
+          "client_test.go#TestEveryCatalogEndpointHasCallableWireContract",
+          "client_test.go#TestDecodeErrorPreservesStatusHeadersAndRaw",
+          "client_test.go#TestWriteTransportNeverRetries",
+          "tls_test.go#TestTLSMutualAuthenticationEncryptedKeyAndRotationCache"
+        ],
+        "integration": [
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "scripts/test-patroni-integration.sh#v3.3.8-v4.0.7-v4.1.3-matrix"
+        ]
+      },
+      "status": "complete"
+    },
+    {
+      "id": "get-failsafe",
+      "method": "GET",
+      "path": "/failsafe",
+      "handler": "do_GET_failsafe",
+      "risk": "peer-internal-read",
+      "request": "none",
+      "response": "failsafe-json",
+      "since": "3.0.0",
+      "rawResponse": true,
+      "sourceRef": "patroni/api.py:833",
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestRESTInventory"
+        ],
+        "contract": [
+          "client_test.go#TestEveryCatalogEndpointHasCallableWireContract",
+          "client_test.go#TestDecodeErrorPreservesStatusHeadersAndRaw",
+          "client_test.go#TestWriteTransportNeverRetries",
+          "tls_test.go#TestTLSMutualAuthenticationEncryptedKeyAndRotationCache"
+        ],
+        "integration": [
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "scripts/test-patroni-integration.sh#v3.3.8-v4.0.7-v4.1.3-matrix"
+        ]
+      },
+      "status": "complete"
+    },
+    {
+      "id": "patch-config",
+      "method": "PATCH",
+      "path": "/config",
+      "handler": "do_PATCH_config",
+      "risk": "admin-write",
+      "request": "config-patch-json",
+      "response": "config-json",
+      "since": "3.0.0",
+      "rawResponse": true,
+      "sourceRef": "patroni/api.py:780",
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestRESTInventory"
+        ],
+        "contract": [
+          "client_test.go#TestEveryCatalogEndpointHasCallableWireContract",
+          "client_test.go#TestDecodeErrorPreservesStatusHeadersAndRaw",
+          "client_test.go#TestWriteTransportNeverRetries",
+          "tls_test.go#TestTLSMutualAuthenticationEncryptedKeyAndRotationCache"
+        ],
+        "integration": [
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "scripts/test-patroni-integration.sh#v3.3.8-v4.0.7-v4.1.3-matrix"
+        ]
+      },
+      "status": "complete"
+    },
+    {
+      "id": "put-config",
+      "method": "PUT",
+      "path": "/config",
+      "handler": "do_PUT_config",
+      "risk": "admin-write",
+      "request": "config-json",
+      "response": "config-json",
+      "since": "3.0.0",
+      "rawResponse": true,
+      "sourceRef": "patroni/api.py:806",
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestRESTInventory"
+        ],
+        "contract": [
+          "client_test.go#TestEveryCatalogEndpointHasCallableWireContract",
+          "client_test.go#TestDecodeErrorPreservesStatusHeadersAndRaw",
+          "client_test.go#TestWriteTransportNeverRetries",
+          "tls_test.go#TestTLSMutualAuthenticationEncryptedKeyAndRotationCache"
+        ],
+        "integration": [
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "scripts/test-patroni-integration.sh#v3.3.8-v4.0.7-v4.1.3-matrix"
+        ]
+      },
+      "status": "complete"
+    },
+    {
+      "id": "post-reload",
+      "method": "POST",
+      "path": "/reload",
+      "handler": "do_POST_reload",
+      "risk": "admin-write",
+      "request": "none",
+      "response": "text",
+      "since": "3.0.0",
+      "rawResponse": true,
+      "sourceRef": "patroni/api.py:825",
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestRESTInventory"
+        ],
+        "contract": [
+          "client_test.go#TestEveryCatalogEndpointHasCallableWireContract",
+          "client_test.go#TestDecodeErrorPreservesStatusHeadersAndRaw",
+          "client_test.go#TestWriteTransportNeverRetries",
+          "tls_test.go#TestTLSMutualAuthenticationEncryptedKeyAndRotationCache"
+        ],
+        "integration": [
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "scripts/test-patroni-integration.sh#v3.3.8-v4.0.7-v4.1.3-matrix"
+        ]
+      },
+      "status": "complete"
+    },
+    {
+      "id": "post-failsafe",
+      "method": "POST",
+      "path": "/failsafe",
+      "handler": "do_POST_failsafe",
+      "risk": "peer-internal",
+      "request": "failsafe-peer-json",
+      "response": "text",
+      "since": "3.0.0",
+      "rawResponse": true,
+      "sourceRef": "patroni/api.py:850",
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestRESTInventory"
+        ],
+        "contract": [
+          "client_test.go#TestEveryCatalogEndpointHasCallableWireContract",
+          "client_test.go#TestDecodeErrorPreservesStatusHeadersAndRaw",
+          "client_test.go#TestWriteTransportNeverRetries",
+          "tls_test.go#TestTLSMutualAuthenticationEncryptedKeyAndRotationCache"
+        ],
+        "integration": [
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "scripts/test-patroni-integration.sh#v3.3.8-v4.0.7-v4.1.3-matrix"
+        ]
+      },
+      "status": "complete"
+    },
+    {
+      "id": "post-sigterm",
+      "method": "POST",
+      "path": "/sigterm",
+      "handler": "do_POST_sigterm",
+      "risk": "test-platform-dangerous",
+      "request": "none",
+      "response": "text",
+      "since": "3.0.0",
+      "rawResponse": true,
+      "sourceRef": "patroni/api.py:871",
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestRESTInventory"
+        ],
+        "contract": [
+          "client_test.go#TestEveryCatalogEndpointHasCallableWireContract",
+          "client_test.go#TestDecodeErrorPreservesStatusHeadersAndRaw",
+          "client_test.go#TestWriteTransportNeverRetries",
+          "tls_test.go#TestTLSMutualAuthenticationEncryptedKeyAndRotationCache"
+        ],
+        "integration": [
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "scripts/test-patroni-integration.sh#v3.3.8-v4.0.7-v4.1.3-matrix"
+        ]
+      },
+      "status": "complete"
+    },
+    {
+      "id": "post-restart",
+      "method": "POST",
+      "path": "/restart",
+      "handler": "do_POST_restart",
+      "risk": "admin-write",
+      "request": "restart-json",
+      "response": "text",
+      "since": "3.0.0",
+      "rawResponse": true,
+      "sourceRef": "patroni/api.py:922",
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestRESTInventory"
+        ],
+        "contract": [
+          "client_test.go#TestEveryCatalogEndpointHasCallableWireContract",
+          "client_test.go#TestDecodeErrorPreservesStatusHeadersAndRaw",
+          "client_test.go#TestWriteTransportNeverRetries",
+          "tls_test.go#TestTLSMutualAuthenticationEncryptedKeyAndRotationCache"
+        ],
+        "integration": [
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "scripts/test-patroni-integration.sh#v3.3.8-v4.0.7-v4.1.3-matrix"
+        ]
+      },
+      "status": "complete"
+    },
+    {
+      "id": "delete-restart",
+      "method": "DELETE",
+      "path": "/restart",
+      "handler": "do_DELETE_restart",
+      "risk": "admin-write",
+      "request": "none",
+      "response": "text",
+      "since": "3.0.0",
+      "rawResponse": true,
+      "sourceRef": "patroni/api.py:1024",
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestRESTInventory"
+        ],
+        "contract": [
+          "client_test.go#TestEveryCatalogEndpointHasCallableWireContract",
+          "client_test.go#TestDecodeErrorPreservesStatusHeadersAndRaw",
+          "client_test.go#TestWriteTransportNeverRetries",
+          "tls_test.go#TestTLSMutualAuthenticationEncryptedKeyAndRotationCache"
+        ],
+        "integration": [
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "scripts/test-patroni-integration.sh#v3.3.8-v4.0.7-v4.1.3-matrix"
+        ]
+      },
+      "status": "complete"
+    },
+    {
+      "id": "delete-switchover",
+      "method": "DELETE",
+      "path": "/switchover",
+      "handler": "do_DELETE_switchover",
+      "risk": "admin-write",
+      "request": "none",
+      "response": "text",
+      "since": "3.0.0",
+      "rawResponse": true,
+      "sourceRef": "patroni/api.py:1043",
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestRESTInventory"
+        ],
+        "contract": [
+          "client_test.go#TestEveryCatalogEndpointHasCallableWireContract",
+          "client_test.go#TestDecodeErrorPreservesStatusHeadersAndRaw",
+          "client_test.go#TestWriteTransportNeverRetries",
+          "tls_test.go#TestTLSMutualAuthenticationEncryptedKeyAndRotationCache"
+        ],
+        "integration": [
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "scripts/test-patroni-integration.sh#v3.3.8-v4.0.7-v4.1.3-matrix"
+        ]
+      },
+      "status": "complete"
+    },
+    {
+      "id": "post-reinitialize",
+      "method": "POST",
+      "path": "/reinitialize",
+      "handler": "do_POST_reinitialize",
+      "risk": "admin-write",
+      "request": "reinitialize-json",
+      "response": "text",
+      "since": "3.0.0",
+      "rawResponse": true,
+      "sourceRef": "patroni/api.py:1067",
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestRESTInventory"
+        ],
+        "contract": [
+          "client_test.go#TestEveryCatalogEndpointHasCallableWireContract",
+          "client_test.go#TestDecodeErrorPreservesStatusHeadersAndRaw",
+          "client_test.go#TestWriteTransportNeverRetries",
+          "tls_test.go#TestTLSMutualAuthenticationEncryptedKeyAndRotationCache"
+        ],
+        "integration": [
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "scripts/test-patroni-integration.sh#v3.3.8-v4.0.7-v4.1.3-matrix"
+        ]
+      },
+      "status": "complete"
+    },
+    {
+      "id": "post-failover",
+      "method": "POST",
+      "path": "/failover",
+      "handler": "do_POST_failover",
+      "risk": "availability-write",
+      "request": "failover-json",
+      "response": "text",
+      "since": "3.0.0",
+      "rawResponse": true,
+      "sourceRef": "patroni/api.py:1165",
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestRESTInventory"
+        ],
+        "contract": [
+          "client_test.go#TestEveryCatalogEndpointHasCallableWireContract",
+          "client_test.go#TestDecodeErrorPreservesStatusHeadersAndRaw",
+          "client_test.go#TestWriteTransportNeverRetries",
+          "tls_test.go#TestTLSMutualAuthenticationEncryptedKeyAndRotationCache"
+        ],
+        "integration": [
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "scripts/test-patroni-integration.sh#v3.3.8-v4.0.7-v4.1.3-matrix"
+        ]
+      },
+      "status": "complete"
+    },
+    {
+      "id": "post-switchover",
+      "method": "POST",
+      "path": "/switchover",
+      "handler": "do_POST_switchover",
+      "risk": "availability-write",
+      "request": "switchover-json",
+      "response": "text",
+      "since": "3.0.0",
+      "rawResponse": true,
+      "sourceRef": "patroni/api.py:1252",
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestRESTInventory"
+        ],
+        "contract": [
+          "client_test.go#TestEveryCatalogEndpointHasCallableWireContract",
+          "client_test.go#TestDecodeErrorPreservesStatusHeadersAndRaw",
+          "client_test.go#TestWriteTransportNeverRetries",
+          "tls_test.go#TestTLSMutualAuthenticationEncryptedKeyAndRotationCache"
+        ],
+        "integration": [
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "scripts/test-patroni-integration.sh#v3.3.8-v4.0.7-v4.1.3-matrix"
+        ]
+      },
+      "status": "complete"
+    },
+    {
+      "id": "post-citus",
+      "method": "POST",
+      "path": "/citus",
+      "handler": "do_POST_citus",
+      "risk": "peer-internal",
+      "request": "mpp-event-json",
+      "response": "text",
+      "since": "3.0.0",
+      "rawResponse": true,
+      "sourceRef": "patroni/api.py:1260",
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestRESTInventory"
+        ],
+        "contract": [
+          "client_test.go#TestEveryCatalogEndpointHasCallableWireContract",
+          "client_test.go#TestDecodeErrorPreservesStatusHeadersAndRaw",
+          "client_test.go#TestWriteTransportNeverRetries",
+          "tls_test.go#TestTLSMutualAuthenticationEncryptedKeyAndRotationCache"
+        ],
+        "integration": [
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "scripts/test-patroni-integration.sh#v3.3.8-v4.0.7-v4.1.3-matrix"
+        ]
+      },
+      "status": "complete"
+    },
+    {
+      "id": "post-mpp",
+      "method": "POST",
+      "path": "/mpp",
+      "handler": "do_POST_mpp",
+      "risk": "peer-internal",
+      "request": "mpp-event-json",
+      "response": "text",
+      "since": "3.3.0",
+      "rawResponse": true,
+      "sourceRef": "patroni/api.py:1268",
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestRESTInventory"
+        ],
+        "contract": [
+          "client_test.go#TestEveryCatalogEndpointHasCallableWireContract",
+          "client_test.go#TestDecodeErrorPreservesStatusHeadersAndRaw",
+          "client_test.go#TestWriteTransportNeverRetries",
+          "tls_test.go#TestTLSMutualAuthenticationEncryptedKeyAndRotationCache"
+        ],
+        "integration": [
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "scripts/test-patroni-integration.sh#v3.3.8-v4.0.7-v4.1.3-matrix"
+        ]
+      },
+      "status": "complete"
+    }
+  ],
+  "releasePolicy": "every method/path row requires typed SDK and contract tests; raw response is mandatory"
+}

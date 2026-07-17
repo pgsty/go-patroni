@@ -1,0 +1,41 @@
+{
+  "schemaVersion": "patroni.pgsty.com/compatibility/v1alpha1",
+  "kind": "PatroniSourcePin",
+  "generatedBy": "tools/compatgen + test/compat/oracle/extract_inventory.py",
+  "repository": "https://github.com/patroni/patroni",
+  "commit": "d35409952f970d7f33d36d8f868eb20fc1e2a7f7",
+  "describe": "v4.1.3",
+  "version": "4.1.3",
+  "commitDate": "2026-05-05T14:33:39Z",
+  "supportedRange": ">=3.0.0,<5.0.0",
+  "contractFiles": [
+    {
+      "path": "patroni/ctl.py",
+      "sha256": "55be3208399b71791a8f8041fb64d570d7b742cf8ccc18bd9d07d6a3b28e0fa4"
+    },
+    {
+      "path": "patroni/api.py",
+      "sha256": "3561c8e74918cdd9e3a3e1d373760a5a4a333b34287a5535ba7b8c395480e897"
+    },
+    {
+      "path": "patroni/dcs/__init__.py",
+      "sha256": "6d32bac79b9fc5e3cefdb69d22052add9eb494cba9697094258e1c08c386ba85"
+    },
+    {
+      "path": "patroni/dcs/etcd3.py",
+      "sha256": "668984b52bce37670556fd19034737a82b366b1e59e63f776b4c9bade14d5ff4"
+    },
+    {
+      "path": "patroni/version.py",
+      "sha256": "ca90a63c905ed5835bfe91af1f04a629a440ad3887b68db0faffdc80cf874b3c"
+    },
+    {
+      "path": "docs/rest_api.rst",
+      "sha256": "150b3e18661f2d4abfb502b90324523ea1e14b0b4682fc7d593206cbbddd5c18"
+    }
+  ],
+  "sourceKind": "github-tag-archive",
+  "worktree": {
+    "contractFilesClean": true
+  }
+}

@@ -14,7 +14,7 @@ var (
 
 const (
 	SupportedPatroni = ">=3.0.0,<5.0.0"
-	MachineSchema    = "boar.pgsty.com/v1alpha1"
+	MachineSchema    = "patroni.pgsty.com/v1alpha1"
 )
 
 // Info is the stable source for CLI and Server version adapters.

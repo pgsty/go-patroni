@@ -1,0 +1,1942 @@
+{
+  "$defs": {
+    "cli_machineCluster": {
+      "additionalProperties": false,
+      "properties": {
+        "discoveryState": {
+          "enum": [
+            "DISCOVERED",
+            "CONFIGURED_ONLY",
+            "ABSENT"
+          ],
+          "type": "string"
+        },
+        "healthState": {
+          "enum": [
+            "HEALTHY",
+            "DEGRADED",
+            "UNHEALTHY",
+            "UNKNOWN"
+          ],
+          "type": "string"
+        },
+        "initialize": {
+          "type": "string"
+        },
+        "leader": {
+          "type": "string"
+        },
+        "managementState": {
+          "enum": [
+            "EXPLICIT",
+            "ALL_SELECTED",
+            "UNMANAGED"
+          ],
+          "type": "string"
+        },
+        "members": {
+          "items": {
+            "$ref": "#/$defs/model_Member"
+          },
+          "type": "array"
+        },
+        "paused": {
+          "type": "boolean"
+        },
+        "reachabilityState": {
+          "enum": [
+            "REACHABLE",
+            "PARTIALLY_REACHABLE",
+            "UNREACHABLE",
+            "UNKNOWN"
+          ],
+          "type": "string"
+        },
+        "revision": {
+          "type": "integer"
+        },
+        "scheduledSwitchover": {
+          "$ref": "#/$defs/model_ScheduledSwitchover"
+        },
+        "target": {
+          "$ref": "#/$defs/model_Target"
+        }
+      },
+      "required": [
+        "discoveryState",
+        "healthState",
+        "managementState",
+        "members",
+        "paused",
+        "reachabilityState",
+        "revision",
+        "target"
+      ],
+      "type": "object"
+    },
+    "cli_machineClusterList": {
+      "additionalProperties": false,
+      "properties": {
+        "clusters": {
+          "items": {
+            "$ref": "#/$defs/cli_machineCluster"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "clusters"
+      ],
+      "type": "object"
+    },
+    "cli_machineClusterSummary": {
+      "additionalProperties": false,
+      "properties": {
+        "discoveryState": {
+          "enum": [
+            "DISCOVERED",
+            "CONFIGURED_ONLY",
+            "ABSENT"
+          ],
+          "type": "string"
+        },
+        "healthState": {
+          "enum": [
+            "HEALTHY",
+            "DEGRADED",
+            "UNHEALTHY",
+            "UNKNOWN"
+          ],
+          "type": "string"
+        },
+        "leader": {
+          "type": "string"
+        },
+        "managementState": {
+          "enum": [
+            "EXPLICIT",
+            "ALL_SELECTED",
+            "UNMANAGED"
+          ],
+          "type": "string"
+        },
+        "memberCount": {
+          "type": "integer"
+        },
+        "reachabilityState": {
+          "enum": [
+            "REACHABLE",
+            "PARTIALLY_REACHABLE",
+            "UNREACHABLE",
+            "UNKNOWN"
+          ],
+          "type": "string"
+        },
+        "revision": {
+          "type": "integer"
+        },
+        "target": {
+          "$ref": "#/$defs/model_Target"
+        }
+      },
+      "required": [
+        "discoveryState",
+        "healthState",
+        "managementState",
+        "memberCount",
+        "reachabilityState",
+        "revision",
+        "target"
+      ],
+      "type": "object"
+    },
+    "cli_machineDiscovery": {
+      "additionalProperties": false,
+      "properties": {
+        "clusters": {
+          "items": {
+            "$ref": "#/$defs/cli_machineClusterSummary"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "clusters"
+      ],
+      "type": "object"
+    },
+    "cli_machineError": {
+      "additionalProperties": false,
+      "properties": {
+        "category": {
+          "enum": [
+            "USAGE",
+            "CONFIG",
+            "UNSUPPORTED",
+            "AUTH",
+            "TLS",
+            "NOT_FOUND",
+            "CONFLICT",
+            "UNREACHABLE",
+            "FAILED",
+            "UNKNOWN",
+            "INTERNAL"
+          ],
+          "type": "string"
+        },
+        "cause": {
+          "enum": [
+            "INVALID_INPUT",
+            "INVALID_CONFIGURATION",
+            "UNSUPPORTED_PATRONI_VERSION",
+            "AUTHENTICATION_REJECTED",
+            "TLS_CONFIGURATION_OR_VERIFICATION_FAILED",
+            "TARGET_NOT_FOUND",
+            "CONCURRENT_STATE_CONFLICT",
+            "UPSTREAM_UNREACHABLE",
+            "OPERATION_REJECTED",
+            "OUTCOME_UNCONFIRMED",
+            "INTERNAL_INVARIANT"
+          ],
+          "type": "string"
+        },
+        "evidence": {
+          "items": {
+            "$ref": "#/$defs/control_Evidence"
+          },
+          "type": "array"
+        },
+        "message": {
+          "type": "string"
+        },
+        "nextActions": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "operation": {
+          "type": "string"
+        },
+        "retryable": {
+          "type": "boolean"
+        },
+        "target": {
+          "$ref": "#/$defs/model_Target"
+        }
+      },
+      "required": [
+        "category",
+        "cause",
+        "evidence",
+        "message",
+        "nextActions",
+        "operation",
+        "retryable",
+        "target"
+      ],
+      "type": "object"
+    },
+    "cli_machineMemberVersion": {
+      "additionalProperties": false,
+      "properties": {
+        "error": {
+          "$ref": "#/$defs/cli_machineError"
+        },
+        "httpStatus": {
+          "maximum": 599,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "patroniVersion": {
+          "type": "string"
+        },
+        "postgresVersion": {
+          "type": "string"
+        },
+        "target": {
+          "$ref": "#/$defs/model_Target"
+        }
+      },
+      "required": [
+        "target"
+      ],
+      "type": "object"
+    },
+    "cli_machineTopology": {
+      "additionalProperties": false,
+      "properties": {
+        "cluster": {
+          "$ref": "#/$defs/cli_machineCluster"
+        },
+        "members": {
+          "items": {
+            "$ref": "#/$defs/cli_machineTopologyMember"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "cluster",
+        "members"
+      ],
+      "type": "object"
+    },
+    "cli_machineTopologyList": {
+      "additionalProperties": false,
+      "properties": {
+        "topologies": {
+          "items": {
+            "$ref": "#/$defs/cli_machineTopology"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "topologies"
+      ],
+      "type": "object"
+    },
+    "cli_machineTopologyMember": {
+      "additionalProperties": false,
+      "properties": {
+        "depth": {
+          "type": "integer"
+        },
+        "member": {
+          "$ref": "#/$defs/model_Member"
+        },
+        "parent": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "depth",
+        "member"
+      ],
+      "type": "object"
+    },
+    "cli_machineVersionInfo": {
+      "additionalProperties": false,
+      "properties": {
+        "buildTime": {
+          "type": "string"
+        },
+        "commit": {
+          "type": "string"
+        },
+        "goVersion": {
+          "type": "string"
+        },
+        "machineSchema": {
+          "const": "patroni.pgsty.com/v1alpha1",
+          "type": "string"
+        },
+        "members": {
+          "items": {
+            "$ref": "#/$defs/cli_machineMemberVersion"
+          },
+          "type": "array"
+        },
+        "supportedPatroni": {
+          "const": "\u003e=3.0.0,\u003c5.0.0",
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "buildTime",
+        "commit",
+        "goVersion",
+        "machineSchema",
+        "members",
+        "supportedPatroni",
+        "version"
+      ],
+      "type": "object"
+    },
+    "config_Warning": {
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "enum": [
+            "SCHEMELESS_DCS_URL",
+            "INSECURE_REST_TLS"
+          ],
+          "type": "string"
+        },
+        "field": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "code",
+        "field",
+        "message"
+      ],
+      "type": "object"
+    },
+    "control_BatchWriteData": {
+      "additionalProperties": false,
+      "properties": {
+        "members": {
+          "items": {
+            "$ref": "#/$defs/control_MemberWriteResult"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "members"
+      ],
+      "type": "object"
+    },
+    "control_ClusterRoleData": {
+      "additionalProperties": false,
+      "properties": {
+        "dcsRevision": {
+          "type": "integer"
+        },
+        "desiredRole": {
+          "type": "string"
+        },
+        "httpStatus": {
+          "maximum": 599,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "leader": {
+          "type": "string"
+        },
+        "noop": {
+          "type": "boolean"
+        },
+        "pendingConditions": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "previousLeader": {
+          "type": "string"
+        },
+        "restSendState": {
+          "enum": [
+            "NOT_SENT",
+            "MAYBE_SENT",
+            "ACCEPTED"
+          ],
+          "type": "string"
+        },
+        "verification": {
+          "enum": [
+            "UNVERIFIED",
+            "VERIFIED_SUCCEEDED",
+            "VERIFIED_FAILED"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "desiredRole",
+        "noop",
+        "previousLeader",
+        "restSendState",
+        "verification"
+      ],
+      "type": "object"
+    },
+    "control_ClusterWriteData": {
+      "additionalProperties": false,
+      "properties": {
+        "candidate": {
+          "type": "string"
+        },
+        "dcsRevision": {
+          "type": "integer"
+        },
+        "dcsSendState": {
+          "enum": [
+            "NOT_SENT",
+            "MAYBE_SENT",
+            "ACCEPTED"
+          ],
+          "type": "string"
+        },
+        "httpStatus": {
+          "maximum": 599,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "leader": {
+          "type": "string"
+        },
+        "legacyEndpoint": {
+          "type": "boolean"
+        },
+        "restSendState": {
+          "enum": [
+            "NOT_SENT",
+            "MAYBE_SENT",
+            "ACCEPTED"
+          ],
+          "type": "string"
+        },
+        "scheduledAt": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "verification": {
+          "enum": [
+            "UNVERIFIED",
+            "VERIFIED_SUCCEEDED",
+            "VERIFIED_FAILED"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "legacyEndpoint",
+        "restSendState",
+        "verification"
+      ],
+      "type": "object"
+    },
+    "control_ConfigData": {
+      "additionalProperties": false,
+      "properties": {
+        "config": {
+          "additionalProperties": true,
+          "type": "object"
+        },
+        "revision": {
+          "type": "integer"
+        },
+        "target": {
+          "$ref": "#/$defs/model_Target"
+        }
+      },
+      "required": [
+        "config",
+        "revision",
+        "target"
+      ],
+      "type": "object"
+    },
+    "control_ConfigEditData": {
+      "additionalProperties": false,
+      "properties": {
+        "beforeRevision": {
+          "type": "integer"
+        },
+        "changedPaths": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "dcsRevision": {
+          "type": "integer"
+        },
+        "dcsSendState": {
+          "enum": [
+            "NOT_SENT",
+            "MAYBE_SENT",
+            "ACCEPTED"
+          ],
+          "type": "string"
+        },
+        "noop": {
+          "type": "boolean"
+        },
+        "verification": {
+          "enum": [
+            "UNVERIFIED",
+            "VERIFIED_SUCCEEDED",
+            "VERIFIED_FAILED"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "beforeRevision",
+        "changedPaths",
+        "dcsSendState",
+        "noop",
+        "verification"
+      ],
+      "type": "object"
+    },
+    "control_ConfigurationInspection": {
+      "additionalProperties": false,
+      "properties": {
+        "effective": {
+          "additionalProperties": true,
+          "type": "object"
+        },
+        "networkTimeouts": {
+          "$ref": "#/$defs/control_NetworkTimeoutInspection"
+        },
+        "sources": {
+          "items": {
+            "$ref": "#/$defs/control_ConfigurationSource"
+          },
+          "type": "array"
+        },
+        "target": {
+          "$ref": "#/$defs/model_Target"
+        },
+        "warnings": {
+          "items": {
+            "$ref": "#/$defs/config_Warning"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "effective",
+        "networkTimeouts",
+        "sources",
+        "target",
+        "warnings"
+      ],
+      "type": "object"
+    },
+    "control_ConfigurationSource": {
+      "additionalProperties": false,
+      "properties": {
+        "field": {
+          "type": "string"
+        },
+        "layer": {
+          "enum": [
+            "default",
+            "file",
+            "context",
+            "environment",
+            "flag"
+          ],
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "field",
+        "layer",
+        "name"
+      ],
+      "type": "object"
+    },
+    "control_DSNData": {
+      "additionalProperties": false,
+      "properties": {
+        "host": {
+          "type": "string"
+        },
+        "member": {
+          "type": "string"
+        },
+        "port": {
+          "maximum": 65535,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "role": {
+          "enum": [
+            "leader",
+            "primary",
+            "standby-leader",
+            "replica",
+            "standby",
+            "any"
+          ],
+          "type": "string"
+        },
+        "target": {
+          "$ref": "#/$defs/model_Target"
+        }
+      },
+      "required": [
+        "host",
+        "member",
+        "port",
+        "role",
+        "target"
+      ],
+      "type": "object"
+    },
+    "control_Error": {
+      "additionalProperties": false,
+      "properties": {
+        "category": {
+          "enum": [
+            "USAGE",
+            "CONFIG",
+            "UNSUPPORTED",
+            "AUTH",
+            "TLS",
+            "NOT_FOUND",
+            "CONFLICT",
+            "UNREACHABLE",
+            "FAILED",
+            "UNKNOWN",
+            "INTERNAL"
+          ],
+          "type": "string"
+        },
+        "evidence": {
+          "items": {
+            "$ref": "#/$defs/control_Evidence"
+          },
+          "type": "array"
+        },
+        "message": {
+          "type": "string"
+        },
+        "operation": {
+          "type": "string"
+        },
+        "retryable": {
+          "type": "boolean"
+        },
+        "target": {
+          "$ref": "#/$defs/model_Target"
+        }
+      },
+      "required": [
+        "category",
+        "evidence",
+        "message",
+        "operation",
+        "retryable",
+        "target"
+      ],
+      "type": "object"
+    },
+    "control_Evidence": {
+      "additionalProperties": false,
+      "properties": {
+        "observedAt": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "revision": {
+          "type": "string"
+        },
+        "sendState": {
+          "enum": [
+            "NOT_SENT",
+            "MAYBE_SENT",
+            "ACCEPTED"
+          ],
+          "type": "string"
+        },
+        "source": {
+          "enum": [
+            "LOCAL",
+            "DCS",
+            "PATRONI",
+            "POSTGRES",
+            "CONTROL"
+          ],
+          "type": "string"
+        },
+        "summary": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "observedAt",
+        "source",
+        "summary"
+      ],
+      "type": "object"
+    },
+    "control_FlushData": {
+      "additionalProperties": false,
+      "properties": {
+        "dcsRevision": {
+          "type": "integer"
+        },
+        "dcsSendState": {
+          "enum": [
+            "NOT_SENT",
+            "MAYBE_SENT",
+            "ACCEPTED"
+          ],
+          "type": "string"
+        },
+        "event": {
+          "enum": [
+            "restart",
+            "switchover"
+          ],
+          "type": "string"
+        },
+        "noop": {
+          "type": "boolean"
+        },
+        "restSendState": {
+          "enum": [
+            "NOT_SENT",
+            "MAYBE_SENT",
+            "ACCEPTED"
+          ],
+          "type": "string"
+        },
+        "results": {
+          "items": {
+            "$ref": "#/$defs/control_MemberWriteResult"
+          },
+          "type": "array"
+        },
+        "verification": {
+          "enum": [
+            "UNVERIFIED",
+            "VERIFIED_SUCCEEDED",
+            "VERIFIED_FAILED"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "event",
+        "noop",
+        "restSendState",
+        "verification"
+      ],
+      "type": "object"
+    },
+    "control_HistoryData": {
+      "additionalProperties": false,
+      "properties": {
+        "entries": {
+          "items": {
+            "$ref": "#/$defs/control_HistoryEntry"
+          },
+          "type": "array"
+        },
+        "target": {
+          "$ref": "#/$defs/model_Target"
+        }
+      },
+      "required": [
+        "entries",
+        "target"
+      ],
+      "type": "object"
+    },
+    "control_HistoryEntry": {
+      "additionalProperties": false,
+      "properties": {
+        "lsn": {
+          "type": "integer"
+        },
+        "newLeader": {
+          "type": "string"
+        },
+        "reason": {
+          "type": "string"
+        },
+        "timeline": {
+          "type": "integer"
+        },
+        "timestamp": {
+          "format": "date-time",
+          "type": "string"
+        }
+      },
+      "required": [
+        "lsn",
+        "reason",
+        "timeline"
+      ],
+      "type": "object"
+    },
+    "control_MemberWriteResult": {
+      "additionalProperties": false,
+      "properties": {
+        "error": {
+          "$ref": "#/$defs/control_Error"
+        },
+        "evidence": {
+          "items": {
+            "$ref": "#/$defs/control_Evidence"
+          },
+          "type": "array"
+        },
+        "httpStatus": {
+          "maximum": 599,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "outcome": {
+          "enum": [
+            "SUCCEEDED",
+            "FAILED",
+            "UNKNOWN"
+          ],
+          "type": "string"
+        },
+        "sendState": {
+          "enum": [
+            "NOT_SENT",
+            "MAYBE_SENT",
+            "ACCEPTED"
+          ],
+          "type": "string"
+        },
+        "summary": {
+          "type": "string"
+        },
+        "target": {
+          "$ref": "#/$defs/model_Target"
+        },
+        "verification": {
+          "enum": [
+            "UNVERIFIED",
+            "VERIFIED_SUCCEEDED",
+            "VERIFIED_FAILED"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "evidence",
+        "outcome",
+        "sendState",
+        "summary",
+        "target",
+        "verification"
+      ],
+      "type": "object"
+    },
+    "control_NetworkTimeoutInspection": {
+      "additionalProperties": false,
+      "properties": {
+        "dcsDialMilliseconds": {
+          "type": "integer"
+        },
+        "dcsRequestMilliseconds": {
+          "type": "integer"
+        },
+        "dnsLookupMilliseconds": {
+          "type": "integer"
+        },
+        "patroniRequestMilliseconds": {
+          "type": "integer"
+        },
+        "postgresCloseMilliseconds": {
+          "type": "integer"
+        },
+        "postgresQueryMilliseconds": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "dcsDialMilliseconds",
+        "dcsRequestMilliseconds",
+        "dnsLookupMilliseconds",
+        "patroniRequestMilliseconds",
+        "postgresCloseMilliseconds",
+        "postgresQueryMilliseconds"
+      ],
+      "type": "object"
+    },
+    "control_PauseData": {
+      "additionalProperties": false,
+      "properties": {
+        "dcsRevision": {
+          "type": "integer"
+        },
+        "noop": {
+          "type": "boolean"
+        },
+        "paused": {
+          "type": "boolean"
+        },
+        "pendingMembers": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "restSendState": {
+          "enum": [
+            "NOT_SENT",
+            "MAYBE_SENT",
+            "ACCEPTED"
+          ],
+          "type": "string"
+        },
+        "results": {
+          "items": {
+            "$ref": "#/$defs/control_MemberWriteResult"
+          },
+          "type": "array"
+        },
+        "verification": {
+          "enum": [
+            "UNVERIFIED",
+            "VERIFIED_SUCCEEDED",
+            "VERIFIED_FAILED"
+          ],
+          "type": "string"
+        },
+        "wait": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "noop",
+        "paused",
+        "restSendState",
+        "verification",
+        "wait"
+      ],
+      "type": "object"
+    },
+    "control_QueryData": {
+      "additionalProperties": false,
+      "properties": {
+        "error": {
+          "$ref": "#/$defs/control_QueryError"
+        },
+        "member": {
+          "type": "string"
+        },
+        "result": {
+          "$ref": "#/$defs/postgres_QueryResult"
+        },
+        "target": {
+          "$ref": "#/$defs/model_Target"
+        }
+      },
+      "required": [
+        "result",
+        "target"
+      ],
+      "type": "object"
+    },
+    "control_QueryError": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "NO_CONNECTION",
+            "DATABASE",
+            "ROLE_MISMATCH"
+          ],
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        },
+        "sqlState": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "message"
+      ],
+      "type": "object"
+    },
+    "control_RemoveData": {
+      "additionalProperties": false,
+      "properties": {
+        "dcsRevision": {
+          "type": "integer"
+        },
+        "dcsSendState": {
+          "enum": [
+            "NOT_SENT",
+            "MAYBE_SENT",
+            "ACCEPTED"
+          ],
+          "type": "string"
+        },
+        "deleted": {
+          "type": "integer"
+        },
+        "expectedKeys": {
+          "type": "integer"
+        },
+        "noop": {
+          "type": "boolean"
+        },
+        "remainingKeys": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "verification": {
+          "enum": [
+            "UNVERIFIED",
+            "VERIFIED_SUCCEEDED",
+            "VERIFIED_FAILED"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "dcsSendState",
+        "deleted",
+        "expectedKeys",
+        "noop",
+        "verification"
+      ],
+      "type": "object"
+    },
+    "control_TopologyData": {
+      "additionalProperties": false,
+      "properties": {
+        "cluster": {
+          "$ref": "#/$defs/model_Cluster"
+        },
+        "members": {
+          "items": {
+            "$ref": "#/$defs/control_TopologyMember"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "cluster",
+        "members"
+      ],
+      "type": "object"
+    },
+    "control_TopologyMember": {
+      "additionalProperties": false,
+      "properties": {
+        "depth": {
+          "type": "integer"
+        },
+        "member": {
+          "$ref": "#/$defs/model_Member"
+        },
+        "parent": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "depth",
+        "member"
+      ],
+      "type": "object"
+    },
+    "metadata": {
+      "additionalProperties": false,
+      "properties": {
+        "observedAt": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "requestId": {
+          "type": "string"
+        },
+        "revision": {
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "minLength": 1,
+              "type": "string"
+            }
+          ]
+        },
+        "warnings": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "observedAt",
+        "requestId",
+        "warnings"
+      ],
+      "type": "object"
+    },
+    "model_Cluster": {
+      "additionalProperties": false,
+      "properties": {
+        "discoveryState": {
+          "enum": [
+            "DISCOVERED",
+            "CONFIGURED_ONLY",
+            "ABSENT"
+          ],
+          "type": "string"
+        },
+        "healthState": {
+          "enum": [
+            "HEALTHY",
+            "DEGRADED",
+            "UNHEALTHY",
+            "UNKNOWN"
+          ],
+          "type": "string"
+        },
+        "initialize": {
+          "type": "string"
+        },
+        "leader": {
+          "type": "string"
+        },
+        "managementState": {
+          "enum": [
+            "EXPLICIT",
+            "ALL_SELECTED",
+            "UNMANAGED"
+          ],
+          "type": "string"
+        },
+        "members": {
+          "items": {
+            "$ref": "#/$defs/model_Member"
+          },
+          "type": "array"
+        },
+        "paused": {
+          "type": "boolean"
+        },
+        "reachabilityState": {
+          "enum": [
+            "REACHABLE",
+            "PARTIALLY_REACHABLE",
+            "UNREACHABLE",
+            "UNKNOWN"
+          ],
+          "type": "string"
+        },
+        "revision": {
+          "type": "integer"
+        },
+        "scheduledSwitchover": {
+          "$ref": "#/$defs/model_ScheduledSwitchover"
+        },
+        "target": {
+          "$ref": "#/$defs/model_Target"
+        }
+      },
+      "required": [
+        "discoveryState",
+        "healthState",
+        "managementState",
+        "members",
+        "paused",
+        "reachabilityState",
+        "revision",
+        "target"
+      ],
+      "type": "object"
+    },
+    "model_Member": {
+      "additionalProperties": false,
+      "properties": {
+        "apiUrl": {
+          "type": "string"
+        },
+        "host": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "patroniVersion": {
+          "type": "string"
+        },
+        "pendingRestart": {
+          "type": "boolean"
+        },
+        "pendingRestartReason": {
+          "additionalProperties": true,
+          "type": "object"
+        },
+        "port": {
+          "maximum": 65535,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "receiveLagBytes": {
+          "type": "integer"
+        },
+        "receiveLsn": {
+          "type": "string"
+        },
+        "replayLagBytes": {
+          "type": "integer"
+        },
+        "replayLsn": {
+          "type": "string"
+        },
+        "role": {
+          "enum": [
+            "leader",
+            "standby_leader",
+            "sync_standby",
+            "quorum_standby",
+            "replica"
+          ],
+          "type": "string"
+        },
+        "scheduledRestart": {
+          "$ref": "#/$defs/model_ScheduledRestart"
+        },
+        "state": {
+          "type": "string"
+        },
+        "tags": {
+          "additionalProperties": true,
+          "type": "object"
+        },
+        "target": {
+          "$ref": "#/$defs/model_Target"
+        },
+        "timeline": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "name",
+        "role",
+        "target"
+      ],
+      "type": "object"
+    },
+    "model_ScheduledRestart": {
+      "additionalProperties": false,
+      "properties": {
+        "postgresVersion": {
+          "type": "string"
+        },
+        "schedule": {
+          "format": "date-time",
+          "type": "string"
+        }
+      },
+      "required": [
+        "schedule"
+      ],
+      "type": "object"
+    },
+    "model_ScheduledSwitchover": {
+      "additionalProperties": false,
+      "properties": {
+        "at": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "from": {
+          "type": "string"
+        },
+        "to": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "at"
+      ],
+      "type": "object"
+    },
+    "model_Target": {
+      "additionalProperties": false,
+      "properties": {
+        "context": {
+          "type": "string"
+        },
+        "group": {
+          "type": "integer"
+        },
+        "member": {
+          "type": "string"
+        },
+        "namespace": {
+          "pattern": "^/",
+          "type": "string"
+        },
+        "scope": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "context",
+        "namespace",
+        "scope"
+      ],
+      "type": "object"
+    },
+    "postgres_Cell": {
+      "additionalProperties": false,
+      "properties": {
+        "bytes": {
+          "type": "integer"
+        },
+        "null": {
+          "type": "boolean"
+        },
+        "text": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "bytes",
+        "null"
+      ],
+      "type": "object"
+    },
+    "postgres_Column": {
+      "additionalProperties": false,
+      "properties": {
+        "dataTypeOID": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "dataTypeSize": {
+          "type": "integer"
+        },
+        "format": {
+          "type": "integer"
+        },
+        "name": {
+          "type": "string"
+        },
+        "tableAttributeNumber": {
+          "maximum": 65535,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "tableOID": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "typeModifier": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "dataTypeOID",
+        "dataTypeSize",
+        "format",
+        "name",
+        "tableAttributeNumber",
+        "tableOID",
+        "typeModifier"
+      ],
+      "type": "object"
+    },
+    "postgres_QueryResult": {
+      "additionalProperties": false,
+      "properties": {
+        "sets": {
+          "items": {
+            "$ref": "#/$defs/postgres_ResultSet"
+          },
+          "type": "array"
+        },
+        "summary": {
+          "$ref": "#/$defs/postgres_Summary"
+        }
+      },
+      "required": [
+        "sets",
+        "summary"
+      ],
+      "type": "object"
+    },
+    "postgres_ResultSet": {
+      "additionalProperties": false,
+      "properties": {
+        "columns": {
+          "items": {
+            "$ref": "#/$defs/postgres_Column"
+          },
+          "type": "array"
+        },
+        "commandTag": {
+          "type": "string"
+        },
+        "index": {
+          "type": "integer"
+        },
+        "rows": {
+          "items": {
+            "items": {
+              "$ref": "#/$defs/postgres_Cell"
+            },
+            "type": "array"
+          },
+          "type": "array"
+        },
+        "rowsAffected": {
+          "type": "integer"
+        },
+        "truncated": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "columns",
+        "commandTag",
+        "index",
+        "rows",
+        "rowsAffected",
+        "truncated"
+      ],
+      "type": "object"
+    },
+    "postgres_ResultSummary": {
+      "additionalProperties": false,
+      "properties": {
+        "columns": {
+          "items": {
+            "$ref": "#/$defs/postgres_Column"
+          },
+          "type": "array"
+        },
+        "commandTag": {
+          "type": "string"
+        },
+        "emittedBytes": {
+          "type": "integer"
+        },
+        "emittedRows": {
+          "type": "integer"
+        },
+        "index": {
+          "type": "integer"
+        },
+        "observedBytes": {
+          "type": "integer"
+        },
+        "observedRows": {
+          "type": "integer"
+        },
+        "rowsAffected": {
+          "type": "integer"
+        },
+        "truncated": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "columns",
+        "commandTag",
+        "emittedBytes",
+        "emittedRows",
+        "index",
+        "observedBytes",
+        "observedRows",
+        "rowsAffected",
+        "truncated"
+      ],
+      "type": "object"
+    },
+    "postgres_Summary": {
+      "additionalProperties": false,
+      "properties": {
+        "emittedBytes": {
+          "type": "integer"
+        },
+        "emittedRows": {
+          "type": "integer"
+        },
+        "observedBytes": {
+          "type": "integer"
+        },
+        "observedRows": {
+          "type": "integer"
+        },
+        "results": {
+          "items": {
+            "$ref": "#/$defs/postgres_ResultSummary"
+          },
+          "type": "array"
+        },
+        "truncated": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "emittedBytes",
+        "emittedRows",
+        "observedBytes",
+        "observedRows",
+        "results",
+        "truncated"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "https://patroni.pgsty.com/schema/machine/v1alpha1/result.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "oneOf": [
+    {
+      "properties": {
+        "data": {
+          "$ref": "#/$defs/cli_machineDiscovery"
+        },
+        "kind": {
+          "const": "ClusterDiscovery"
+        }
+      },
+      "required": [
+        "kind",
+        "data"
+      ]
+    },
+    {
+      "properties": {
+        "data": {
+          "$ref": "#/$defs/control_HistoryData"
+        },
+        "kind": {
+          "const": "ClusterHistory"
+        }
+      },
+      "required": [
+        "kind",
+        "data"
+      ]
+    },
+    {
+      "properties": {
+        "data": {
+          "$ref": "#/$defs/cli_machineClusterList"
+        },
+        "kind": {
+          "const": "ClusterList"
+        }
+      },
+      "required": [
+        "kind",
+        "data"
+      ]
+    },
+    {
+      "properties": {
+        "data": {
+          "$ref": "#/$defs/control_TopologyData"
+        },
+        "kind": {
+          "const": "ClusterTopology"
+        }
+      },
+      "required": [
+        "kind",
+        "data"
+      ]
+    },
+    {
+      "properties": {
+        "data": {
+          "$ref": "#/$defs/cli_machineTopologyList"
+        },
+        "kind": {
+          "const": "ClusterTopologyList"
+        }
+      },
+      "required": [
+        "kind",
+        "data"
+      ]
+    },
+    {
+      "properties": {
+        "data": {
+          "$ref": "#/$defs/control_ConfigEditData"
+        },
+        "kind": {
+          "const": "ConfigEditResult"
+        }
+      },
+      "required": [
+        "kind",
+        "data"
+      ]
+    },
+    {
+      "properties": {
+        "data": {
+          "$ref": "#/$defs/control_DSNData"
+        },
+        "kind": {
+          "const": "DSN"
+        }
+      },
+      "required": [
+        "kind",
+        "data"
+      ]
+    },
+    {
+      "properties": {
+        "data": {
+          "$ref": "#/$defs/control_ClusterRoleData"
+        },
+        "kind": {
+          "const": "DemoteClusterResult"
+        }
+      },
+      "required": [
+        "kind",
+        "data"
+      ]
+    },
+    {
+      "properties": {
+        "data": {
+          "$ref": "#/$defs/control_ConfigData"
+        },
+        "kind": {
+          "const": "DynamicConfig"
+        }
+      },
+      "required": [
+        "kind",
+        "data"
+      ]
+    },
+    {
+      "properties": {
+        "data": {
+          "$ref": "#/$defs/control_ConfigurationInspection"
+        },
+        "kind": {
+          "const": "EffectiveConfiguration"
+        }
+      },
+      "required": [
+        "kind",
+        "data"
+      ]
+    },
+    {
+      "properties": {
+        "data": {
+          "$ref": "#/$defs/control_ClusterWriteData"
+        },
+        "kind": {
+          "const": "FailoverResult"
+        }
+      },
+      "required": [
+        "kind",
+        "data"
+      ]
+    },
+    {
+      "properties": {
+        "data": {
+          "$ref": "#/$defs/control_FlushData"
+        },
+        "kind": {
+          "const": "FlushResult"
+        }
+      },
+      "required": [
+        "kind",
+        "data"
+      ]
+    },
+    {
+      "properties": {
+        "data": {
+          "$ref": "#/$defs/control_PauseData"
+        },
+        "kind": {
+          "const": "PauseResult"
+        }
+      },
+      "required": [
+        "kind",
+        "data"
+      ]
+    },
+    {
+      "properties": {
+        "data": {
+          "$ref": "#/$defs/control_ClusterRoleData"
+        },
+        "kind": {
+          "const": "PromoteClusterResult"
+        }
+      },
+      "required": [
+        "kind",
+        "data"
+      ]
+    },
+    {
+      "properties": {
+        "data": {
+          "$ref": "#/$defs/control_QueryData"
+        },
+        "kind": {
+          "const": "QueryResult"
+        }
+      },
+      "required": [
+        "kind",
+        "data"
+      ]
+    },
+    {
+      "properties": {
+        "data": {
+          "$ref": "#/$defs/control_BatchWriteData"
+        },
+        "kind": {
+          "const": "ReinitializeResult"
+        }
+      },
+      "required": [
+        "kind",
+        "data"
+      ]
+    },
+    {
+      "properties": {
+        "data": {
+          "$ref": "#/$defs/control_BatchWriteData"
+        },
+        "kind": {
+          "const": "ReloadResult"
+        }
+      },
+      "required": [
+        "kind",
+        "data"
+      ]
+    },
+    {
+      "properties": {
+        "data": {
+          "$ref": "#/$defs/control_RemoveData"
+        },
+        "kind": {
+          "const": "RemoveResult"
+        }
+      },
+      "required": [
+        "kind",
+        "data"
+      ]
+    },
+    {
+      "properties": {
+        "data": {
+          "$ref": "#/$defs/control_BatchWriteData"
+        },
+        "kind": {
+          "const": "RestartResult"
+        }
+      },
+      "required": [
+        "kind",
+        "data"
+      ]
+    },
+    {
+      "properties": {
+        "data": {
+          "$ref": "#/$defs/control_PauseData"
+        },
+        "kind": {
+          "const": "ResumeResult"
+        }
+      },
+      "required": [
+        "kind",
+        "data"
+      ]
+    },
+    {
+      "properties": {
+        "data": {
+          "$ref": "#/$defs/control_ClusterWriteData"
+        },
+        "kind": {
+          "const": "SwitchoverResult"
+        }
+      },
+      "required": [
+        "kind",
+        "data"
+      ]
+    },
+    {
+      "properties": {
+        "data": {
+          "$ref": "#/$defs/cli_machineVersionInfo"
+        },
+        "kind": {
+          "const": "VersionInfo"
+        }
+      },
+      "required": [
+        "kind",
+        "data"
+      ]
+    }
+  ],
+  "properties": {
+    "apiVersion": {
+      "const": "patroni.pgsty.com/v1alpha1"
+    },
+    "data": true,
+    "kind": {
+      "enum": [
+        "ClusterDiscovery",
+        "ClusterHistory",
+        "ClusterList",
+        "ClusterTopology",
+        "ClusterTopologyList",
+        "ConfigEditResult",
+        "DSN",
+        "DemoteClusterResult",
+        "DynamicConfig",
+        "EffectiveConfiguration",
+        "FailoverResult",
+        "FlushResult",
+        "PauseResult",
+        "PromoteClusterResult",
+        "QueryResult",
+        "ReinitializeResult",
+        "ReloadResult",
+        "RemoveResult",
+        "RestartResult",
+        "ResumeResult",
+        "SwitchoverResult",
+        "VersionInfo"
+      ]
+    },
+    "metadata": {
+      "$ref": "#/$defs/metadata"
+    }
+  },
+  "required": [
+    "apiVersion",
+    "kind",
+    "metadata",
+    "data"
+  ],
+  "title": "Go patronictl v1alpha1 exhaustive success envelope",
+  "type": "object"
+}

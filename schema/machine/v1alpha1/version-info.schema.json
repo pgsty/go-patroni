@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://patroni.pgsty.com/schema/machine/v1alpha1/version-info.schema.json",
+  "title": "Go patronictl v1alpha1 binary and Patroni version information",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["apiVersion", "kind", "metadata", "data"],
+  "properties": {
+    "apiVersion": {"const": "patroni.pgsty.com/v1alpha1"},
+    "kind": {"const": "VersionInfo"},
+    "metadata": {"$ref": "result.schema.json#/$defs/metadata"},
+    "data": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["version", "commit", "buildTime", "goVersion", "supportedPatroni", "machineSchema", "members"],
+      "properties": {
+        "version": {"type": "string", "minLength": 1},
+        "commit": {"type": "string", "minLength": 1},
+        "buildTime": {"type": "string", "minLength": 1},
+        "goVersion": {"type": "string", "minLength": 1},
+        "supportedPatroni": {"const": ">=3.0.0,<5.0.0"},
+        "machineSchema": {"const": "patroni.pgsty.com/v1alpha1"},
+        "members": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["target"],
+            "properties": {
+              "target": {"$ref": "error.schema.json#/$defs/target"},
+              "patroniVersion": {"type": "string"},
+              "postgresVersion": {"type": "string"},
+              "httpStatus": {"type": "integer", "minimum": 0, "maximum": 599},
+              "error": {"$ref": "error.schema.json#/properties/error"}
+            }
+          }
+        }
+      }
+    }
+  }
+}

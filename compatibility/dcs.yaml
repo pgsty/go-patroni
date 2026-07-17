@@ -1,0 +1,284 @@
+{
+  "schemaVersion": "patroni.pgsty.com/compatibility/v1alpha1",
+  "kind": "PatroniDCSCompatibility",
+  "generatedBy": "tools/compatgen + test/compat/oracle/extract_inventory.py",
+  "source": {
+    "commit": "d35409952f970d7f33d36d8f868eb20fc1e2a7f7",
+    "version": "4.1.3",
+    "files": [
+      "patroni/dcs/__init__.py",
+      "patroni/dcs/etcd3.py"
+    ]
+  },
+  "backend": "etcd3",
+  "otherBackendsSupported": [],
+  "pathTemplates": {
+    "postgresql": "/{trimmedNamespace}/{scope}/{key}",
+    "mpp": "/{trimmedNamespace}/{scope}/{group}/{key}",
+    "defaultNamespace": "service"
+  },
+  "consistency": {
+    "snapshot": "linearizable etcd v3 range read with header revision",
+    "watch": "start after snapshot revision; compaction requires full resnapshot",
+    "remove": "exact cluster prefix delete after compatibility confirmations"
+  },
+  "expectedKeyCount": 10,
+  "keys": [
+    {
+      "path": "initialize",
+      "readUse": "cluster initialization evidence",
+      "sdkDirectWrites": [
+        "remove-prefix"
+      ],
+      "cas": "none",
+      "sourceRef": "patroni/dcs/__init__.py:1515",
+      "etcd3SourceRefs": [
+        "patroni/dcs/etcd3.py:1070"
+      ],
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestDCSInventory"
+        ],
+        "differential": [
+          "test/compat/dcs_oracle_test.go#TestDCSProjectionAgainstPinnedPatroni",
+          "test/compat/dcs_oracle_test.go#TestDCSMutationContractAgainstPinnedPatroni"
+        ],
+        "integration": [
+          "test/integration/dcs_etcd3_test.go#TestEtcd3PatroniSnapshotDiscoveryCASRemoveAndWatch"
+        ]
+      },
+      "status": "complete"
+    },
+    {
+      "path": "config",
+      "readUse": "dynamic configuration and pause state",
+      "sdkDirectWrites": [
+        "config-cas",
+        "remove-prefix"
+      ],
+      "cas": "mod_revision",
+      "sourceRef": "patroni/dcs/__init__.py:1516",
+      "etcd3SourceRefs": [
+        "patroni/dcs/etcd3.py:1015"
+      ],
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestDCSInventory"
+        ],
+        "differential": [
+          "test/compat/dcs_oracle_test.go#TestDCSProjectionAgainstPinnedPatroni",
+          "test/compat/dcs_oracle_test.go#TestDCSMutationContractAgainstPinnedPatroni"
+        ],
+        "integration": [
+          "test/integration/dcs_etcd3_test.go#TestEtcd3PatroniSnapshotDiscoveryCASRemoveAndWatch"
+        ]
+      },
+      "status": "complete"
+    },
+    {
+      "path": "members/{name}",
+      "readUse": "member identity, REST api_url, PostgreSQL connection and state",
+      "sdkDirectWrites": [
+        "remove-prefix"
+      ],
+      "cas": "none",
+      "sourceRef": "patroni/dcs/__init__.py:1520",
+      "etcd3SourceRefs": [
+        "patroni/dcs/etcd3.py:1070"
+      ],
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestDCSInventory"
+        ],
+        "differential": [
+          "test/compat/dcs_oracle_test.go#TestDCSProjectionAgainstPinnedPatroni",
+          "test/compat/dcs_oracle_test.go#TestDCSMutationContractAgainstPinnedPatroni"
+        ],
+        "integration": [
+          "test/integration/dcs_etcd3_test.go#TestEtcd3PatroniSnapshotDiscoveryCASRemoveAndWatch"
+        ]
+      },
+      "status": "complete"
+    },
+    {
+      "path": "leader",
+      "readUse": "leader identity and lease",
+      "sdkDirectWrites": [
+        "remove-prefix"
+      ],
+      "cas": "none",
+      "sourceRef": "patroni/dcs/__init__.py:1517",
+      "etcd3SourceRefs": [
+        "patroni/dcs/etcd3.py:1070"
+      ],
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestDCSInventory"
+        ],
+        "differential": [
+          "test/compat/dcs_oracle_test.go#TestDCSProjectionAgainstPinnedPatroni",
+          "test/compat/dcs_oracle_test.go#TestDCSMutationContractAgainstPinnedPatroni"
+        ],
+        "integration": [
+          "test/integration/dcs_etcd3_test.go#TestEtcd3PatroniSnapshotDiscoveryCASRemoveAndWatch"
+        ]
+      },
+      "status": "complete"
+    },
+    {
+      "path": "failover",
+      "readUse": "manual/scheduled failover or switchover state",
+      "sdkDirectWrites": [
+        "fallback-cas",
+        "flush-cas",
+        "remove-prefix"
+      ],
+      "cas": "mod_revision",
+      "sourceRef": "patroni/dcs/__init__.py:1518",
+      "etcd3SourceRefs": [
+        "patroni/dcs/etcd3.py:1011",
+        "patroni/dcs/etcd3.py:1070"
+      ],
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestDCSInventory"
+        ],
+        "differential": [
+          "test/compat/dcs_oracle_test.go#TestDCSProjectionAgainstPinnedPatroni",
+          "test/compat/dcs_oracle_test.go#TestDCSMutationContractAgainstPinnedPatroni"
+        ],
+        "integration": [
+          "test/integration/dcs_etcd3_test.go#TestEtcd3PatroniSnapshotDiscoveryCASRemoveAndWatch"
+        ]
+      },
+      "status": "complete"
+    },
+    {
+      "path": "history",
+      "readUse": "timeline history",
+      "sdkDirectWrites": [
+        "remove-prefix"
+      ],
+      "cas": "none",
+      "sourceRef": "patroni/dcs/__init__.py:1519",
+      "etcd3SourceRefs": [
+        "patroni/dcs/etcd3.py:1070"
+      ],
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestDCSInventory"
+        ],
+        "differential": [
+          "test/compat/dcs_oracle_test.go#TestDCSProjectionAgainstPinnedPatroni",
+          "test/compat/dcs_oracle_test.go#TestDCSMutationContractAgainstPinnedPatroni"
+        ],
+        "integration": [
+          "test/integration/dcs_etcd3_test.go#TestEtcd3PatroniSnapshotDiscoveryCASRemoveAndWatch"
+        ]
+      },
+      "status": "complete"
+    },
+    {
+      "path": "status",
+      "readUse": "leader LSN and retained slot status",
+      "sdkDirectWrites": [
+        "remove-prefix"
+      ],
+      "cas": "none",
+      "sourceRef": "patroni/dcs/__init__.py:1522",
+      "etcd3SourceRefs": [
+        "patroni/dcs/etcd3.py:1070"
+      ],
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestDCSInventory"
+        ],
+        "differential": [
+          "test/compat/dcs_oracle_test.go#TestDCSProjectionAgainstPinnedPatroni",
+          "test/compat/dcs_oracle_test.go#TestDCSMutationContractAgainstPinnedPatroni"
+        ],
+        "integration": [
+          "test/integration/dcs_etcd3_test.go#TestEtcd3PatroniSnapshotDiscoveryCASRemoveAndWatch"
+        ]
+      },
+      "status": "complete"
+    },
+    {
+      "path": "optime/leader",
+      "readUse": "legacy leader LSN fallback",
+      "sdkDirectWrites": [
+        "remove-prefix"
+      ],
+      "cas": "none",
+      "sourceRef": "patroni/dcs/__init__.py:1523",
+      "etcd3SourceRefs": [
+        "patroni/dcs/etcd3.py:1070"
+      ],
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestDCSInventory"
+        ],
+        "differential": [
+          "test/compat/dcs_oracle_test.go#TestDCSProjectionAgainstPinnedPatroni",
+          "test/compat/dcs_oracle_test.go#TestDCSMutationContractAgainstPinnedPatroni"
+        ],
+        "integration": [
+          "test/integration/dcs_etcd3_test.go#TestEtcd3PatroniSnapshotDiscoveryCASRemoveAndWatch"
+        ]
+      },
+      "status": "complete"
+    },
+    {
+      "path": "sync",
+      "readUse": "synchronous/quorum state",
+      "sdkDirectWrites": [
+        "remove-prefix"
+      ],
+      "cas": "none",
+      "sourceRef": "patroni/dcs/__init__.py:1524",
+      "etcd3SourceRefs": [
+        "patroni/dcs/etcd3.py:1070"
+      ],
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestDCSInventory"
+        ],
+        "differential": [
+          "test/compat/dcs_oracle_test.go#TestDCSProjectionAgainstPinnedPatroni",
+          "test/compat/dcs_oracle_test.go#TestDCSMutationContractAgainstPinnedPatroni"
+        ],
+        "integration": [
+          "test/integration/dcs_etcd3_test.go#TestEtcd3PatroniSnapshotDiscoveryCASRemoveAndWatch"
+        ]
+      },
+      "status": "complete"
+    },
+    {
+      "path": "failsafe",
+      "readUse": "failsafe topology",
+      "sdkDirectWrites": [
+        "remove-prefix"
+      ],
+      "cas": "none",
+      "sourceRef": "patroni/dcs/__init__.py:1525",
+      "etcd3SourceRefs": [
+        "patroni/dcs/etcd3.py:1070"
+      ],
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestDCSInventory"
+        ],
+        "differential": [
+          "test/compat/dcs_oracle_test.go#TestDCSProjectionAgainstPinnedPatroni",
+          "test/compat/dcs_oracle_test.go#TestDCSMutationContractAgainstPinnedPatroni"
+        ],
+        "integration": [
+          "test/integration/dcs_etcd3_test.go#TestEtcd3PatroniSnapshotDiscoveryCASRemoveAndWatch"
+        ]
+      },
+      "status": "complete"
+    }
+  ],
+  "unknownKeys": "retain as raw diagnostics; never treat alone as cluster discovery evidence",
+  "releasePolicy": "all keys and command-scoped writes require oracle differential and real etcd3 evidence"
+}

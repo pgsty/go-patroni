@@ -1,0 +1,1 @@
+{"apiVersion":"boar.pgsty.com/v1alpha1","kind":"VersionInfo","metadata":{"requestId":"cli-request-1","observedAt":"2026-07-13T12:34:56Z","warnings":[]},"data":{"version":"1.2.3-test","commit":"abc123fixture","buildTime":"2026-07-13T12:00:00Z","goVersion":"<go-version>","supportedPatroni":">=4.0.0,<5.0.0","machineSchema":"boar.pgsty.com/v1alpha1","members":[]}}

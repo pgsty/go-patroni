@@ -1,0 +1,2859 @@
+{
+  "schemaVersion": "boar.pgsty.com/compatibility/v1alpha1",
+  "kind": "PatronictlCompatibility",
+  "generatedBy": "tools/compatgen + test/compat/oracle/extract_inventory.py",
+  "source": {
+    "commit": "b247bfac17176b99bd24603c8d8aa28added2d02",
+    "version": "4.1.0",
+    "file": "patroni/ctl.py"
+  },
+  "supportedRange": ">=4.0.0,<5.0.0",
+  "expectedCommandCount": 19,
+  "rootParameters": [
+    {
+      "kind": "option",
+      "name": "config_file",
+      "flags": [
+        "--config-file",
+        "-c"
+      ],
+      "required": false,
+      "type": "string",
+      "default": {
+        "expression": "CONFIG_FILE_PATH"
+      },
+      "env": "PATRONICTL_CONFIG_FILE",
+      "multiple": false,
+      "isFlag": false,
+      "help": "Configuration file",
+      "sourceRef": "patroni/ctl.py:322",
+      "defaultSource": "CONFIG_FILE_PATH"
+    },
+    {
+      "kind": "option",
+      "name": "dcs_url",
+      "flags": [
+        "--dcs-url",
+        "--dcs",
+        "-d"
+      ],
+      "required": false,
+      "type": "string",
+      "default": null,
+      "env": "DCS_URL",
+      "multiple": false,
+      "isFlag": false,
+      "help": "The DCS connect url",
+      "sourceRef": "patroni/ctl.py:324"
+    },
+    {
+      "kind": "option",
+      "name": "insecure",
+      "flags": [
+        "-k",
+        "--insecure"
+      ],
+      "required": false,
+      "type": "boolean",
+      "default": false,
+      "env": null,
+      "multiple": false,
+      "isFlag": true,
+      "help": "Allow connections to SSL sites without certs",
+      "sourceRef": "patroni/ctl.py:325"
+    }
+  ],
+  "commands": [
+    {
+      "command": "dsn",
+      "function": "dsn",
+      "help": "Generate a dsn for the provided member, defaults to a dsn of the leader",
+      "sourceRef": "patroni/ctl.py:779",
+      "parameters": [
+        {
+          "kind": "option",
+          "name": "role",
+          "flags": [
+            "--role",
+            "-r"
+          ],
+          "required": false,
+          "type": "string",
+          "default": null,
+          "env": null,
+          "multiple": false,
+          "isFlag": false,
+          "help": "Give a dsn of any member with this role",
+          "sourceRef": "patroni/ctl.py:780",
+          "choices": [
+            "leader",
+            "primary",
+            "standby-leader",
+            "replica",
+            "standby",
+            "any"
+          ]
+        },
+        {
+          "kind": "option",
+          "name": "member",
+          "flags": [
+            "--member",
+            "-m"
+          ],
+          "required": false,
+          "type": "string",
+          "default": null,
+          "env": null,
+          "multiple": false,
+          "isFlag": false,
+          "help": "Generate a dsn for this member",
+          "sourceRef": "patroni/ctl.py:781"
+        },
+        {
+          "kind": "argument",
+          "name": "cluster_name",
+          "required": false,
+          "nargs": 1,
+          "type": "string",
+          "default": {
+            "expression": "lambda: _get_configuration().get('scope')"
+          },
+          "sourceRef": "patroni/ctl.py:313",
+          "defaultSource": "lambda: _get_configuration().get('scope')"
+        },
+        {
+          "kind": "option",
+          "name": "group",
+          "flags": [
+            "--group"
+          ],
+          "required": false,
+          "type": "integer",
+          "default": null,
+          "env": null,
+          "multiple": false,
+          "isFlag": false,
+          "help": "Citus group",
+          "sourceRef": "patroni/ctl.py:317"
+        }
+      ],
+      "exitBehavior": {
+        "success": "normal return exits 0",
+        "usage": "Click usage and PatroniCtlException paths exit non-zero",
+        "operation": "preserve source behavior; some per-member HTTP failures are rendered and return 0"
+      },
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestPatronictlInventory"
+        ],
+        "unit": [
+          "control/service_read_test.go#TestReadServiceDSNMatchesMemberSelectionAndNeverReturnsCredentials",
+          "control/discover_test.go#TestListExpandsGroupLessCitusScopeInsideControl",
+          "internal/cli/root_test.go#TestCobraTreeMatchesPinnedPatronictlInventory",
+          "internal/cli/adapter_test.go#TestEveryPatronictlCommandHasVersionedMachineUsageEnvelope",
+          "test/compat/citus_semantics_test.go#TestPatronictlCitusSemanticsMatrix"
+        ],
+        "golden": [
+          "internal/cli/adapter_test.go#TestEveryPatronictlCommandHasVersionedMachineUsageEnvelope"
+        ],
+        "differential": [
+          "internal/cli/compat_oracle_test.go#TestPatronictlSemanticParity/dsn_default",
+          "internal/cli/compat_oracle_test.go#TestPatronictlSemanticParity/dsn_selector_conflict"
+        ],
+        "integration": [
+          "test/integration/dcs_etcd3_test.go#TestEtcd3PatroniSnapshotDiscoveryCASRemoveAndWatch",
+          "test/integration/citus_cli_test.go#TestM8CitusMultiGroupCLI"
+        ]
+      },
+      "deviations": [],
+      "status": "complete",
+      "dataPaths": [
+        "dcs-read"
+      ],
+      "writes": false,
+      "risk": "read",
+      "formats": [
+        "text"
+      ],
+      "prompts": [],
+      "fallback": {
+        "mode": "none"
+      },
+      "requirements": [
+        "FR14"
+      ],
+      "citus": {
+        "groupOption": "explicit",
+        "omittedGroup": "all-groups"
+      }
+    },
+    {
+      "command": "query",
+      "function": "query",
+      "help": "Query a Patroni PostgreSQL member",
+      "sourceRef": "patroni/ctl.py:813",
+      "parameters": [
+        {
+          "kind": "argument",
+          "name": "cluster_name",
+          "required": false,
+          "nargs": 1,
+          "type": "string",
+          "default": {
+            "expression": "lambda: _get_configuration().get('scope')"
+          },
+          "sourceRef": "patroni/ctl.py:313",
+          "defaultSource": "lambda: _get_configuration().get('scope')"
+        },
+        {
+          "kind": "option",
+          "name": "group",
+          "flags": [
+            "--group"
+          ],
+          "required": false,
+          "type": "integer",
+          "default": null,
+          "env": null,
+          "multiple": false,
+          "isFlag": false,
+          "help": "Citus group",
+          "sourceRef": "patroni/ctl.py:317"
+        },
+        {
+          "kind": "option",
+          "name": "fmt",
+          "flags": [
+            "--format"
+          ],
+          "required": false,
+          "type": "string",
+          "default": "tsv",
+          "env": null,
+          "multiple": false,
+          "isFlag": false,
+          "help": "Output format (pretty, tsv, json, yaml)",
+          "sourceRef": "patroni/ctl.py:816"
+        },
+        {
+          "kind": "option",
+          "name": "p_file",
+          "flags": [
+            "--file",
+            "-f"
+          ],
+          "required": false,
+          "type": "file",
+          "default": null,
+          "env": null,
+          "multiple": false,
+          "isFlag": false,
+          "help": "Execute the SQL commands from this file",
+          "sourceRef": "patroni/ctl.py:817",
+          "typeSource": "click.File('rb')"
+        },
+        {
+          "kind": "option",
+          "name": "password",
+          "flags": [
+            "--password"
+          ],
+          "required": false,
+          "type": "boolean",
+          "default": false,
+          "env": null,
+          "multiple": false,
+          "isFlag": true,
+          "help": "force password prompt",
+          "sourceRef": "patroni/ctl.py:818"
+        },
+        {
+          "kind": "option",
+          "name": "username",
+          "flags": [
+            "-U",
+            "--username"
+          ],
+          "required": false,
+          "type": "string",
+          "default": null,
+          "env": null,
+          "multiple": false,
+          "isFlag": false,
+          "help": "database user name",
+          "sourceRef": "patroni/ctl.py:819"
+        },
+        {
+          "kind": "option",
+          "name": "W",
+          "flags": [
+            "-W"
+          ],
+          "required": false,
+          "type": "boolean",
+          "default": false,
+          "env": null,
+          "multiple": false,
+          "isFlag": true,
+          "help": "Auto update the screen every 2 seconds",
+          "sourceRef": "patroni/ctl.py:311"
+        },
+        {
+          "kind": "option",
+          "name": "watch",
+          "flags": [
+            "-w",
+            "--watch"
+          ],
+          "required": false,
+          "type": "number",
+          "default": null,
+          "env": null,
+          "multiple": false,
+          "isFlag": false,
+          "help": "Auto update the screen every X seconds",
+          "sourceRef": "patroni/ctl.py:310"
+        },
+        {
+          "kind": "option",
+          "name": "role",
+          "flags": [
+            "--role",
+            "-r"
+          ],
+          "required": false,
+          "type": "string",
+          "default": null,
+          "env": null,
+          "multiple": false,
+          "isFlag": false,
+          "help": "The role of the query",
+          "sourceRef": "patroni/ctl.py:822",
+          "choices": [
+            "leader",
+            "primary",
+            "standby-leader",
+            "replica",
+            "standby",
+            "any"
+          ]
+        },
+        {
+          "kind": "option",
+          "name": "member",
+          "flags": [
+            "--member",
+            "-m"
+          ],
+          "required": false,
+          "type": "string",
+          "default": null,
+          "env": null,
+          "multiple": false,
+          "isFlag": false,
+          "help": "Query a specific member",
+          "sourceRef": "patroni/ctl.py:823"
+        },
+        {
+          "kind": "option",
+          "name": "delimiter",
+          "flags": [
+            "--delimiter"
+          ],
+          "required": false,
+          "type": "string",
+          "default": "\t",
+          "env": null,
+          "multiple": false,
+          "isFlag": false,
+          "help": "The column delimiter",
+          "sourceRef": "patroni/ctl.py:824"
+        },
+        {
+          "kind": "option",
+          "name": "command",
+          "flags": [
+            "--command",
+            "-c"
+          ],
+          "required": false,
+          "type": "string",
+          "default": null,
+          "env": null,
+          "multiple": false,
+          "isFlag": false,
+          "help": "The SQL commands to execute",
+          "sourceRef": "patroni/ctl.py:825"
+        },
+        {
+          "kind": "option",
+          "name": "dbname",
+          "flags": [
+            "-d",
+            "--dbname"
+          ],
+          "required": false,
+          "type": "string",
+          "default": null,
+          "env": null,
+          "multiple": false,
+          "isFlag": false,
+          "help": "database name to connect to",
+          "sourceRef": "patroni/ctl.py:826"
+        }
+      ],
+      "exitBehavior": {
+        "success": "normal return exits 0",
+        "usage": "Click usage and PatroniCtlException paths exit non-zero",
+        "operation": "database errors are rendered as result rows by the oracle and normally exit 0"
+      },
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestPatronictlInventory"
+        ],
+        "unit": [
+          "control/service_read_test.go#TestReadServiceQueryResolvesMemberAndChecksNonLeaderRole",
+          "control/service_read_test.go#TestReadServiceQueryPreservesPatronictlResultRowErrorSemantics",
+          "control/service_read_test.go#TestControlQueryRequestFormattingAndJSONRedactSQLAndConnection",
+          "control/version_gate_test.go#TestUnsupportedPatroniReadRequiresExplicitBestEffortPolicy",
+          "control/discover_test.go#TestListExpandsGroupLessCitusScopeInsideControl",
+          "internal/cli/root_test.go#TestCobraTreeMatchesPinnedPatronictlInventory",
+          "internal/cli/adapter_test.go#TestEveryPatronictlCommandHasVersionedMachineUsageEnvelope",
+          "test/compat/citus_semantics_test.go#TestPatronictlCitusSemanticsMatrix"
+        ],
+        "golden": [
+          "internal/cli/adapter_test.go#TestEveryPatronictlCommandHasVersionedMachineUsageEnvelope"
+        ],
+        "differential": [
+          "internal/cli/compat_oracle_test.go#TestPatronictlSemanticParity/query_missing_input",
+          "internal/cli/compat_oracle_test.go#TestPatronictlSemanticParity/query_tsv"
+        ],
+        "integration": [
+          "test/integration/dcs_etcd3_test.go#TestEtcd3PatroniSnapshotDiscoveryCASRemoveAndWatch",
+          "test/integration/postgres_test.go#TestPostgreSQLNativeQueryTLSAuthMultiResultLimitsErrorAndCancel"
+        ]
+      },
+      "deviations": [],
+      "status": "complete",
+      "dataPaths": [
+        "dcs-read",
+        "postgres-write-or-read"
+      ],
+      "writes": true,
+      "risk": "sql",
+      "formats": [
+        "pretty",
+        "tsv",
+        "json",
+        "yaml"
+      ],
+      "prompts": [
+        {
+          "when": "--password or server requests a password",
+          "behavior": "hidden password prompt",
+          "sourceRef": "patroni/ctl.py:827"
+        }
+      ],
+      "fallback": {
+        "mode": "none"
+      },
+      "requirements": [
+        "FR32",
+        "FR33"
+      ],
+      "citus": {
+        "groupOption": "explicit",
+        "omittedGroup": "all-groups"
+      }
+    },
+    {
+      "command": "remove",
+      "function": "remove",
+      "help": "Remove cluster from DCS",
+      "sourceRef": "patroni/ctl.py:952",
+      "parameters": [
+        {
+          "kind": "argument",
+          "name": "cluster_name",
+          "required": true,
+          "nargs": 1,
+          "type": "string",
+          "default": null,
+          "sourceRef": "patroni/ctl.py:953"
+        },
+        {
+          "kind": "option",
+          "name": "group",
+          "flags": [
+            "--group"
+          ],
+          "required": false,
+          "type": "integer",
+          "default": null,
+          "env": null,
+          "multiple": false,
+          "isFlag": false,
+          "help": "Citus group",
+          "sourceRef": "patroni/ctl.py:317"
+        },
+        {
+          "kind": "option",
+          "name": "fmt",
+          "flags": [
+            "--format",
+            "-f"
+          ],
+          "required": false,
+          "type": "string",
+          "default": "pretty",
+          "env": null,
+          "multiple": false,
+          "isFlag": false,
+          "help": "Output format",
+          "sourceRef": "patroni/ctl.py:308",
+          "choices": [
+            "pretty",
+            "tsv",
+            "json",
+            "yaml",
+            "yml"
+          ]
+        }
+      ],
+      "exitBehavior": {
+        "success": "normal return exits 0",
+        "usage": "Click usage and PatroniCtlException paths exit non-zero",
+        "operation": "preserve source behavior; some per-member HTTP failures are rendered and return 0"
+      },
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestPatronictlInventory"
+        ],
+        "unit": [
+          "control/remove_test.go#TestPrepareRemoveFreezesExactDestructiveConfirmation",
+          "control/remove_test.go#TestExecuteRemoveRequiresPatronictlConfirmations",
+          "control/remove_test.go#TestExecuteRemoveClassifiesDeleteAndAuthoritativeReadback",
+          "control/remove_test.go#TestExecuteRemoveConcurrencyAndCancellationRemainSafe",
+          "internal/cli/root_test.go#TestCobraTreeMatchesPinnedPatronictlInventory",
+          "internal/cli/adapter_test.go#TestEveryPatronictlCommandHasVersionedMachineUsageEnvelope",
+          "test/compat/citus_semantics_test.go#TestPatronictlCitusSemanticsMatrix",
+          "control/version_gate_test.go#TestEveryWritePlanFailsClosedForUnsupportedPatroni"
+        ],
+        "golden": [
+          "internal/cli/adapter_test.go#TestEveryPatronictlCommandHasVersionedMachineUsageEnvelope"
+        ],
+        "differential": [
+          "internal/cli/compat_oracle_test.go#TestPatronictlSemanticParity/remove_abort",
+          "internal/cli/compat_oracle_test.go#TestPatronictlSemanticParity/remove"
+        ],
+        "integration": [
+          "test/integration/dcs_etcd3_test.go#TestEtcd3PatroniSnapshotDiscoveryCASRemoveAndWatch"
+        ]
+      },
+      "deviations": [],
+      "status": "complete",
+      "dataPaths": [
+        "dcs-read",
+        "dcs-prefix-delete"
+      ],
+      "writes": true,
+      "risk": "destructive",
+      "formats": [
+        "pretty",
+        "tsv",
+        "json",
+        "yaml",
+        "yml"
+      ],
+      "prompts": [
+        {
+          "when": "always",
+          "behavior": "type exact cluster name",
+          "sourceRef": "patroni/ctl.py:956"
+        },
+        {
+          "when": "always",
+          "behavior": "type exact phrase Yes I am aware",
+          "sourceRef": "patroni/ctl.py:956"
+        },
+        {
+          "when": "cluster has a leader",
+          "behavior": "type exact current leader name",
+          "sourceRef": "patroni/ctl.py:956"
+        }
+      ],
+      "fallback": {
+        "mode": "none"
+      },
+      "requirements": [
+        "FR26"
+      ],
+      "citus": {
+        "groupOption": "explicit",
+        "omittedGroup": "rejected"
+      }
+    },
+    {
+      "command": "reload",
+      "function": "reload",
+      "help": "Reload cluster member configuration",
+      "sourceRef": "patroni/ctl.py:1058",
+      "parameters": [
+        {
+          "kind": "argument",
+          "name": "cluster_name",
+          "required": true,
+          "nargs": 1,
+          "type": "string",
+          "default": null,
+          "sourceRef": "patroni/ctl.py:1059"
+        },
+        {
+          "kind": "argument",
+          "name": "member_names",
+          "required": true,
+          "nargs": -1,
+          "type": "string",
+          "default": null,
+          "sourceRef": "patroni/ctl.py:1060"
+        },
+        {
+          "kind": "option",
+          "name": "group",
+          "flags": [
+            "--group"
+          ],
+          "required": false,
+          "type": "integer",
+          "default": null,
+          "env": null,
+          "multiple": false,
+          "isFlag": false,
+          "help": "Citus group",
+          "sourceRef": "patroni/ctl.py:317"
+        },
+        {
+          "kind": "option",
+          "name": "role",
+          "flags": [
+            "--role",
+            "-r"
+          ],
+          "required": false,
+          "type": "string",
+          "default": "any",
+          "env": null,
+          "multiple": false,
+          "isFlag": false,
+          "help": "Reload only members with this role",
+          "sourceRef": "patroni/ctl.py:1062",
+          "choices": [
+            "leader",
+            "primary",
+            "standby-leader",
+            "replica",
+            "standby",
+            "any"
+          ],
+          "defaultSource": "repr(CtlPostgresqlRole.ANY)"
+        },
+        {
+          "kind": "option",
+          "name": "force",
+          "flags": [
+            "--force"
+          ],
+          "required": false,
+          "type": "boolean",
+          "default": false,
+          "env": null,
+          "multiple": false,
+          "isFlag": true,
+          "help": "Do not ask for confirmation at any point",
+          "sourceRef": "patroni/ctl.py:312"
+        }
+      ],
+      "exitBehavior": {
+        "success": "normal return exits 0",
+        "usage": "Click usage and PatroniCtlException paths exit non-zero",
+        "operation": "per-member HTTP rejection is rendered and the oracle normally exits 0"
+      },
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestPatronictlInventory"
+        ],
+        "unit": [
+          "control/service_read_test.go#TestReloadPrepareBuildsCompleteDeterministicPlan",
+          "control/service_read_test.go#TestReloadExecuteClassifiesAcceptedAndDefiniteHTTPFailure",
+          "control/service_read_test.go#TestReloadAmbiguousTransportIsUnknownAndNeverRetried",
+          "control/service_read_test.go#TestReloadNotSentIsDefiniteAndCancellationStopsSubsequentWrites",
+          "control/service_read_test.go#TestReloadFreshSnapshotDetectsConcurrentMembershipChangeBeforeWrite",
+          "control/discover_test.go#TestReloadExpandsAndRevalidatesGroupLessCitusScope",
+          "internal/cli/root_test.go#TestCobraTreeMatchesPinnedPatronictlInventory",
+          "internal/cli/adapter_test.go#TestEveryPatronictlCommandHasVersionedMachineUsageEnvelope",
+          "test/compat/citus_semantics_test.go#TestPatronictlCitusSemanticsMatrix",
+          "control/version_gate_test.go#TestEveryWritePlanFailsClosedForUnsupportedPatroni"
+        ],
+        "golden": [
+          "internal/cli/adapter_test.go#TestEveryPatronictlCommandHasVersionedMachineUsageEnvelope"
+        ],
+        "differential": [
+          "internal/cli/compat_oracle_test.go#TestPatronictlSemanticParity/reload_abort",
+          "internal/cli/compat_oracle_test.go#TestPatronictlSemanticParity/reload_200",
+          "internal/cli/compat_oracle_test.go#TestPatronictlSemanticParity/reload_202"
+        ],
+        "integration": [
+          "test/integration/dcs_etcd3_test.go#TestEtcd3PatroniSnapshotDiscoveryCASRemoveAndWatch",
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "test/integration/multicluster_cli_test.go#TestM5DefaultContextThreeNodeMultiClusterCLI",
+          "test/integration/citus_cli_test.go#TestM8CitusMultiGroupCLI"
+        ]
+      },
+      "deviations": [],
+      "status": "complete",
+      "dataPaths": [
+        "dcs-read",
+        "rest-post-/reload"
+      ],
+      "writes": true,
+      "risk": "admin-write",
+      "formats": [
+        "human"
+      ],
+      "prompts": [
+        {
+          "when": "without --force",
+          "behavior": "confirm selected member action",
+          "sourceRef": "patroni/ctl.py:1772"
+        }
+      ],
+      "fallback": {
+        "mode": "none"
+      },
+      "requirements": [
+        "FR17"
+      ],
+      "citus": {
+        "groupOption": "explicit",
+        "omittedGroup": "all-groups"
+      }
+    },
+    {
+      "command": "restart",
+      "function": "restart",
+      "help": "Restart cluster member",
+      "sourceRef": "patroni/ctl.py:1097",
+      "parameters": [
+        {
+          "kind": "argument",
+          "name": "cluster_name",
+          "required": true,
+          "nargs": 1,
+          "type": "string",
+          "default": null,
+          "sourceRef": "patroni/ctl.py:1098"
+        },
+        {
+          "kind": "argument",
+          "name": "member_names",
+          "required": true,
+          "nargs": -1,
+          "type": "string",
+          "default": null,
+          "sourceRef": "patroni/ctl.py:1099"
+        },
+        {
+          "kind": "option",
+          "name": "group",
+          "flags": [
+            "--group"
+          ],
+          "required": false,
+          "type": "integer",
+          "default": null,
+          "env": null,
+          "multiple": false,
+          "isFlag": false,
+          "help": "Citus group",
+          "sourceRef": "patroni/ctl.py:317"
+        },
+        {
+          "kind": "option",
+          "name": "role",
+          "flags": [
+            "--role",
+            "-r"
+          ],
+          "required": false,
+          "type": "string",
+          "default": "any",
+          "env": null,
+          "multiple": false,
+          "isFlag": false,
+          "help": "Restart only members with this role",
+          "sourceRef": "patroni/ctl.py:1101",
+          "choices": [
+            "leader",
+            "primary",
+            "standby-leader",
+            "replica",
+            "standby",
+            "any"
+          ],
+          "defaultSource": "repr(CtlPostgresqlRole.ANY)"
+        },
+        {
+          "kind": "option",
+          "name": "p_any",
+          "flags": [
+            "--any"
+          ],
+          "required": false,
+          "type": "boolean",
+          "default": false,
+          "env": null,
+          "multiple": false,
+          "isFlag": true,
+          "help": "Restart a single member only",
+          "sourceRef": "patroni/ctl.py:1103"
+        },
+        {
+          "kind": "option",
+          "name": "scheduled",
+          "flags": [
+            "--scheduled"
+          ],
+          "required": false,
+          "type": "string",
+          "default": null,
+          "env": null,
+          "multiple": false,
+          "isFlag": false,
+          "help": "Timestamp of a scheduled restart in unambiguous format (e.g. ISO 8601)",
+          "sourceRef": "patroni/ctl.py:1104"
+        },
+        {
+          "kind": "option",
+          "name": "version",
+          "flags": [
+            "--pg-version"
+          ],
+          "required": false,
+          "type": "string",
+          "default": null,
+          "env": null,
+          "multiple": false,
+          "isFlag": false,
+          "help": "Restart if the PostgreSQL version is less than provided (e.g. 9.5.2)",
+          "sourceRef": "patroni/ctl.py:1106"
+        },
+        {
+          "kind": "option",
+          "name": "pending",
+          "flags": [
+            "--pending"
+          ],
+          "required": false,
+          "type": "boolean",
+          "default": false,
+          "env": null,
+          "multiple": false,
+          "isFlag": true,
+          "help": "Restart if pending",
+          "sourceRef": "patroni/ctl.py:1108"
+        },
+        {
+          "kind": "option",
+          "name": "timeout",
+          "flags": [
+            "--timeout"
+          ],
+          "required": false,
+          "type": "string",
+          "default": null,
+          "env": null,
+          "multiple": false,
+          "isFlag": false,
+          "help": "Return error and fail over if necessary when restarting takes longer than this.",
+          "sourceRef": "patroni/ctl.py:1109"
+        },
+        {
+          "kind": "option",
+          "name": "force",
+          "flags": [
+            "--force"
+          ],
+          "required": false,
+          "type": "boolean",
+          "default": false,
+          "env": null,
+          "multiple": false,
+          "isFlag": true,
+          "help": "Do not ask for confirmation at any point",
+          "sourceRef": "patroni/ctl.py:312"
+        }
+      ],
+      "exitBehavior": {
+        "success": "normal return exits 0",
+        "usage": "Click usage and PatroniCtlException paths exit non-zero",
+        "operation": "per-member HTTP rejection is rendered and the oracle normally exits 0"
+      },
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestPatronictlInventory"
+        ],
+        "unit": [
+          "control/service_read_test.go#TestRestartPrepareFiltersPendingValidatesConditionsAndFreezesAnySelection",
+          "control/service_read_test.go#TestRestartImmediateSuccessAndDefiniteConflict",
+          "control/service_read_test.go#TestRestartImmediateAmbiguousAndNotSentAreNeverRetried",
+          "control/service_read_test.go#TestRestartDetectsPendingConcurrencyAndSelectorTamperingBeforeWrite",
+          "control/service_read_test.go#TestRestartScheduledReadAfterWriteResolvesAcceptedAndAmbiguousSend",
+          "control/service_read_test.go#TestRestartForcedReplacementStopsAfterAmbiguousFlush",
+          "control/service_read_test.go#TestRestartForcedReplacementContinuesAfterDefiniteFlushResponse",
+          "control/discover_test.go#TestRestartExpandsAndRevalidatesGroupLessCitusScope",
+          "internal/cli/root_test.go#TestCobraTreeMatchesPinnedPatronictlInventory",
+          "internal/cli/adapter_test.go#TestEveryPatronictlCommandHasVersionedMachineUsageEnvelope",
+          "test/compat/citus_semantics_test.go#TestPatronictlCitusSemanticsMatrix",
+          "control/version_gate_test.go#TestEveryWritePlanFailsClosedForUnsupportedPatroni"
+        ],
+        "golden": [
+          "internal/cli/adapter_test.go#TestEveryPatronictlCommandHasVersionedMachineUsageEnvelope"
+        ],
+        "differential": [
+          "internal/cli/compat_oracle_test.go#TestPatronictlSemanticParity/restart_immediate",
+          "internal/cli/compat_oracle_test.go#TestPatronictlSemanticParity/restart_scheduled_replace"
+        ],
+        "integration": [
+          "test/integration/dcs_etcd3_test.go#TestEtcd3PatroniSnapshotDiscoveryCASRemoveAndWatch",
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "test/integration/multicluster_cli_test.go#TestM5DefaultContextThreeNodeMultiClusterCLI",
+          "test/integration/citus_cli_test.go#TestM8CitusMultiGroupCLI"
+        ]
+      },
+      "deviations": [],
+      "status": "complete",
+      "dataPaths": [
+        "dcs-read",
+        "rest-post-/restart"
+      ],
+      "writes": true,
+      "risk": "admin-write",
+      "formats": [
+        "human"
+      ],
+      "prompts": [
+        {
+          "when": "schedule omitted and without --force",
+          "behavior": "prompt when to restart; default now",
+          "sourceRef": "patroni/ctl.py:1111"
+        },
+        {
+          "when": "without --force",
+          "behavior": "confirm members or scheduled restart",
+          "sourceRef": "patroni/ctl.py:1111"
+        },
+        {
+          "when": "PostgreSQL version condition omitted and without --force",
+          "behavior": "prompt optional version condition",
+          "sourceRef": "patroni/ctl.py:1111"
+        }
+      ],
+      "fallback": {
+        "mode": "none"
+      },
+      "requirements": [
+        "FR18"
+      ],
+      "citus": {
+        "groupOption": "explicit",
+        "omittedGroup": "all-groups"
+      }
+    },
+    {
+      "command": "reinit",
+      "function": "reinit",
+      "help": "Reinitialize cluster member",
+      "sourceRef": "patroni/ctl.py:1198",
+      "parameters": [
+        {
+          "kind": "argument",
+          "name": "cluster_name",
+          "required": true,
+          "nargs": 1,
+          "type": "string",
+          "default": null,
+          "sourceRef": "patroni/ctl.py:1199"
+        },
+        {
+          "kind": "option",
+          "name": "group",
+          "flags": [
+            "--group"
+          ],
+          "required": false,
+          "type": "integer",
+          "default": null,
+          "env": null,
+          "multiple": false,
+          "isFlag": false,
+          "help": "Citus group",
+          "sourceRef": "patroni/ctl.py:317"
+        },
+        {
+          "kind": "argument",
+          "name": "member_names",
+          "required": true,
+          "nargs": -1,
+          "type": "string",
+          "default": null,
+          "sourceRef": "patroni/ctl.py:1201"
+        },
+        {
+          "kind": "option",
+          "name": "force",
+          "flags": [
+            "--force"
+          ],
+          "required": false,
+          "type": "boolean",
+          "default": false,
+          "env": null,
+          "multiple": false,
+          "isFlag": true,
+          "help": "Do not ask for confirmation at any point",
+          "sourceRef": "patroni/ctl.py:312"
+        },
+        {
+          "kind": "option",
+          "name": "from_leader",
+          "flags": [
+            "--from-leader"
+          ],
+          "required": false,
+          "type": "boolean",
+          "default": false,
+          "env": null,
+          "multiple": false,
+          "isFlag": true,
+          "help": "Get basebackup from leader",
+          "sourceRef": "patroni/ctl.py:1203"
+        },
+        {
+          "kind": "option",
+          "name": "wait",
+          "flags": [
+            "--wait"
+          ],
+          "required": false,
+          "type": "boolean",
+          "default": false,
+          "env": null,
+          "multiple": false,
+          "isFlag": true,
+          "help": "Wait until reinitialization completes",
+          "sourceRef": "patroni/ctl.py:1204"
+        }
+      ],
+      "exitBehavior": {
+        "success": "normal return exits 0",
+        "usage": "Click usage and PatroniCtlException paths exit non-zero",
+        "operation": "preserve source behavior; some per-member HTTP failures are rendered and return 0"
+      },
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestPatronictlInventory"
+        ],
+        "unit": [
+          "control/service_read_test.go#TestReinitializePrepareIsReplicaOnlyAndPreservesForceNoop",
+          "control/service_read_test.go#TestReinitializeSuccessFailureUnknownAndNoRetry",
+          "control/service_read_test.go#TestReinitializeWaitUsesPatroniEvidenceToResolveOutcome",
+          "control/service_read_test.go#TestReinitializeDetectsReplicaPromotionBeforeWrite",
+          "control/discover_test.go#TestReinitializeExpandsAndRevalidatesGroupLessCitusScope",
+          "internal/cli/root_test.go#TestCobraTreeMatchesPinnedPatronictlInventory",
+          "internal/cli/adapter_test.go#TestEveryPatronictlCommandHasVersionedMachineUsageEnvelope",
+          "test/compat/citus_semantics_test.go#TestPatronictlCitusSemanticsMatrix",
+          "control/version_gate_test.go#TestEveryWritePlanFailsClosedForUnsupportedPatroni"
+        ],
+        "golden": [
+          "internal/cli/adapter_test.go#TestEveryPatronictlCommandHasVersionedMachineUsageEnvelope"
+        ],
+        "differential": [
+          "internal/cli/compat_oracle_test.go#TestPatronictlSemanticParity/reinit"
+        ],
+        "integration": [
+          "test/integration/dcs_etcd3_test.go#TestEtcd3PatroniSnapshotDiscoveryCASRemoveAndWatch",
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "test/integration/multicluster_cli_test.go#TestM5DefaultContextThreeNodeMultiClusterCLI"
+        ]
+      },
+      "deviations": [],
+      "status": "complete",
+      "dataPaths": [
+        "dcs-read",
+        "rest-post-/reinitialize"
+      ],
+      "writes": true,
+      "risk": "destructive",
+      "formats": [
+        "human"
+      ],
+      "prompts": [
+        {
+          "when": "member omitted and without --force",
+          "behavior": "prompt for replica member",
+          "sourceRef": "patroni/ctl.py:1205"
+        },
+        {
+          "when": "without --force",
+          "behavior": "confirm selected replicas",
+          "sourceRef": "patroni/ctl.py:1205"
+        }
+      ],
+      "fallback": {
+        "mode": "none"
+      },
+      "requirements": [
+        "FR20"
+      ],
+      "citus": {
+        "groupOption": "explicit",
+        "omittedGroup": "all-groups"
+      }
+    },
+    {
+      "command": "failover",
+      "function": "failover",
+      "help": "Failover to a replica",
+      "sourceRef": "patroni/ctl.py:1412",
+      "parameters": [
+        {
+          "kind": "argument",
+          "name": "cluster_name",
+          "required": false,
+          "nargs": 1,
+          "type": "string",
+          "default": {
+            "expression": "lambda: _get_configuration().get('scope')"
+          },
+          "sourceRef": "patroni/ctl.py:313",
+          "defaultSource": "lambda: _get_configuration().get('scope')"
+        },
+        {
+          "kind": "option",
+          "name": "group",
+          "flags": [
+            "--group"
+          ],
+          "required": false,
+          "type": "integer",
+          "default": null,
+          "env": null,
+          "multiple": false,
+          "isFlag": false,
+          "help": "Citus group",
+          "sourceRef": "patroni/ctl.py:317"
+        },
+        {
+          "kind": "option",
+          "name": "candidate",
+          "flags": [
+            "--candidate"
+          ],
+          "required": false,
+          "type": "string",
+          "default": null,
+          "env": null,
+          "multiple": false,
+          "isFlag": false,
+          "help": "The name of the candidate",
+          "sourceRef": "patroni/ctl.py:1415"
+        },
+        {
+          "kind": "option",
+          "name": "force",
+          "flags": [
+            "--force"
+          ],
+          "required": false,
+          "type": "boolean",
+          "default": false,
+          "env": null,
+          "multiple": false,
+          "isFlag": true,
+          "help": "Do not ask for confirmation at any point",
+          "sourceRef": "patroni/ctl.py:312"
+        }
+      ],
+      "exitBehavior": {
+        "success": "normal return exits 0",
+        "usage": "Click usage and PatroniCtlException paths exit non-zero",
+        "operation": "preserve source behavior; some per-member HTTP failures are rendered and return 0"
+      },
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestPatronictlInventory"
+        ],
+        "unit": [
+          "control/service_read_test.go#TestFailoverAndSwitchoverPrepareFreezePatronictlSelection",
+          "control/service_read_test.go#TestFailoverRESTSuccessDefiniteFailureAndConcurrency",
+          "control/service_read_test.go#TestFailoverTransportExceptionFallsBackToExactDCSCAS",
+          "internal/cli/root_test.go#TestCobraTreeMatchesPinnedPatronictlInventory",
+          "internal/cli/adapter_test.go#TestEveryPatronictlCommandHasVersionedMachineUsageEnvelope",
+          "test/compat/citus_semantics_test.go#TestPatronictlCitusSemanticsMatrix",
+          "control/version_gate_test.go#TestEveryWritePlanFailsClosedForUnsupportedPatroni"
+        ],
+        "golden": [
+          "internal/cli/adapter_test.go#TestEveryPatronictlCommandHasVersionedMachineUsageEnvelope"
+        ],
+        "differential": [
+          "internal/cli/compat_oracle_test.go#TestPatronictlSemanticParity/failover"
+        ],
+        "integration": [
+          "test/integration/dcs_etcd3_test.go#TestEtcd3PatroniSnapshotDiscoveryCASRemoveAndWatch",
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "test/integration/multicluster_cli_test.go#TestM5DefaultContextThreeNodeMultiClusterCLI",
+          "test/integration/citus_cli_test.go#TestM8CitusMultiGroupCLI"
+        ]
+      },
+      "deviations": [],
+      "status": "complete",
+      "dataPaths": [
+        "dcs-read",
+        "rest-post-/failover",
+        "dcs-failover-cas"
+      ],
+      "writes": true,
+      "risk": "availability",
+      "formats": [
+        "human"
+      ],
+      "prompts": [
+        {
+          "when": "Citus group omitted and interactive",
+          "behavior": "prompt for group",
+          "sourceRef": "patroni/ctl.py:1417"
+        },
+        {
+          "when": "candidate omitted and without --force",
+          "behavior": "prompt for candidate",
+          "sourceRef": "patroni/ctl.py:1417"
+        },
+        {
+          "when": "asynchronous candidate under synchronous mode",
+          "behavior": "explicit asynchronous failover confirmation",
+          "sourceRef": "patroni/ctl.py:1417"
+        },
+        {
+          "when": "without --force",
+          "behavior": "confirm failover and current leader demotion",
+          "sourceRef": "patroni/ctl.py:1417"
+        }
+      ],
+      "fallback": {
+        "mode": "rest-to-dcs",
+        "trigger": "transport exception from Patroni request",
+        "sendState": "fallback is source-compatible even when the REST request may have been sent",
+        "sourceBehavior": "manual_failover write after logging Failing over to DCS"
+      },
+      "requirements": [
+        "FR21",
+        "FR28"
+      ],
+      "citus": {
+        "groupOption": "explicit",
+        "omittedGroup": "prompt-or-reject-with-force"
+      }
+    },
+    {
+      "command": "switchover",
+      "function": "switchover",
+      "help": "Switchover to a replica",
+      "sourceRef": "patroni/ctl.py:1434",
+      "parameters": [
+        {
+          "kind": "argument",
+          "name": "cluster_name",
+          "required": false,
+          "nargs": 1,
+          "type": "string",
+          "default": {
+            "expression": "lambda: _get_configuration().get('scope')"
+          },
+          "sourceRef": "patroni/ctl.py:313",
+          "defaultSource": "lambda: _get_configuration().get('scope')"
+        },
+        {
+          "kind": "option",
+          "name": "group",
+          "flags": [
+            "--group"
+          ],
+          "required": false,
+          "type": "integer",
+          "default": null,
+          "env": null,
+          "multiple": false,
+          "isFlag": false,
+          "help": "Citus group",
+          "sourceRef": "patroni/ctl.py:317"
+        },
+        {
+          "kind": "option",
+          "name": "leader",
+          "flags": [
+            "--leader",
+            "--primary"
+          ],
+          "required": false,
+          "type": "string",
+          "default": null,
+          "env": null,
+          "multiple": false,
+          "isFlag": false,
+          "help": "The name of the current leader",
+          "sourceRef": "patroni/ctl.py:1437"
+        },
+        {
+          "kind": "option",
+          "name": "candidate",
+          "flags": [
+            "--candidate"
+          ],
+          "required": false,
+          "type": "string",
+          "default": null,
+          "env": null,
+          "multiple": false,
+          "isFlag": false,
+          "help": "The name of the candidate",
+          "sourceRef": "patroni/ctl.py:1438"
+        },
+        {
+          "kind": "option",
+          "name": "scheduled",
+          "flags": [
+            "--scheduled"
+          ],
+          "required": false,
+          "type": "string",
+          "default": null,
+          "env": null,
+          "multiple": false,
+          "isFlag": false,
+          "help": "Timestamp of a scheduled switchover in unambiguous format (e.g. ISO 8601)",
+          "sourceRef": "patroni/ctl.py:1439"
+        },
+        {
+          "kind": "option",
+          "name": "force",
+          "flags": [
+            "--force"
+          ],
+          "required": false,
+          "type": "boolean",
+          "default": false,
+          "env": null,
+          "multiple": false,
+          "isFlag": true,
+          "help": "Do not ask for confirmation at any point",
+          "sourceRef": "patroni/ctl.py:312"
+        }
+      ],
+      "exitBehavior": {
+        "success": "normal return exits 0",
+        "usage": "Click usage and PatroniCtlException paths exit non-zero",
+        "operation": "preserve source behavior; some per-member HTTP failures are rendered and return 0"
+      },
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestPatronictlInventory"
+        ],
+        "unit": [
+          "control/service_read_test.go#TestFailoverAndSwitchoverPrepareFreezePatronictlSelection",
+          "control/service_read_test.go#TestSwitchoverUsesLegacyEndpointOnlyForExact501Contract",
+          "control/service_read_test.go#TestScheduledSwitchoverRESTAcceptanceRequiresDCSReadback",
+          "control/service_read_test.go#TestScheduledSwitchoverFallbackAndCancellation",
+          "internal/cli/root_test.go#TestCobraTreeMatchesPinnedPatronictlInventory",
+          "internal/cli/adapter_test.go#TestEveryPatronictlCommandHasVersionedMachineUsageEnvelope",
+          "test/compat/citus_semantics_test.go#TestPatronictlCitusSemanticsMatrix",
+          "control/version_gate_test.go#TestEveryWritePlanFailsClosedForUnsupportedPatroni"
+        ],
+        "golden": [
+          "internal/cli/adapter_test.go#TestEveryPatronictlCommandHasVersionedMachineUsageEnvelope"
+        ],
+        "differential": [
+          "internal/cli/compat_oracle_test.go#TestPatronictlSemanticParity/switchover"
+        ],
+        "integration": [
+          "test/integration/dcs_etcd3_test.go#TestEtcd3PatroniSnapshotDiscoveryCASRemoveAndWatch",
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "test/integration/multicluster_cli_test.go#TestM5DefaultContextThreeNodeMultiClusterCLI"
+        ]
+      },
+      "deviations": [],
+      "status": "complete",
+      "dataPaths": [
+        "dcs-read",
+        "rest-post-/switchover",
+        "rest-post-/failover-legacy",
+        "dcs-failover-cas"
+      ],
+      "writes": true,
+      "risk": "availability",
+      "formats": [
+        "human"
+      ],
+      "prompts": [
+        {
+          "when": "Citus group omitted and interactive",
+          "behavior": "prompt for group",
+          "sourceRef": "patroni/ctl.py:1442"
+        },
+        {
+          "when": "leader/candidate omitted and without --force",
+          "behavior": "prompt for target values",
+          "sourceRef": "patroni/ctl.py:1442"
+        },
+        {
+          "when": "schedule omitted and without --force",
+          "behavior": "prompt when to switchover; default now",
+          "sourceRef": "patroni/ctl.py:1442"
+        },
+        {
+          "when": "without --force",
+          "behavior": "confirm immediate or scheduled switchover",
+          "sourceRef": "patroni/ctl.py:1442"
+        }
+      ],
+      "fallback": {
+        "mode": "rest-to-rest-legacy-then-dcs",
+        "trigger": "501 unsupported switchover uses /failover; transport exception writes DCS",
+        "sendState": "DCS fallback remains source-compatible after a possibly-sent REST request"
+      },
+      "requirements": [
+        "FR22",
+        "FR28"
+      ],
+      "citus": {
+        "groupOption": "explicit",
+        "omittedGroup": "prompt-or-reject-with-force"
+      }
+    },
+    {
+      "command": "list",
+      "function": "members",
+      "help": "List the Patroni members for a given Patroni",
+      "sourceRef": "patroni/ctl.py:1690",
+      "parameters": [
+        {
+          "kind": "argument",
+          "name": "cluster_names",
+          "required": true,
+          "nargs": -1,
+          "type": "string",
+          "default": null,
+          "sourceRef": "patroni/ctl.py:1691"
+        },
+        {
+          "kind": "option",
+          "name": "group",
+          "flags": [
+            "--group"
+          ],
+          "required": false,
+          "type": "integer",
+          "default": null,
+          "env": null,
+          "multiple": false,
+          "isFlag": false,
+          "help": "Citus group",
+          "sourceRef": "patroni/ctl.py:317"
+        },
+        {
+          "kind": "option",
+          "name": "extended",
+          "flags": [
+            "--extended",
+            "-e"
+          ],
+          "required": false,
+          "type": "boolean",
+          "default": false,
+          "env": null,
+          "multiple": false,
+          "isFlag": true,
+          "help": "Show some extra information",
+          "sourceRef": "patroni/ctl.py:1693"
+        },
+        {
+          "kind": "option",
+          "name": "ts",
+          "flags": [
+            "--timestamp",
+            "-t"
+          ],
+          "required": false,
+          "type": "boolean",
+          "default": false,
+          "env": null,
+          "multiple": false,
+          "isFlag": true,
+          "help": "Print timestamp",
+          "sourceRef": "patroni/ctl.py:1694"
+        },
+        {
+          "kind": "option",
+          "name": "fmt",
+          "flags": [
+            "--format",
+            "-f"
+          ],
+          "required": false,
+          "type": "string",
+          "default": "pretty",
+          "env": null,
+          "multiple": false,
+          "isFlag": false,
+          "help": "Output format",
+          "sourceRef": "patroni/ctl.py:308",
+          "choices": [
+            "pretty",
+            "tsv",
+            "json",
+            "yaml",
+            "yml"
+          ]
+        },
+        {
+          "kind": "option",
+          "name": "W",
+          "flags": [
+            "-W"
+          ],
+          "required": false,
+          "type": "boolean",
+          "default": false,
+          "env": null,
+          "multiple": false,
+          "isFlag": true,
+          "help": "Auto update the screen every 2 seconds",
+          "sourceRef": "patroni/ctl.py:311"
+        },
+        {
+          "kind": "option",
+          "name": "watch",
+          "flags": [
+            "-w",
+            "--watch"
+          ],
+          "required": false,
+          "type": "number",
+          "default": null,
+          "env": null,
+          "multiple": false,
+          "isFlag": false,
+          "help": "Auto update the screen every X seconds",
+          "sourceRef": "patroni/ctl.py:310"
+        }
+      ],
+      "exitBehavior": {
+        "success": "normal return exits 0",
+        "usage": "Click usage and PatroniCtlException paths exit non-zero",
+        "operation": "preserve source behavior; some per-member HTTP failures are rendered and return 0"
+      },
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestPatronictlInventory"
+        ],
+        "unit": [
+          "control/service_read_test.go#TestReadServiceListProjectsPatroniClusterDeterministically",
+          "control/discover_test.go#TestListExpandsGroupLessCitusScopeInsideControl",
+          "internal/cli/root_test.go#TestCobraTreeMatchesPinnedPatronictlInventory",
+          "internal/cli/adapter_test.go#TestEveryPatronictlCommandHasVersionedMachineUsageEnvelope",
+          "test/compat/citus_semantics_test.go#TestPatronictlCitusSemanticsMatrix"
+        ],
+        "golden": [
+          "internal/cli/adapter_test.go#TestEveryPatronictlCommandHasVersionedMachineUsageEnvelope"
+        ],
+        "differential": [
+          "internal/cli/compat_oracle_test.go#TestPatronictlSemanticParity/list_json",
+          "internal/cli/compat_oracle_test.go#TestPatronictlSemanticParity/list_tsv"
+        ],
+        "integration": [
+          "test/integration/dcs_etcd3_test.go#TestEtcd3PatroniSnapshotDiscoveryCASRemoveAndWatch",
+          "test/integration/multicluster_cli_test.go#TestM5DefaultContextThreeNodeMultiClusterCLI",
+          "test/integration/citus_cli_test.go#TestM8CitusMultiGroupCLI"
+        ]
+      },
+      "deviations": [],
+      "status": "complete",
+      "dataPaths": [
+        "dcs-read"
+      ],
+      "writes": false,
+      "risk": "read",
+      "formats": [
+        "pretty",
+        "tsv",
+        "json",
+        "yaml",
+        "yml"
+      ],
+      "prompts": [],
+      "fallback": {
+        "mode": "none"
+      },
+      "requirements": [
+        "FR10",
+        "FR13"
+      ],
+      "citus": {
+        "groupOption": "explicit",
+        "omittedGroup": "all-groups"
+      }
+    },
+    {
+      "command": "topology",
+      "function": "topology",
+      "help": "Prints ASCII topology for given cluster",
+      "sourceRef": "patroni/ctl.py:1732",
+      "parameters": [
+        {
+          "kind": "argument",
+          "name": "cluster_names",
+          "required": true,
+          "nargs": -1,
+          "type": "string",
+          "default": null,
+          "sourceRef": "patroni/ctl.py:1733"
+        },
+        {
+          "kind": "option",
+          "name": "group",
+          "flags": [
+            "--group"
+          ],
+          "required": false,
+          "type": "integer",
+          "default": null,
+          "env": null,
+          "multiple": false,
+          "isFlag": false,
+          "help": "Citus group",
+          "sourceRef": "patroni/ctl.py:317"
+        },
+        {
+          "kind": "option",
+          "name": "W",
+          "flags": [
+            "-W"
+          ],
+          "required": false,
+          "type": "boolean",
+          "default": false,
+          "env": null,
+          "multiple": false,
+          "isFlag": true,
+          "help": "Auto update the screen every 2 seconds",
+          "sourceRef": "patroni/ctl.py:311"
+        },
+        {
+          "kind": "option",
+          "name": "watch",
+          "flags": [
+            "-w",
+            "--watch"
+          ],
+          "required": false,
+          "type": "number",
+          "default": null,
+          "env": null,
+          "multiple": false,
+          "isFlag": false,
+          "help": "Auto update the screen every X seconds",
+          "sourceRef": "patroni/ctl.py:310"
+        }
+      ],
+      "exitBehavior": {
+        "success": "normal return exits 0",
+        "usage": "Click usage and PatroniCtlException paths exit non-zero",
+        "operation": "preserve source behavior; some per-member HTTP failures are rendered and return 0"
+      },
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestPatronictlInventory"
+        ],
+        "unit": [
+          "control/service_read_test.go#TestReadServiceTopologyUsesReplicateFromTree",
+          "control/discover_test.go#TestListExpandsGroupLessCitusScopeInsideControl",
+          "internal/cli/root_test.go#TestCobraTreeMatchesPinnedPatronictlInventory",
+          "internal/cli/adapter_test.go#TestEveryPatronictlCommandHasVersionedMachineUsageEnvelope",
+          "test/compat/citus_semantics_test.go#TestPatronictlCitusSemanticsMatrix"
+        ],
+        "golden": [
+          "internal/cli/adapter_test.go#TestEveryPatronictlCommandHasVersionedMachineUsageEnvelope"
+        ],
+        "differential": [
+          "internal/cli/compat_oracle_test.go#TestPatronictlSemanticParity/topology"
+        ],
+        "integration": [
+          "test/integration/dcs_etcd3_test.go#TestEtcd3PatroniSnapshotDiscoveryCASRemoveAndWatch",
+          "test/integration/multicluster_cli_test.go#TestM5DefaultContextThreeNodeMultiClusterCLI",
+          "test/integration/citus_cli_test.go#TestM8CitusMultiGroupCLI"
+        ]
+      },
+      "deviations": [],
+      "status": "complete",
+      "dataPaths": [
+        "dcs-read"
+      ],
+      "writes": false,
+      "risk": "read",
+      "formats": [
+        "topology"
+      ],
+      "prompts": [],
+      "fallback": {
+        "mode": "none"
+      },
+      "requirements": [
+        "FR12"
+      ],
+      "citus": {
+        "groupOption": "explicit",
+        "omittedGroup": "all-groups"
+      }
+    },
+    {
+      "command": "flush",
+      "function": "flush",
+      "help": "Discard scheduled events",
+      "sourceRef": "patroni/ctl.py:1764",
+      "parameters": [
+        {
+          "kind": "argument",
+          "name": "cluster_name",
+          "required": true,
+          "nargs": 1,
+          "type": "string",
+          "default": null,
+          "sourceRef": "patroni/ctl.py:1765"
+        },
+        {
+          "kind": "option",
+          "name": "group",
+          "flags": [
+            "--group"
+          ],
+          "required": false,
+          "type": "integer",
+          "default": null,
+          "env": null,
+          "multiple": false,
+          "isFlag": false,
+          "help": "Citus group",
+          "sourceRef": "patroni/ctl.py:317"
+        },
+        {
+          "kind": "argument",
+          "name": "member_names",
+          "required": true,
+          "nargs": -1,
+          "type": "string",
+          "default": null,
+          "sourceRef": "patroni/ctl.py:1767"
+        },
+        {
+          "kind": "argument",
+          "name": "target",
+          "required": true,
+          "nargs": 1,
+          "type": "string",
+          "default": null,
+          "sourceRef": "patroni/ctl.py:1768",
+          "choices": [
+            "restart",
+            "switchover"
+          ]
+        },
+        {
+          "kind": "option",
+          "name": "role",
+          "flags": [
+            "--role",
+            "-r"
+          ],
+          "required": false,
+          "type": "string",
+          "default": "any",
+          "env": null,
+          "multiple": false,
+          "isFlag": false,
+          "help": "Flush only members with this role",
+          "sourceRef": "patroni/ctl.py:1769",
+          "choices": [
+            "leader",
+            "primary",
+            "standby-leader",
+            "replica",
+            "standby",
+            "any"
+          ],
+          "defaultSource": "repr(CtlPostgresqlRole.ANY)"
+        },
+        {
+          "kind": "option",
+          "name": "force",
+          "flags": [
+            "--force"
+          ],
+          "required": false,
+          "type": "boolean",
+          "default": false,
+          "env": null,
+          "multiple": false,
+          "isFlag": true,
+          "help": "Do not ask for confirmation at any point",
+          "sourceRef": "patroni/ctl.py:312"
+        }
+      ],
+      "exitBehavior": {
+        "success": "normal return exits 0",
+        "usage": "Click usage and PatroniCtlException paths exit non-zero",
+        "operation": "preserve source behavior; some per-member HTTP failures are rendered and return 0"
+      },
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestPatronictlInventory"
+        ],
+        "unit": [
+          "control/flush_test.go#TestPrepareFlushFreezesPatronictlSelection",
+          "control/flush_test.go#TestFlushRestartClassifiesAndVerifiesOutcomes",
+          "control/flush_test.go#TestFlushSwitchoverProbesLeaderFirstAndStopsOnTerminalResponse",
+          "control/flush_test.go#TestFlushSwitchoverFallsBackToExactDCSDelete",
+          "control/flush_test.go#TestFlushSwitchoverConflictAndCancellationRemainSafe",
+          "control/flush_test.go#TestFlushRestartExpandsAndRevalidatesGroupLessCitusScope",
+          "control/flush_test.go#TestFlushSwitchoverUsesCitusCoordinatorGroup",
+          "internal/cli/root_test.go#TestCobraTreeMatchesPinnedPatronictlInventory",
+          "internal/cli/adapter_test.go#TestEveryPatronictlCommandHasVersionedMachineUsageEnvelope",
+          "test/compat/citus_semantics_test.go#TestPatronictlCitusSemanticsMatrix",
+          "control/version_gate_test.go#TestEveryWritePlanFailsClosedForUnsupportedPatroni"
+        ],
+        "golden": [
+          "internal/cli/adapter_test.go#TestEveryPatronictlCommandHasVersionedMachineUsageEnvelope"
+        ],
+        "differential": [
+          "internal/cli/compat_oracle_test.go#TestPatronictlSemanticParity/flush_restart",
+          "internal/cli/compat_oracle_test.go#TestPatronictlSemanticParity/flush_switchover_noop"
+        ],
+        "integration": [
+          "test/integration/dcs_etcd3_test.go#TestEtcd3PatroniSnapshotDiscoveryCASRemoveAndWatch",
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "test/integration/citus_cli_test.go#TestM8CitusMultiGroupCLI"
+        ]
+      },
+      "deviations": [],
+      "status": "complete",
+      "dataPaths": [
+        "dcs-read",
+        "rest-delete-/restart",
+        "rest-delete-/switchover",
+        "dcs-failover-cas"
+      ],
+      "writes": true,
+      "risk": "admin-write",
+      "formats": [
+        "human"
+      ],
+      "prompts": [
+        {
+          "when": "without --force",
+          "behavior": "confirm selected member action",
+          "sourceRef": "patroni/ctl.py:1772"
+        }
+      ],
+      "fallback": {
+        "mode": "command-specific",
+        "trigger": "scheduled switchover only: no accessible member after probing leader-first",
+        "sendState": "clear failover key with its observed version; restart has no DCS fallback"
+      },
+      "requirements": [
+        "FR19",
+        "FR23"
+      ],
+      "citus": {
+        "groupOption": "explicit",
+        "omittedGroup": "target-dependent",
+        "targets": {
+          "restart": "all-groups",
+          "switchover": "coordinator-group-0"
+        }
+      }
+    },
+    {
+      "command": "pause",
+      "function": "pause",
+      "help": "Disable auto failover",
+      "sourceRef": "patroni/ctl.py:1887",
+      "parameters": [
+        {
+          "kind": "argument",
+          "name": "cluster_name",
+          "required": false,
+          "nargs": 1,
+          "type": "string",
+          "default": {
+            "expression": "lambda: _get_configuration().get('scope')"
+          },
+          "sourceRef": "patroni/ctl.py:313",
+          "defaultSource": "lambda: _get_configuration().get('scope')"
+        },
+        {
+          "kind": "option",
+          "name": "group",
+          "flags": [
+            "--group"
+          ],
+          "required": false,
+          "type": "integer",
+          "default": {
+            "expression": "lambda: _get_configuration().get('citus', {}).get('group')"
+          },
+          "env": null,
+          "multiple": false,
+          "isFlag": false,
+          "help": "Citus group",
+          "sourceRef": "patroni/ctl.py:315",
+          "defaultSource": "lambda: _get_configuration().get('citus', {}).get('group')"
+        },
+        {
+          "kind": "option",
+          "name": "wait",
+          "flags": [
+            "--wait"
+          ],
+          "required": false,
+          "type": "boolean",
+          "default": false,
+          "env": null,
+          "multiple": false,
+          "isFlag": true,
+          "help": "Wait until pause is applied on all nodes",
+          "sourceRef": "patroni/ctl.py:1890"
+        }
+      ],
+      "exitBehavior": {
+        "success": "normal return exits 0",
+        "usage": "Click usage and PatroniCtlException paths exit non-zero",
+        "operation": "preserve source behavior; some per-member HTTP failures are rendered and return 0"
+      },
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestPatronictlInventory"
+        ],
+        "unit": [
+          "control/pause_test.go#TestPreparePauseResumeFreezesLeaderFirstPlan",
+          "control/pause_test.go#TestPauseResumePayloadAndTerminalResponseSemantics",
+          "control/pause_test.go#TestPauseResumeProbingAndAmbiguousEvidence",
+          "control/pause_test.go#TestPauseResumeWaitConvergenceAndConcurrency",
+          "internal/cli/root_test.go#TestCobraTreeMatchesPinnedPatronictlInventory",
+          "internal/cli/adapter_test.go#TestEveryPatronictlCommandHasVersionedMachineUsageEnvelope",
+          "test/compat/citus_semantics_test.go#TestPatronictlCitusSemanticsMatrix",
+          "control/version_gate_test.go#TestEveryWritePlanFailsClosedForUnsupportedPatroni"
+        ],
+        "golden": [
+          "internal/cli/adapter_test.go#TestEveryPatronictlCommandHasVersionedMachineUsageEnvelope"
+        ],
+        "differential": [
+          "internal/cli/compat_oracle_test.go#TestPatronictlSemanticParity/pause"
+        ],
+        "integration": [
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "test/integration/dcs_etcd3_test.go#TestEtcd3PatroniSnapshotDiscoveryCASRemoveAndWatch",
+          "test/integration/citus_cli_test.go#TestM8CitusMultiGroupCLI"
+        ]
+      },
+      "deviations": [],
+      "status": "complete",
+      "dataPaths": [
+        "dcs-read",
+        "rest-patch-/config"
+      ],
+      "writes": true,
+      "risk": "availability",
+      "formats": [
+        "human"
+      ],
+      "prompts": [],
+      "fallback": {
+        "mode": "none"
+      },
+      "requirements": [
+        "FR24"
+      ],
+      "citus": {
+        "groupOption": "configured-default",
+        "omittedGroup": "configured-group"
+      }
+    },
+    {
+      "command": "resume",
+      "function": "resume",
+      "help": "Resume auto failover",
+      "sourceRef": "patroni/ctl.py:1903",
+      "parameters": [
+        {
+          "kind": "argument",
+          "name": "cluster_name",
+          "required": false,
+          "nargs": 1,
+          "type": "string",
+          "default": {
+            "expression": "lambda: _get_configuration().get('scope')"
+          },
+          "sourceRef": "patroni/ctl.py:313",
+          "defaultSource": "lambda: _get_configuration().get('scope')"
+        },
+        {
+          "kind": "option",
+          "name": "group",
+          "flags": [
+            "--group"
+          ],
+          "required": false,
+          "type": "integer",
+          "default": {
+            "expression": "lambda: _get_configuration().get('citus', {}).get('group')"
+          },
+          "env": null,
+          "multiple": false,
+          "isFlag": false,
+          "help": "Citus group",
+          "sourceRef": "patroni/ctl.py:315",
+          "defaultSource": "lambda: _get_configuration().get('citus', {}).get('group')"
+        },
+        {
+          "kind": "option",
+          "name": "wait",
+          "flags": [
+            "--wait"
+          ],
+          "required": false,
+          "type": "boolean",
+          "default": false,
+          "env": null,
+          "multiple": false,
+          "isFlag": true,
+          "help": "Wait until pause is cleared on all nodes",
+          "sourceRef": "patroni/ctl.py:1906"
+        }
+      ],
+      "exitBehavior": {
+        "success": "normal return exits 0",
+        "usage": "Click usage and PatroniCtlException paths exit non-zero",
+        "operation": "preserve source behavior; some per-member HTTP failures are rendered and return 0"
+      },
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestPatronictlInventory"
+        ],
+        "unit": [
+          "control/pause_test.go#TestPreparePauseResumeFreezesLeaderFirstPlan",
+          "control/pause_test.go#TestPauseResumePayloadAndTerminalResponseSemantics",
+          "control/pause_test.go#TestPauseResumeProbingAndAmbiguousEvidence",
+          "control/pause_test.go#TestPauseResumeWaitConvergenceAndConcurrency",
+          "internal/cli/root_test.go#TestCobraTreeMatchesPinnedPatronictlInventory",
+          "internal/cli/adapter_test.go#TestEveryPatronictlCommandHasVersionedMachineUsageEnvelope",
+          "test/compat/citus_semantics_test.go#TestPatronictlCitusSemanticsMatrix",
+          "control/version_gate_test.go#TestEveryWritePlanFailsClosedForUnsupportedPatroni"
+        ],
+        "golden": [
+          "internal/cli/adapter_test.go#TestEveryPatronictlCommandHasVersionedMachineUsageEnvelope"
+        ],
+        "differential": [
+          "internal/cli/compat_oracle_test.go#TestPatronictlSemanticParity/resume"
+        ],
+        "integration": [
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "test/integration/dcs_etcd3_test.go#TestEtcd3PatroniSnapshotDiscoveryCASRemoveAndWatch",
+          "test/integration/citus_cli_test.go#TestM8CitusMultiGroupCLI"
+        ]
+      },
+      "deviations": [],
+      "status": "complete",
+      "dataPaths": [
+        "dcs-read",
+        "rest-patch-/config"
+      ],
+      "writes": true,
+      "risk": "availability",
+      "formats": [
+        "human"
+      ],
+      "prompts": [],
+      "fallback": {
+        "mode": "none"
+      },
+      "requirements": [
+        "FR24"
+      ],
+      "citus": {
+        "groupOption": "configured-default",
+        "omittedGroup": "configured-group"
+      }
+    },
+    {
+      "command": "edit-config",
+      "function": "edit_config",
+      "help": "Edit cluster configuration",
+      "sourceRef": "patroni/ctl.py:2137",
+      "parameters": [
+        {
+          "kind": "argument",
+          "name": "cluster_name",
+          "required": false,
+          "nargs": 1,
+          "type": "string",
+          "default": {
+            "expression": "lambda: _get_configuration().get('scope')"
+          },
+          "sourceRef": "patroni/ctl.py:313",
+          "defaultSource": "lambda: _get_configuration().get('scope')"
+        },
+        {
+          "kind": "option",
+          "name": "group",
+          "flags": [
+            "--group"
+          ],
+          "required": false,
+          "type": "integer",
+          "default": {
+            "expression": "lambda: _get_configuration().get('citus', {}).get('group')"
+          },
+          "env": null,
+          "multiple": false,
+          "isFlag": false,
+          "help": "Citus group",
+          "sourceRef": "patroni/ctl.py:315",
+          "defaultSource": "lambda: _get_configuration().get('citus', {}).get('group')"
+        },
+        {
+          "kind": "option",
+          "name": "quiet",
+          "flags": [
+            "--quiet",
+            "-q"
+          ],
+          "required": false,
+          "type": "boolean",
+          "default": false,
+          "env": null,
+          "multiple": false,
+          "isFlag": true,
+          "help": "Do not show changes",
+          "sourceRef": "patroni/ctl.py:2140"
+        },
+        {
+          "kind": "option",
+          "name": "kvpairs",
+          "flags": [
+            "--set",
+            "-s"
+          ],
+          "required": false,
+          "type": "string",
+          "default": [],
+          "env": null,
+          "multiple": true,
+          "isFlag": false,
+          "help": "Set specific configuration value. Can be specified multiple times",
+          "sourceRef": "patroni/ctl.py:2141"
+        },
+        {
+          "kind": "option",
+          "name": "pgkvpairs",
+          "flags": [
+            "--pg",
+            "-p"
+          ],
+          "required": false,
+          "type": "string",
+          "default": [],
+          "env": null,
+          "multiple": true,
+          "isFlag": false,
+          "help": "Set specific PostgreSQL parameter value. Shorthand for -s postgresql.parameters. Can be specified multiple times",
+          "sourceRef": "patroni/ctl.py:2143"
+        },
+        {
+          "kind": "option",
+          "name": "apply_filename",
+          "flags": [
+            "--apply"
+          ],
+          "required": false,
+          "type": "string",
+          "default": null,
+          "env": null,
+          "multiple": false,
+          "isFlag": false,
+          "help": "Apply configuration from file. Use - for stdin.",
+          "sourceRef": "patroni/ctl.py:2146"
+        },
+        {
+          "kind": "option",
+          "name": "replace_filename",
+          "flags": [
+            "--replace"
+          ],
+          "required": false,
+          "type": "string",
+          "default": null,
+          "env": null,
+          "multiple": false,
+          "isFlag": false,
+          "help": "Apply configuration from file, replacing existing configuration. Use - for stdin.",
+          "sourceRef": "patroni/ctl.py:2147"
+        },
+        {
+          "kind": "option",
+          "name": "force",
+          "flags": [
+            "--force"
+          ],
+          "required": false,
+          "type": "boolean",
+          "default": false,
+          "env": null,
+          "multiple": false,
+          "isFlag": true,
+          "help": "Do not ask for confirmation at any point",
+          "sourceRef": "patroni/ctl.py:312"
+        }
+      ],
+      "exitBehavior": {
+        "success": "normal return exits 0",
+        "usage": "Click usage and PatroniCtlException paths exit non-zero",
+        "operation": "preserve source behavior; some per-member HTTP failures are rendered and return 0"
+      },
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestPatronictlInventory"
+        ],
+        "unit": [
+          "control/edit_config_test.go#TestPreviewEditConfigMatchesPatroniPatchSetAndReplaceSemantics",
+          "control/edit_config_test.go#TestPrepareEditConfigFreezesSecretSafeCASPlan",
+          "control/edit_config_test.go#TestExecuteEditConfigClassifiesCASAndAuthoritativeReadback",
+          "control/edit_config_test.go#TestExecuteEditConfigRejectsConcurrencyTamperingAndCancellation",
+          "internal/cli/root_test.go#TestCobraTreeMatchesPinnedPatronictlInventory",
+          "internal/cli/adapter_test.go#TestEveryPatronictlCommandHasVersionedMachineUsageEnvelope",
+          "test/compat/citus_semantics_test.go#TestPatronictlCitusSemanticsMatrix",
+          "control/version_gate_test.go#TestEveryWritePlanFailsClosedForUnsupportedPatroni"
+        ],
+        "golden": [
+          "internal/cli/adapter_test.go#TestEveryPatronictlCommandHasVersionedMachineUsageEnvelope"
+        ],
+        "differential": [
+          "internal/cli/compat_oracle_test.go#TestPatronictlSemanticParity/edit_config"
+        ],
+        "integration": [
+          "test/integration/dcs_etcd3_test.go#TestEtcd3PatroniSnapshotDiscoveryCASRemoveAndWatch",
+          "test/integration/multicluster_cli_test.go#TestM5DefaultContextThreeNodeMultiClusterCLI",
+          "test/integration/citus_cli_test.go#TestM8CitusMultiGroupCLI"
+        ]
+      },
+      "deviations": [],
+      "status": "complete",
+      "dataPaths": [
+        "dcs-read",
+        "dcs-config-cas"
+      ],
+      "writes": true,
+      "risk": "configuration",
+      "formats": [
+        "human-diff",
+        "yaml-editor"
+      ],
+      "prompts": [
+        {
+          "when": "no --set/--pg/--apply/--replace",
+          "behavior": "launch EDITOR/editor/vi",
+          "sourceRef": "patroni/ctl.py:2150"
+        },
+        {
+          "when": "changes exist and without --force",
+          "behavior": "confirm Apply these changes?",
+          "sourceRef": "patroni/ctl.py:2150"
+        }
+      ],
+      "fallback": {
+        "mode": "none"
+      },
+      "requirements": [
+        "FR25"
+      ],
+      "citus": {
+        "groupOption": "configured-default",
+        "omittedGroup": "configured-group"
+      }
+    },
+    {
+      "command": "show-config",
+      "function": "show_config",
+      "help": "Show cluster configuration",
+      "sourceRef": "patroni/ctl.py:2215",
+      "parameters": [
+        {
+          "kind": "argument",
+          "name": "cluster_name",
+          "required": false,
+          "nargs": 1,
+          "type": "string",
+          "default": {
+            "expression": "lambda: _get_configuration().get('scope')"
+          },
+          "sourceRef": "patroni/ctl.py:313",
+          "defaultSource": "lambda: _get_configuration().get('scope')"
+        },
+        {
+          "kind": "option",
+          "name": "group",
+          "flags": [
+            "--group"
+          ],
+          "required": false,
+          "type": "integer",
+          "default": {
+            "expression": "lambda: _get_configuration().get('citus', {}).get('group')"
+          },
+          "env": null,
+          "multiple": false,
+          "isFlag": false,
+          "help": "Citus group",
+          "sourceRef": "patroni/ctl.py:315",
+          "defaultSource": "lambda: _get_configuration().get('citus', {}).get('group')"
+        }
+      ],
+      "exitBehavior": {
+        "success": "normal return exits 0",
+        "usage": "Click usage and PatroniCtlException paths exit non-zero",
+        "operation": "preserve source behavior; some per-member HTTP failures are rendered and return 0"
+      },
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestPatronictlInventory"
+        ],
+        "unit": [
+          "control/service_read_test.go#TestReadServiceShowConfigAndHistoryAreNormalizedCopies",
+          "internal/cli/root_test.go#TestCobraTreeMatchesPinnedPatronictlInventory",
+          "internal/cli/adapter_test.go#TestEveryPatronictlCommandHasVersionedMachineUsageEnvelope",
+          "test/compat/citus_semantics_test.go#TestPatronictlCitusSemanticsMatrix"
+        ],
+        "golden": [
+          "internal/cli/adapter_test.go#TestEveryPatronictlCommandHasVersionedMachineUsageEnvelope"
+        ],
+        "differential": [
+          "internal/cli/compat_oracle_test.go#TestPatronictlSemanticParity/show_config"
+        ],
+        "integration": [
+          "test/integration/dcs_etcd3_test.go#TestEtcd3PatroniSnapshotDiscoveryCASRemoveAndWatch",
+          "test/integration/citus_cli_test.go#TestM8CitusMultiGroupCLI"
+        ]
+      },
+      "deviations": [],
+      "status": "complete",
+      "dataPaths": [
+        "dcs-read"
+      ],
+      "writes": false,
+      "risk": "read",
+      "formats": [
+        "yaml"
+      ],
+      "prompts": [],
+      "fallback": {
+        "mode": "none"
+      },
+      "requirements": [
+        "FR15",
+        "FR25"
+      ],
+      "citus": {
+        "groupOption": "configured-default",
+        "omittedGroup": "configured-group"
+      }
+    },
+    {
+      "command": "version",
+      "function": "version",
+      "help": "Output version of patronictl command or a running Patroni instance",
+      "sourceRef": "patroni/ctl.py:2231",
+      "parameters": [
+        {
+          "kind": "argument",
+          "name": "cluster_name",
+          "required": false,
+          "nargs": 1,
+          "type": "string",
+          "default": null,
+          "sourceRef": "patroni/ctl.py:2232"
+        },
+        {
+          "kind": "argument",
+          "name": "member_names",
+          "required": true,
+          "nargs": -1,
+          "type": "string",
+          "default": null,
+          "sourceRef": "patroni/ctl.py:2233"
+        },
+        {
+          "kind": "option",
+          "name": "group",
+          "flags": [
+            "--group"
+          ],
+          "required": false,
+          "type": "integer",
+          "default": null,
+          "env": null,
+          "multiple": false,
+          "isFlag": false,
+          "help": "Citus group",
+          "sourceRef": "patroni/ctl.py:317"
+        }
+      ],
+      "exitBehavior": {
+        "success": "normal return exits 0",
+        "usage": "Click usage and PatroniCtlException paths exit non-zero",
+        "operation": "preserve source behavior; some per-member HTTP failures are rendered and return 0"
+      },
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestPatronictlInventory"
+        ],
+        "unit": [
+          "control/service_read_test.go#TestReadServiceVersionIsolatesPerMemberRESTFailure",
+          "control/version_gate_test.go#TestVersionRESTProbeHonorsUnsupportedReadPolicy",
+          "control/discover_test.go#TestListExpandsGroupLessCitusScopeInsideControl",
+          "internal/cli/root_test.go#TestCobraTreeMatchesPinnedPatronictlInventory",
+          "internal/cli/adapter_test.go#TestEveryPatronictlCommandHasVersionedMachineUsageEnvelope",
+          "test/compat/citus_semantics_test.go#TestPatronictlCitusSemanticsMatrix"
+        ],
+        "golden": [
+          "internal/cli/adapter_test.go#TestEveryPatronictlCommandHasVersionedMachineUsageEnvelope"
+        ],
+        "differential": [
+          "internal/cli/compat_oracle_test.go#TestPatronictlSemanticParity/version_local",
+          "internal/cli/compat_oracle_test.go#TestPatronictlSemanticParity/version_cluster"
+        ],
+        "integration": [
+          "test/integration/dcs_etcd3_test.go#TestEtcd3PatroniSnapshotDiscoveryCASRemoveAndWatch",
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "test/integration/citus_cli_test.go#TestM8CitusMultiGroupCLI"
+        ]
+      },
+      "deviations": [],
+      "status": "complete",
+      "dataPaths": [
+        "local",
+        "dcs-read",
+        "rest-get-/"
+      ],
+      "writes": false,
+      "risk": "read",
+      "formats": [
+        "human"
+      ],
+      "prompts": [],
+      "fallback": {
+        "mode": "none"
+      },
+      "requirements": [
+        "FR15",
+        "FR57"
+      ],
+      "citus": {
+        "groupOption": "explicit",
+        "omittedGroup": "all-groups"
+      }
+    },
+    {
+      "command": "history",
+      "function": "history",
+      "help": "Show the history of failovers/switchovers",
+      "sourceRef": "patroni/ctl.py:2268",
+      "parameters": [
+        {
+          "kind": "argument",
+          "name": "cluster_name",
+          "required": false,
+          "nargs": 1,
+          "type": "string",
+          "default": {
+            "expression": "lambda: _get_configuration().get('scope')"
+          },
+          "sourceRef": "patroni/ctl.py:313",
+          "defaultSource": "lambda: _get_configuration().get('scope')"
+        },
+        {
+          "kind": "option",
+          "name": "group",
+          "flags": [
+            "--group"
+          ],
+          "required": false,
+          "type": "integer",
+          "default": {
+            "expression": "lambda: _get_configuration().get('citus', {}).get('group')"
+          },
+          "env": null,
+          "multiple": false,
+          "isFlag": false,
+          "help": "Citus group",
+          "sourceRef": "patroni/ctl.py:315",
+          "defaultSource": "lambda: _get_configuration().get('citus', {}).get('group')"
+        },
+        {
+          "kind": "option",
+          "name": "fmt",
+          "flags": [
+            "--format",
+            "-f"
+          ],
+          "required": false,
+          "type": "string",
+          "default": "pretty",
+          "env": null,
+          "multiple": false,
+          "isFlag": false,
+          "help": "Output format",
+          "sourceRef": "patroni/ctl.py:308",
+          "choices": [
+            "pretty",
+            "tsv",
+            "json",
+            "yaml",
+            "yml"
+          ]
+        }
+      ],
+      "exitBehavior": {
+        "success": "normal return exits 0",
+        "usage": "Click usage and PatroniCtlException paths exit non-zero",
+        "operation": "preserve source behavior; some per-member HTTP failures are rendered and return 0"
+      },
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestPatronictlInventory"
+        ],
+        "unit": [
+          "control/service_read_test.go#TestReadServiceShowConfigAndHistoryAreNormalizedCopies",
+          "internal/cli/root_test.go#TestCobraTreeMatchesPinnedPatronictlInventory",
+          "internal/cli/adapter_test.go#TestEveryPatronictlCommandHasVersionedMachineUsageEnvelope",
+          "test/compat/citus_semantics_test.go#TestPatronictlCitusSemanticsMatrix"
+        ],
+        "golden": [
+          "internal/cli/adapter_test.go#TestEveryPatronictlCommandHasVersionedMachineUsageEnvelope"
+        ],
+        "differential": [
+          "internal/cli/compat_oracle_test.go#TestPatronictlSemanticParity/history_json"
+        ],
+        "integration": [
+          "test/integration/dcs_etcd3_test.go#TestEtcd3PatroniSnapshotDiscoveryCASRemoveAndWatch"
+        ]
+      },
+      "deviations": [],
+      "status": "complete",
+      "dataPaths": [
+        "dcs-read"
+      ],
+      "writes": false,
+      "risk": "read",
+      "formats": [
+        "pretty",
+        "tsv",
+        "json",
+        "yaml",
+        "yml"
+      ],
+      "prompts": [],
+      "fallback": {
+        "mode": "none"
+      },
+      "requirements": [
+        "FR15"
+      ],
+      "citus": {
+        "groupOption": "configured-default",
+        "omittedGroup": "configured-group"
+      }
+    },
+    {
+      "command": "demote-cluster",
+      "function": "demote_cluster",
+      "help": "Demote cluster to a standby cluster",
+      "sourceRef": "patroni/ctl.py:2385",
+      "parameters": [
+        {
+          "kind": "argument",
+          "name": "cluster_name",
+          "required": false,
+          "nargs": 1,
+          "type": "string",
+          "default": {
+            "expression": "lambda: _get_configuration().get('scope')"
+          },
+          "sourceRef": "patroni/ctl.py:313",
+          "defaultSource": "lambda: _get_configuration().get('scope')"
+        },
+        {
+          "kind": "option",
+          "name": "force",
+          "flags": [
+            "--force"
+          ],
+          "required": false,
+          "type": "boolean",
+          "default": false,
+          "env": null,
+          "multiple": false,
+          "isFlag": true,
+          "help": "Do not ask for confirmation at any point",
+          "sourceRef": "patroni/ctl.py:312"
+        },
+        {
+          "kind": "option",
+          "name": "host",
+          "flags": [
+            "--host"
+          ],
+          "required": false,
+          "type": "string",
+          "default": null,
+          "env": null,
+          "multiple": false,
+          "isFlag": false,
+          "help": "Address of the remote node",
+          "sourceRef": "patroni/ctl.py:2388"
+        },
+        {
+          "kind": "option",
+          "name": "port",
+          "flags": [
+            "--port"
+          ],
+          "required": false,
+          "type": "integer",
+          "default": null,
+          "env": null,
+          "multiple": false,
+          "isFlag": false,
+          "help": "Port of the remote node",
+          "sourceRef": "patroni/ctl.py:2389"
+        },
+        {
+          "kind": "option",
+          "name": "restore_command",
+          "flags": [
+            "--restore-command"
+          ],
+          "required": false,
+          "type": "string",
+          "default": null,
+          "env": null,
+          "multiple": false,
+          "isFlag": false,
+          "help": "Command to restore WAL records from the remote primary",
+          "sourceRef": "patroni/ctl.py:2390"
+        },
+        {
+          "kind": "option",
+          "name": "primary_slot_name",
+          "flags": [
+            "--primary-slot-name"
+          ],
+          "required": false,
+          "type": "string",
+          "default": null,
+          "env": null,
+          "multiple": false,
+          "isFlag": false,
+          "help": "Name of the slot on the remote node to use for replication",
+          "sourceRef": "patroni/ctl.py:2391"
+        }
+      ],
+      "exitBehavior": {
+        "success": "normal return exits 0",
+        "usage": "Click usage and PatroniCtlException paths exit non-zero",
+        "operation": "preserve source behavior; some per-member HTTP failures are rendered and return 0"
+      },
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestPatronictlInventory"
+        ],
+        "unit": [
+          "control/standby_cluster_test.go#TestPrepareStandbyClusterTransitionsFreezeLeaderAndSecretSafePlan",
+          "control/standby_cluster_test.go#TestStandbyClusterTransitionPayloadAndDefiniteOutcomes",
+          "control/standby_cluster_test.go#TestStandbyClusterTransitionAmbiguousReadback",
+          "control/standby_cluster_test.go#TestStandbyClusterTransitionConvergenceConcurrencyCancellation",
+          "control/standby_cluster_test.go#TestStandbyClusterVerificationPolicyIsBoundedInjectableAndDelayed",
+          "control/standby_cluster_test.go#TestStandbyClusterCitusCommandsSelectCoordinatorGroupZero",
+          "internal/cli/root_test.go#TestCobraTreeMatchesPinnedPatronictlInventory",
+          "internal/cli/adapter_test.go#TestEveryPatronictlCommandHasVersionedMachineUsageEnvelope",
+          "test/compat/citus_semantics_test.go#TestPatronictlCitusSemanticsMatrix",
+          "control/version_gate_test.go#TestEveryWritePlanFailsClosedForUnsupportedPatroni"
+        ],
+        "golden": [
+          "internal/cli/adapter_test.go#TestEveryPatronictlCommandHasVersionedMachineUsageEnvelope"
+        ],
+        "differential": [
+          "internal/cli/compat_oracle_test.go#TestPatronictlSemanticParity/demote_requires_source",
+          "internal/cli/compat_oracle_test.go#TestPatronictlSemanticParity/demote_abort"
+        ],
+        "integration": [
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "test/integration/dcs_etcd3_test.go#TestEtcd3PatroniSnapshotDiscoveryCASRemoveAndWatch",
+          "test/integration/multicluster_cli_test.go#TestM5DefaultContextThreeNodeMultiClusterCLI"
+        ]
+      },
+      "deviations": [],
+      "status": "complete",
+      "dataPaths": [
+        "dcs-read",
+        "rest-patch-/config",
+        "dcs-convergence-read"
+      ],
+      "writes": true,
+      "risk": "availability",
+      "formats": [
+        "human"
+      ],
+      "prompts": [
+        {
+          "when": "without --force",
+          "behavior": "confirm cluster demotion",
+          "sourceRef": "patroni/ctl.py:2392"
+        }
+      ],
+      "fallback": {
+        "mode": "none"
+      },
+      "requirements": [
+        "FR27"
+      ],
+      "citus": {
+        "groupOption": "none",
+        "omittedGroup": "coordinator-group-0"
+      }
+    },
+    {
+      "command": "promote-cluster",
+      "function": "promote_cluster",
+      "help": "Promote cluster, make it run standalone",
+      "sourceRef": "patroni/ctl.py:2422",
+      "parameters": [
+        {
+          "kind": "argument",
+          "name": "cluster_name",
+          "required": false,
+          "nargs": 1,
+          "type": "string",
+          "default": {
+            "expression": "lambda: _get_configuration().get('scope')"
+          },
+          "sourceRef": "patroni/ctl.py:313",
+          "defaultSource": "lambda: _get_configuration().get('scope')"
+        },
+        {
+          "kind": "option",
+          "name": "force",
+          "flags": [
+            "--force"
+          ],
+          "required": false,
+          "type": "boolean",
+          "default": false,
+          "env": null,
+          "multiple": false,
+          "isFlag": true,
+          "help": "Do not ask for confirmation at any point",
+          "sourceRef": "patroni/ctl.py:312"
+        }
+      ],
+      "exitBehavior": {
+        "success": "normal return exits 0",
+        "usage": "Click usage and PatroniCtlException paths exit non-zero",
+        "operation": "preserve source behavior; some per-member HTTP failures are rendered and return 0"
+      },
+      "tests": {
+        "inventory": [
+          "test/compat/manifest_test.go#TestPatronictlInventory"
+        ],
+        "unit": [
+          "control/standby_cluster_test.go#TestPrepareStandbyClusterTransitionsFreezeLeaderAndSecretSafePlan",
+          "control/standby_cluster_test.go#TestStandbyClusterTransitionPayloadAndDefiniteOutcomes",
+          "control/standby_cluster_test.go#TestStandbyClusterTransitionAmbiguousReadback",
+          "control/standby_cluster_test.go#TestStandbyClusterTransitionConvergenceConcurrencyCancellation",
+          "control/standby_cluster_test.go#TestStandbyClusterVerificationPolicyIsBoundedInjectableAndDelayed",
+          "control/standby_cluster_test.go#TestStandbyClusterCitusCommandsSelectCoordinatorGroupZero",
+          "internal/cli/root_test.go#TestCobraTreeMatchesPinnedPatronictlInventory",
+          "internal/cli/adapter_test.go#TestEveryPatronictlCommandHasVersionedMachineUsageEnvelope",
+          "test/compat/citus_semantics_test.go#TestPatronictlCitusSemanticsMatrix",
+          "control/version_gate_test.go#TestEveryWritePlanFailsClosedForUnsupportedPatroni"
+        ],
+        "golden": [
+          "internal/cli/adapter_test.go#TestEveryPatronictlCommandHasVersionedMachineUsageEnvelope"
+        ],
+        "differential": [
+          "internal/cli/compat_oracle_test.go#TestPatronictlSemanticParity/promote_primary_noop"
+        ],
+        "integration": [
+          "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
+          "test/integration/dcs_etcd3_test.go#TestEtcd3PatroniSnapshotDiscoveryCASRemoveAndWatch",
+          "test/integration/multicluster_cli_test.go#TestM5DefaultContextThreeNodeMultiClusterCLI"
+        ]
+      },
+      "deviations": [],
+      "status": "complete",
+      "dataPaths": [
+        "dcs-read",
+        "rest-patch-/config",
+        "dcs-convergence-read"
+      ],
+      "writes": true,
+      "risk": "availability",
+      "formats": [
+        "human"
+      ],
+      "prompts": [
+        {
+          "when": "without --force",
+          "behavior": "confirm cluster promotion",
+          "sourceRef": "patroni/ctl.py:2425"
+        }
+      ],
+      "fallback": {
+        "mode": "none"
+      },
+      "requirements": [
+        "FR27"
+      ],
+      "citus": {
+        "groupOption": "none",
+        "omittedGroup": "coordinator-group-0"
+      }
+    }
+  ],
+  "boarAdditions": [
+    "discover",
+    "list --all",
+    "topology --all",
+    "serve",
+    "-o/--output",
+    "--context"
+  ],
+  "releasePolicy": "all commands must be complete and have non-empty behavior test links before release"
+}

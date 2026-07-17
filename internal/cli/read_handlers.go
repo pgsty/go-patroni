@@ -499,7 +499,7 @@ func (application *adapter) runVersion(command *cobra.Command, args []string, op
 			}
 			return nil
 		}
-		_, err := fmt.Fprintf(application.stdout, "boar version %s\n", version.String())
+		_, err := fmt.Fprintf(application.stdout, "patronictl version %s\n", version.String())
 		return err
 	}
 	runtime, err := application.openRuntime(command, runtimeRequest{
@@ -518,7 +518,7 @@ func (application *adapter) runVersion(command *cobra.Command, args []string, op
 		return finishResult(application, application.root.output, runtime, machineVersionResult(result), "VersionInfo", nil)
 	}
 	return finishResult(application, application.root.output, runtime, result, "VersionInfo", func(writer io.Writer, data control.VersionData) error {
-		if _, err := fmt.Fprintf(writer, "boar version %s\n", version.String()); err != nil {
+		if _, err := fmt.Fprintf(writer, "patronictl version %s\n", version.String()); err != nil {
 			return err
 		}
 		if len(data.Members) > 0 {
@@ -547,7 +547,7 @@ func (application *adapter) runVersion(command *cobra.Command, args []string, op
 
 // machineVersionInfo is adapter-owned so the stable machine contract does not
 // serialize the control DTO directly. Local and cluster forms have one shape;
-// members is always an array, including for `boar version` without a cluster.
+// members is always an array, including for `patronictl version` without a cluster.
 type machineVersionInfo struct {
 	Version          string                 `json:"version" yaml:"version"`
 	Commit           string                 `json:"commit" yaml:"commit"`

@@ -17,10 +17,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/pgsty/go-patroni"
 	"github.com/pgsty/go-patroni/control"
 	"github.com/pgsty/go-patroni/dcs"
 	"github.com/pgsty/go-patroni/model"
-	"github.com/pgsty/go-patroni"
 	"github.com/pgsty/go-patroni/postgres"
 	"go.yaml.in/yaml/v3"
 )
@@ -319,16 +319,16 @@ func compareOracleCase(t *testing.T, oracle oracleCase) {
 	}}}}
 	service := newOracleCLIService(t, store, rest, database)
 	stdout, stderr, err, _, _ := executeCLIForTest(t, oracle.Input, service, oracle.Args...)
-	boarSucceeded := err == nil
-	if boarSucceeded != (oracle.Exit == 0) {
-		t.Fatalf("success class differs: patronictl exit=%d; boar err=%v code=%d\nstdout=%s\nstderr=%s\noracle=%s",
+	sdkSucceeded := err == nil
+	if sdkSucceeded != (oracle.Exit == 0) {
+		t.Fatalf("success class differs: Python patronictl exit=%d; Go patronictl err=%v code=%d\nstdout=%s\nstderr=%s\noracle=%s",
 			oracle.Exit, err, exitCode(err), stdout, stderr, oracle.Output)
 	}
 	if !equalCanonical(oracle.REST, rest.calls) {
-		t.Fatalf("REST facts differ\npatronictl=%s\nboar=%s", mustJSON(oracle.REST), mustJSON(rest.calls))
+		t.Fatalf("REST facts differ\nPython patronictl=%s\nGo patronictl=%s", mustJSON(oracle.REST), mustJSON(rest.calls))
 	}
 	if !equalCanonical(oracle.DCS, store.mutations) {
-		t.Fatalf("DCS facts differ\npatronictl=%s\nboar=%s", mustJSON(oracle.DCS), mustJSON(store.mutations))
+		t.Fatalf("DCS facts differ\nPython patronictl=%s\nGo patronictl=%s", mustJSON(oracle.DCS), mustJSON(store.mutations))
 	}
 	compareOracleOutput(t, oracle, stdout, stderr, err)
 }
@@ -363,47 +363,47 @@ func compareOracleOutput(t *testing.T, oracle oracleCase, stdout, stderr string,
 	switch oracle.ID {
 	case "dsn_default", "query_tsv":
 		if stdout != oracle.Output {
-			t.Fatalf("compatible text differs\npatronictl=%q\nboar=%q", oracle.Output, stdout)
+			t.Fatalf("compatible text differs\nPython patronictl=%q\nGo patronictl=%q", oracle.Output, stdout)
 		}
 	case "dsn_selector_conflict", "query_missing_input", "demote_requires_source", "promote_primary_noop":
 		if normalizedError(oracle.Output) != normalizedError(combined) {
-			t.Fatalf("error semantic differs\npatronictl=%q\nboar=%q", normalizedError(oracle.Output), normalizedError(combined))
+			t.Fatalf("error semantic differs\nPython patronictl=%q\nGo patronictl=%q", normalizedError(oracle.Output), normalizedError(combined))
 		}
 	case "list_json":
 		if !reflect.DeepEqual(normalizedListJSON(t, oracle.Output), normalizedListJSON(t, stdout)) {
-			t.Fatalf("JSON member rows differ\npatronictl=%s\nboar=%s", oracle.Output, stdout)
+			t.Fatalf("JSON member rows differ\nPython patronictl=%s\nGo patronictl=%s", oracle.Output, stdout)
 		}
 	case "list_tsv":
 		if !reflect.DeepEqual(normalizedListTSV(oracle.Output), normalizedListTSV(stdout)) {
-			t.Fatalf("TSV member rows differ\npatronictl=%s\nboar=%s", oracle.Output, stdout)
+			t.Fatalf("TSV member rows differ\nPython patronictl=%s\nGo patronictl=%s", oracle.Output, stdout)
 		}
 	case "topology":
 		for _, token := range []string{"node-a", "node-b", "Leader", "Sync Standby"} {
 			if !strings.Contains(oracle.Output, token) || !strings.Contains(stdout, token) {
-				t.Fatalf("topology omitted %q\npatronictl=%s\nboar=%s", token, oracle.Output, stdout)
+				t.Fatalf("topology omitted %q\nPython patronictl=%s\nGo patronictl=%s", token, oracle.Output, stdout)
 			}
 		}
 	case "show_config":
 		if !equalYAML(oracle.Output, stdout) {
-			t.Fatalf("dynamic config differs\npatronictl=%s\nboar=%s", oracle.Output, stdout)
+			t.Fatalf("dynamic config differs\nPython patronictl=%s\nGo patronictl=%s", oracle.Output, stdout)
 		}
 	case "version_local":
-		if !strings.HasPrefix(oracle.Output, "patronictl version ") || !strings.HasPrefix(stdout, "boar version ") {
-			t.Fatalf("local product version contract differs\npatronictl=%s\nboar=%s", oracle.Output, stdout)
+		if !strings.HasPrefix(oracle.Output, "patronictl version ") || !strings.HasPrefix(stdout, "patronictl version ") {
+			t.Fatalf("local product version contract differs\nPython patronictl=%s\nGo patronictl=%s", oracle.Output, stdout)
 		}
 	case "version_cluster":
 		for _, token := range []string{"node-a: Patroni 4.1.0 PostgreSQL 16.1", "node-b: Patroni 4.1.0 PostgreSQL 16.1"} {
 			if !strings.Contains(oracle.Output, token) || !strings.Contains(stdout, token) {
-				t.Fatalf("cluster version omitted %q\npatronictl=%s\nboar=%s", token, oracle.Output, stdout)
+				t.Fatalf("cluster version omitted %q\nPython patronictl=%s\nGo patronictl=%s", token, oracle.Output, stdout)
 			}
 		}
 	case "history_json":
 		if !equalCanonical(jsonDocument(t, oracle.Output), jsonDocument(t, stdout)) {
-			t.Fatalf("history JSON differs\npatronictl=%s\nboar=%s", oracle.Output, stdout)
+			t.Fatalf("history JSON differs\nPython patronictl=%s\nGo patronictl=%s", oracle.Output, stdout)
 		}
 	case "reload_abort", "remove_abort", "demote_abort":
 		if normalizedError(oracle.Output) != normalizedError(combined) {
-			t.Fatalf("abort semantic differs\npatronictl=%q\nboar=%q", normalizedError(oracle.Output), normalizedError(combined))
+			t.Fatalf("abort semantic differs\nPython patronictl=%q\nGo patronictl=%q", normalizedError(oracle.Output), normalizedError(combined))
 		}
 	case "reload_200":
 		requireSharedToken(t, oracle.Output, stdout, "No changes to apply on member node-a")
@@ -419,15 +419,15 @@ func compareOracleOutput(t *testing.T, oracle oracleCase, stdout, stderr string,
 		requireSharedToken(t, oracle.Output, stdout, "Success: flush scheduled restart for member node-b")
 	case "flush_switchover_noop":
 		if strings.TrimSpace(stdout) != strings.TrimSpace(oracle.Output) {
-			t.Fatalf("flush no-op differs\npatronictl=%q\nboar=%q", oracle.Output, stdout)
+			t.Fatalf("flush no-op differs\nPython patronictl=%q\nGo patronictl=%q", oracle.Output, stdout)
 		}
 	case "pause", "resume", "edit_config":
 		if strings.TrimSpace(stdout) != strings.TrimSpace(oracle.Output) {
-			t.Fatalf("write confirmation differs\npatronictl=%q\nboar=%q", oracle.Output, stdout)
+			t.Fatalf("write confirmation differs\nPython patronictl=%q\nGo patronictl=%q", oracle.Output, stdout)
 		}
 	case "remove":
 		if strings.Contains(stdout, "Removed cluster") {
-			t.Fatalf("BOAR added a patronictl-incompatible remove success line: %q", stdout)
+			t.Fatalf("Go patronictl added an incompatible remove success line: %q", stdout)
 		}
 	case "failover", "switchover":
 		if strings.TrimSpace(stdout) == "" {
@@ -582,13 +582,13 @@ func normalizedError(output string) string {
 	return ""
 }
 
-func requireSharedToken(t *testing.T, oracleOutput, boarOutput, token string) {
+func requireSharedToken(t *testing.T, oracleOutput, goOutput, token string) {
 	t.Helper()
 	if !strings.Contains(oracleOutput, token) {
 		t.Fatalf("oracle no longer contains expected semantic token %q: %s", token, oracleOutput)
 	}
-	if !strings.Contains(boarOutput, token) {
-		t.Fatalf("BOAR omitted semantic token %q: %s", token, boarOutput)
+	if !strings.Contains(goOutput, token) {
+		t.Fatalf("Go patronictl omitted semantic token %q: %s", token, goOutput)
 	}
 }
 

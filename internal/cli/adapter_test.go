@@ -12,12 +12,12 @@ import (
 	"testing"
 	"time"
 
+	"github.com/pgsty/go-patroni"
 	"github.com/pgsty/go-patroni/config"
 	"github.com/pgsty/go-patroni/control"
 	"github.com/pgsty/go-patroni/dcs"
-	boarversion "github.com/pgsty/go-patroni/internal/version"
+	sdkversion "github.com/pgsty/go-patroni/internal/version"
 	"github.com/pgsty/go-patroni/model"
-	"github.com/pgsty/go-patroni"
 	"github.com/pgsty/go-patroni/postgres"
 	"go.yaml.in/yaml/v3"
 )
@@ -358,10 +358,10 @@ func TestMachineEnvelopeGoldensCoverLocalUsageAndRuntimeFailures(t *testing.T) {
 		return stdout.String(), stderr.String(), err
 	}
 
-	oldVersion, oldCommit, oldBuildTime := boarversion.Version, boarversion.Commit, boarversion.BuildTime
-	boarversion.Version, boarversion.Commit, boarversion.BuildTime = "1.2.3-test", "abc123fixture", "2026-07-13T12:00:00Z"
+	oldVersion, oldCommit, oldBuildTime := sdkversion.Version, sdkversion.Commit, sdkversion.BuildTime
+	sdkversion.Version, sdkversion.Commit, sdkversion.BuildTime = "1.2.3-test", "abc123fixture", "2026-07-13T12:00:00Z"
 	defer func() {
-		boarversion.Version, boarversion.Commit, boarversion.BuildTime = oldVersion, oldCommit, oldBuildTime
+		sdkversion.Version, sdkversion.Commit, sdkversion.BuildTime = oldVersion, oldCommit, oldBuildTime
 	}()
 
 	t.Run("local-version", func(t *testing.T) {
@@ -373,7 +373,7 @@ func TestMachineEnvelopeGoldensCoverLocalUsageAndRuntimeFailures(t *testing.T) {
 		if err != nil || stderr != "" {
 			t.Fatalf("local machine version failed: err=%v stderr=%q output=%s", err, stderr, stdout)
 		}
-		normalized := strings.ReplaceAll(stdout, boarversion.Current().GoVersion, "<go-version>")
+		normalized := strings.ReplaceAll(stdout, sdkversion.Current().GoVersion, "<go-version>")
 		requireGolden(t, "testdata/machine-local-version.golden.json", normalized)
 	})
 
@@ -386,7 +386,7 @@ func TestMachineEnvelopeGoldensCoverLocalUsageAndRuntimeFailures(t *testing.T) {
 		if err != nil || stderr != "" || closes != 1 {
 			t.Fatalf("cluster machine version failed: err=%v stderr=%q closes=%d output=%s", err, stderr, closes, stdout)
 		}
-		normalized := strings.ReplaceAll(stdout, boarversion.Current().GoVersion, "<go-version>")
+		normalized := strings.ReplaceAll(stdout, sdkversion.Current().GoVersion, "<go-version>")
 		requireGolden(t, "testdata/machine-cluster-version.golden.json", normalized)
 	})
 
@@ -667,7 +667,7 @@ func TestEveryPatronictlCommandHasVersionedMachineUsageEnvelope(t *testing.T) {
 			root := newRootCommandWithBoundaries(strings.NewReader(""), &stdout, &stderr, factory,
 				func() time.Time { return time.Date(2026, 7, 13, 12, 34, 56, 0, time.UTC) },
 				func() string { return "all-command-machine-contract" })
-			root.SetArgs([]string{"--output", "json", contract.Command, "--definitely-not-a-boar-flag"})
+			root.SetArgs([]string{"--output", "json", contract.Command, "--definitely-not-a-patronictl-flag"})
 			err := root.ExecuteContext(context.Background())
 			if err == nil || exitCode(err) != control.ExitCode(control.CategoryUsage) || stderr.String() != "" || !errorWasRendered(err) {
 				t.Fatalf("machine usage boundary mismatch: err=%v code=%d stderr=%q output=%s",

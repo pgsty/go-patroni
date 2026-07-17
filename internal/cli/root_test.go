@@ -59,7 +59,7 @@ func TestCobraTreeMatchesPinnedPatronictlInventory(t *testing.T) {
 		assertManifestFlags(t, command, contract.Parameters)
 	}
 	sort.Strings(expectedNames)
-	expectedTopLevelNames := append(append([]string(nil), expectedNames...), "discover", "inspect-config", "serve")
+	expectedTopLevelNames := append(append([]string(nil), expectedNames...), "discover", "inspect-config")
 	sort.Strings(expectedTopLevelNames)
 	actualNames := make([]string, 0, len(root.Commands()))
 	for _, command := range root.Commands() {
@@ -70,22 +70,19 @@ func TestCobraTreeMatchesPinnedPatronictlInventory(t *testing.T) {
 	}
 	sort.Strings(actualNames)
 	if manifest.ExpectedCommandCount != 19 || !reflect.DeepEqual(actualNames, expectedTopLevelNames) {
-		t.Fatalf("top-level command inventory = %v, want 19 compatibility commands plus exact BOAR additions %v", actualNames, expectedTopLevelNames)
+		t.Fatalf("top-level command inventory = %v, want 19 compatibility commands plus exact go-patroni additions %v", actualNames, expectedTopLevelNames)
 	}
 	for _, name := range []string{"list", "topology"} {
 		addition, _, err := root.Find([]string{name})
 		if err != nil || addition.Flags().Lookup("all") == nil {
-			t.Errorf("BOAR additive command contract %s --all missing: command=%v err=%v", name, addition, err)
+			t.Errorf("go-patroni additive command contract %s --all missing: command=%v err=%v", name, addition, err)
 		}
 	}
 	if addition, _, err := root.Find([]string{"discover"}); err != nil || addition == root || addition.Name() != "discover" {
-		t.Errorf("BOAR additive discover command missing: command=%v err=%v", addition, err)
+		t.Errorf("go-patroni additive discover command missing: command=%v err=%v", addition, err)
 	}
 	if addition, _, err := root.Find([]string{"inspect-config"}); err != nil || addition == root || addition.Name() != "inspect-config" {
-		t.Errorf("BOAR additive inspect-config command missing: command=%v err=%v", addition, err)
-	}
-	if addition, _, err := root.Find([]string{"serve"}); err != nil || addition == root || addition.Name() != "serve" {
-		t.Errorf("BOAR additive serve command missing: command=%v err=%v", addition, err)
+		t.Errorf("go-patroni additive inspect-config command missing: command=%v err=%v", addition, err)
 	}
 	if completion, _, err := root.Find([]string{"completion"}); err != nil || completion.Name() != "completion" {
 		t.Fatalf("Cobra completion command missing: command=%v err=%v", completion, err)
@@ -171,13 +168,13 @@ func TestRootCompatibilityFlagsDoNotCollideWithQueryFlags(t *testing.T) {
 
 func TestBashZshAndFishCompletionGenerateWithoutRuntime(t *testing.T) {
 	tests := map[string]string{
-		"bash": "__start_boar", "zsh": "#compdef boar", "fish": "complete -c boar",
+		"bash": "__start_patronictl", "zsh": "#compdef patronictl", "fish": "complete -c patronictl",
 	}
 	for shell, token := range tests {
 		t.Run(shell, func(t *testing.T) {
 			var stdout, stderr bytes.Buffer
 			factory := func(context.Context, runtimeInvocation) (*commandRuntime, error) {
-				t.Fatal("completion opened a BOAR runtime")
+				t.Fatal("completion opened a Patroni runtime")
 				return nil, nil
 			}
 			root := newRootCommand(strings.NewReader(""), &stdout, &stderr, factory)

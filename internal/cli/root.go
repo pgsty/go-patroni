@@ -1,4 +1,4 @@
-// Package cli is the standalone BOAR Cobra adapter. Business algorithms stay
+// Package cli is the standalone patronictl Cobra adapter. Business algorithms stay
 // in public control packages; this package owns parsing, prompting, rendering,
 // signal cancellation, and process exit mapping.
 package cli
@@ -41,7 +41,6 @@ type adapter struct {
 	clock       func() time.Time
 	newID       func() string
 	interactive func() bool
-	serve       ServeRunner
 }
 
 // NewRootCommand constructs the standalone adapter without process-global
@@ -51,15 +50,6 @@ func NewRootCommand(stdout, stderr io.Writer) *cobra.Command {
 	return newRootCommandWithAllBoundaries(
 		os.Stdin, stdout, stderr, defaultRuntimeFactory, time.Now, newCLIRequestID,
 		func() bool { return isTerminalFile(os.Stdin) },
-	)
-}
-
-// NewRootCommandWithServe composes the standalone CLI with the process-level
-// Server bootstrap without making either adapter import the other.
-func NewRootCommandWithServe(stdout, stderr io.Writer, runner ServeRunner) *cobra.Command {
-	return newRootCommandWithAllBoundariesAndServe(
-		os.Stdin, stdout, stderr, defaultRuntimeFactory, time.Now, newCLIRequestID,
-		func() bool { return isTerminalFile(os.Stdin) }, runner,
 	)
 }
 
@@ -85,25 +75,13 @@ func newRootCommandWithAllBoundaries(
 	newID func() string,
 	interactive func() bool,
 ) *cobra.Command {
-	return newRootCommandWithAllBoundariesAndServe(stdin, stdout, stderr, factory, clock, newID, interactive, nil)
-}
-
-func newRootCommandWithAllBoundariesAndServe(
-	stdin io.Reader,
-	stdout, stderr io.Writer,
-	factory runtimeFactory,
-	clock func() time.Time,
-	newID func() string,
-	interactive func() bool,
-	serve ServeRunner,
-) *cobra.Command {
 	application := &adapter{
 		stdin: stdin, input: bufio.NewReader(stdin), stdout: stdout, stderr: stderr,
-		factory: factory, clock: clock, newID: newID, interactive: interactive, serve: serve,
+		factory: factory, clock: clock, newID: newID, interactive: interactive,
 	}
 	command := &cobra.Command{
-		Use:              "boar",
-		Short:            "Patroni 4.x control SDK, CLI, and stateless control plane",
+		Use:              "patronictl",
+		Short:            "Native Go command-line control for Patroni clusters",
 		Version:          version.String(),
 		SilenceErrors:    true,
 		SilenceUsage:     true,
@@ -120,21 +98,20 @@ func newRootCommandWithAllBoundariesAndServe(
 
 	defaultConfig, _ := defaultConfigPath()
 	// Click group options are intentionally local to the root. With
-	// TraverseChildren this preserves `boar -c FILE query ... -c SQL` and the
+	// TraverseChildren this preserves `patronictl -c FILE query ... -c SQL` and the
 	// equivalent -d pair without illegal Cobra inherited-shorthand collisions.
 	command.Flags().StringVarP(&application.root.configFile, "config-file", "c", defaultConfig, "Configuration file")
 	command.Flags().StringVarP(&application.root.dcsURL, "dcs-url", "d", "", "The DCS connect url")
 	command.Flags().StringVar(&application.root.dcsAlias, "dcs", "", "The DCS connect url")
 	command.Flags().BoolVarP(&application.root.insecure, "insecure", "k", false, "Allow connections to SSL sites without certs")
 
-	command.PersistentFlags().StringVar(&application.root.context, "context", "", "Select a named BOAR context")
-	command.PersistentFlags().StringVarP(&application.root.output, "output", "o", "", "BOAR output envelope: human, json, or yaml")
+	command.PersistentFlags().StringVar(&application.root.context, "context", "", "Select a named Patroni context")
+	command.PersistentFlags().StringVarP(&application.root.output, "output", "o", "", "go-patroni output envelope: human, json, or yaml")
 	command.PersistentFlags().BoolVar(&application.root.allowUnsupportedRead, "allow-unsupported-read", false,
 		"Allow best-effort reads from an unsupported Patroni major version")
 
 	application.addReadCommands(command)
 	application.addWriteCommands(command)
-	application.addServeCommand(command)
 	command.InitDefaultCompletionCmd()
 	application.wrapCommandErrors(command)
 	return command
@@ -190,9 +167,9 @@ func (application *adapter) wrapCommandErrors(command *cobra.Command) {
 func newCLIRequestID() string {
 	var value [16]byte
 	if _, err := rand.Read(value[:]); err != nil {
-		return "boar-cli-" + time.Now().UTC().Format("20060102T150405.000000000")
+		return "patronictl-go-cli-" + time.Now().UTC().Format("20060102T150405.000000000")
 	}
-	return "boar-cli-" + hex.EncodeToString(value[:])
+	return "patronictl-go-cli-" + hex.EncodeToString(value[:])
 }
 
 func (application *adapter) now() time.Time {
@@ -271,18 +248,12 @@ func errorWasRendered(err error) bool {
 	return errors.As(err, &typed) && typed.rendered
 }
 
-// Execute owns process signals and exact additive exit mapping.
+// Execute owns process signals and exact patronictl-compatible exit mapping.
 func Execute() int {
-	return ExecuteWithServe(nil)
-}
-
-// ExecuteWithServe owns process signals and composes the optional Server
-// runner at the binary boundary.
-func ExecuteWithServe(runner ServeRunner) int {
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer cancel()
 
-	command := NewRootCommandWithServe(os.Stdout, os.Stderr, runner)
+	command := NewRootCommand(os.Stdout, os.Stderr)
 	if err := command.ExecuteContext(ctx); err != nil {
 		if !errorWasRendered(err) {
 			fmt.Fprintln(os.Stderr, err)

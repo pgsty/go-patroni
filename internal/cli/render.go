@@ -163,7 +163,7 @@ func (application *adapter) renderCommandError(command interface{ Name() string 
 	}
 	category := categoryForExitError(err)
 	operation := command.Name()
-	if operation == "" || operation == "boar" {
+	if operation == "" || operation == "patronictl" {
 		operation = "cli"
 	}
 	scope := ""

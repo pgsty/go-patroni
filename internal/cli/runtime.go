@@ -6,12 +6,12 @@ import (
 	"fmt"
 	"net/url"
 
+	"github.com/pgsty/go-patroni"
 	"github.com/pgsty/go-patroni/config"
 	"github.com/pgsty/go-patroni/control"
 	"github.com/pgsty/go-patroni/dcs"
-	app "github.com/pgsty/go-patroni/runtime"
 	"github.com/pgsty/go-patroni/model"
-	"github.com/pgsty/go-patroni"
+	app "github.com/pgsty/go-patroni/runtime"
 	"github.com/spf13/cobra"
 )
 
@@ -203,5 +203,5 @@ func safeRuntimeError(err error) string {
 	if errors.As(err, &parsedURL) {
 		return "configured endpoint is invalid or unreachable"
 	}
-	return "BOAR runtime initialization failed"
+	return "Patroni runtime initialization failed"
 }

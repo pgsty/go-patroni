@@ -1,0 +1,48 @@
+version: 2
+
+before:
+  hooks:
+    - go test -mod=readonly ./...
+    - go vet ./...
+    - go test -run '^$' -tags=integration ./test/integration
+    - go run ./tools/machineschema -check
+
+builds:
+  - id: patronictl
+    main: ./cmd/patronictl
+    binary: patronictl
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w
+      - -X github.com/pgsty/go-patroni/internal/version.Version={{ .Version }}
+      - -X github.com/pgsty/go-patroni/internal/version.Commit={{ .ShortCommit }}
+      - -X github.com/pgsty/go-patroni/internal/version.BuildTime={{ .Date }}
+
+archives:
+  - id: patronictl
+    ids:
+      - patronictl
+    name_template: "patronictl-v{{ .Version }}.{{ .Os }}-{{ .Arch }}"
+
+checksum:
+  name_template: checksums.txt
+  algorithm: sha256
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+      - '^chore:'
+      - '^Merge '
+
+release:
+  name_template: "go-patroni v{{ .Version }}"

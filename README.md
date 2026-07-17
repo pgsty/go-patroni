@@ -256,6 +256,12 @@ go run ./tools/machineschema -check
 The isolated live matrices are opt-in because they start real Patroni, etcd,
 and PostgreSQL instances. See `scripts/test-*-integration.sh`.
 
+## Releases
+
+Stable releases follow Semantic Versioning and use `vMAJOR.MINOR.PATCH` tags.
+Pushing such a tag runs the release workflow, which publishes `patronictl`
+archives for Linux and macOS on amd64 and arm64, plus SHA-256 checksums.
+
 ## License
 
 Apache License 2.0. See [LICENSE](LICENSE).

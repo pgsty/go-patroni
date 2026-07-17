@@ -4,6 +4,8 @@ package version
 import (
 	"fmt"
 	"runtime"
+	"runtime/debug"
+	"strings"
 )
 
 var (
@@ -29,10 +31,27 @@ type Info struct {
 
 // Current returns immutable build metadata.
 func Current() Info {
+	version := Version
+	if version == "0.0.0-dev" {
+		if build, ok := debug.ReadBuildInfo(); ok {
+			version = moduleVersion(build.Main.Path, build.Main.Version, version)
+		}
+	}
 	return Info{
-		Version: Version, Commit: Commit, BuildTime: BuildTime, GoVersion: runtime.Version(),
+		Version: version, Commit: Commit, BuildTime: BuildTime, GoVersion: runtime.Version(),
 		SupportedPatroni: SupportedPatroni, MachineSchema: MachineSchema,
 	}
+}
+
+func moduleVersion(path, reported, fallback string) string {
+	if path != "github.com/pgsty/go-patroni" {
+		return fallback
+	}
+	reported = strings.TrimSpace(reported)
+	if reported == "" || reported == "(devel)" {
+		return fallback
+	}
+	return strings.TrimPrefix(reported, "v")
 }
 
 // String is suitable for Cobra's built-in --version flag.

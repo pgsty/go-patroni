@@ -1,0 +1,17 @@
+# This image is used only by the compatibility-oracle integration harness.
+# No Python package or executable from it is copied into go-patroni release/runtime artifacts.
+FROM postgres:16-alpine@sha256:57c72fd2a128e416c7fcc499958864df5301e940bca0a56f58fddf30ffc07777
+
+RUN apk add --no-cache python3 py3-pip \
+    && python3 -m venv /opt/patroni \
+    && /opt/patroni/bin/pip install --no-cache-dir \
+        'pip==26.1.2' 'setuptools==83.0.0' 'wheel==0.47.0' 'packaging==26.2'
+
+COPY . /src
+RUN /opt/patroni/bin/pip install --no-cache-dir --no-build-isolation \
+        --constraint /src/go-patroni-oracle-constraints.txt '/src[etcd3,psycopg3]' \
+    && install -d -o postgres -g postgres -m 700 /var/lib/postgresql/go-patroni
+
+ENV PATH=/opt/patroni/bin:/usr/local/bin:/usr/bin:/bin
+USER postgres
+ENTRYPOINT ["patroni"]

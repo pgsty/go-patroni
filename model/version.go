@@ -69,6 +69,39 @@ func (r VersionRange) Contains(version Version) bool {
 	return version.Compare(r.Min) >= 0 && version.Compare(r.Max) < 0
 }
 
+// NewVersionRange parses an inclusive lower bound and exclusive upper bound.
+func NewVersionRange(minimum, maximum string) (VersionRange, error) {
+	minimumVersion, err := ParseVersion(minimum)
+	if err != nil {
+		return VersionRange{}, fmt.Errorf("minimum Patroni version: %w", err)
+	}
+	maximumVersion, err := ParseVersion(maximum)
+	if err != nil {
+		return VersionRange{}, fmt.Errorf("maximum Patroni version: %w", err)
+	}
+	rangeValue := VersionRange{Min: minimumVersion, Max: maximumVersion}
+	if err := rangeValue.Validate(); err != nil {
+		return VersionRange{}, err
+	}
+	return rangeValue, nil
+}
+
+// Validate requires a non-empty increasing range contained within the SDK's
+// audited Patroni range.
+func (r VersionRange) Validate() error {
+	if r.Min.Compare(r.Max) >= 0 {
+		return errors.New("Patroni version range minimum must be less than maximum")
+	}
+	if r.Min.Compare(SupportedPatroniRange.Min) < 0 || r.Max.Compare(SupportedPatroniRange.Max) > 0 {
+		return fmt.Errorf("Patroni version range %s is outside SDK range %s", r, SupportedPatroniRange)
+	}
+	return nil
+}
+
+func (r VersionRange) String() string {
+	return fmt.Sprintf(">=%s,<%s", r.Min, r.Max)
+}
+
 var SupportedPatroniRange = VersionRange{
 	Min: Version{Major: 3, Minor: 0, Patch: 0},
 	Max: Version{Major: 5, Minor: 0, Patch: 0},
@@ -81,7 +114,7 @@ func CheckPatroniVersion(value string) error {
 		return err
 	}
 	if !SupportedPatroniRange.Contains(version) {
-		return fmt.Errorf("%w: %s is outside >=3.0.0,<5.0.0", ErrUnsupportedPatroniVersion, version)
+		return fmt.Errorf("%w: %s is outside %s", ErrUnsupportedPatroniVersion, version, SupportedPatroniRange)
 	}
 	return nil
 }

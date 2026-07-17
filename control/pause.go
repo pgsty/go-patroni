@@ -65,7 +65,7 @@ func (service *Service) preparePause(ctx context.Context, intent pauseIntent, re
 		category, retryable := classifyReadError(err)
 		return failedRead[Plan](service, operationID, intent.operation, intent.target, PathREST, category, retryable, intent.operation+" cluster discovery failed", err)
 	}
-	if versionError := checkSnapshotPatroniVersion(snapshot, false); versionError != nil {
+	if versionError := service.checkSnapshotPatroniVersion(snapshot, false); versionError != nil {
 		return unsupportedVersionResult[Plan](service, operationID, intent.operation, intent.target, PathREST, snapshot, versionError)
 	}
 	current := boolConfig(snapshot.Cluster.Config["pause"])
@@ -123,7 +123,7 @@ func (service *Service) executePause(ctx context.Context, intent pauseIntent, re
 		category, retryable := classifyReadError(err)
 		return failedRead[PauseData](service, operationID, intent.operation, intent.target, PathREST, category, retryable, intent.operation+" execution snapshot failed", err)
 	}
-	if versionError := checkSnapshotPatroniVersion(snapshot, false); versionError != nil {
+	if versionError := service.checkSnapshotPatroniVersion(snapshot, false); versionError != nil {
 		return unsupportedVersionResult[PauseData](service, operationID, intent.operation, intent.target, PathREST, snapshot, versionError)
 	}
 	evidence := []Evidence{snapshotEvidence(service, snapshot, intent.operation+" targets revalidated before execution")}

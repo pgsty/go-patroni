@@ -86,7 +86,7 @@ func (service *Service) PrepareRemove(ctx context.Context, request RemoveRequest
 		category, retryable := classifyReadError(err)
 		return failedRead[Plan](service, operationID, "remove", request.Target, PathDCS, category, retryable, "remove cluster snapshot failed", err)
 	}
-	if versionError := checkSnapshotPatroniVersion(snapshot, false); versionError != nil {
+	if versionError := service.checkSnapshotPatroniVersion(snapshot, false); versionError != nil {
 		return unsupportedVersionResult[Plan](service, operationID, "remove", request.Target, PathDCS, snapshot, versionError)
 	}
 	keys := removeInventory(snapshot)
@@ -148,7 +148,7 @@ func (service *Service) ExecuteRemove(ctx context.Context, request RemoveRequest
 		data.Verification = VerifiedFailed
 		return removeFailure(service, operationID, request.Target, data, category, retryable, "remove execution snapshot failed", err, nil)
 	}
-	if versionError := checkSnapshotPatroniVersion(snapshot, false); versionError != nil {
+	if versionError := service.checkSnapshotPatroniVersion(snapshot, false); versionError != nil {
 		return unsupportedVersionResult[RemoveData](service, operationID, "remove", request.Target, PathDCS, snapshot, versionError)
 	}
 	evidence := []Evidence{snapshotEvidence(service, snapshot, "remove key inventory revalidated before delete")}

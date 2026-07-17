@@ -350,7 +350,7 @@ func (service *Service) PrepareEditConfig(ctx context.Context, request EditConfi
 		category, retryable := classifyReadError(err)
 		return failedRead[Plan](service, operationID, "edit-config", request.Target, PathDCS, category, retryable, "edit-config cluster snapshot failed", err)
 	}
-	if versionError := checkSnapshotPatroniVersion(snapshot, false); versionError != nil {
+	if versionError := service.checkSnapshotPatroniVersion(snapshot, false); versionError != nil {
 		return unsupportedVersionResult[Plan](service, operationID, "edit-config", request.Target, PathDCS, snapshot, versionError)
 	}
 	entry, err := configEntryForEdit(snapshot)
@@ -432,7 +432,7 @@ func (service *Service) ExecuteEditConfig(ctx context.Context, request EditConfi
 		data.Verification = VerifiedFailed
 		return editConfigFailure(service, operationID, request.Target, data, category, retryable, "edit-config execution snapshot failed", err, nil)
 	}
-	if versionError := checkSnapshotPatroniVersion(snapshot, false); versionError != nil {
+	if versionError := service.checkSnapshotPatroniVersion(snapshot, false); versionError != nil {
 		return unsupportedVersionResult[ConfigEditData](service, operationID, "edit-config", request.Target, PathDCS, snapshot, versionError)
 	}
 	evidence := []Evidence{snapshotEvidence(service, snapshot, "edit-config CAS preconditions revalidated")}

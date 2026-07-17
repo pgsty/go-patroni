@@ -3,6 +3,7 @@ package control
 import (
 	"context"
 	"encoding/json"
+	"strings"
 	"testing"
 	"time"
 
@@ -34,13 +35,39 @@ func snapshotWithPatroniVersion(t *testing.T, snapshot dcs.Snapshot, version str
 }
 
 func TestAuditedPatroniThreeAndFourVersionsPassHighLevelGate(t *testing.T) {
+	service := &Service{}
 	for _, version := range []string{"3.0.0", "3.3.8", "4.0.0", "4.1.3"} {
 		t.Run(version, func(t *testing.T) {
 			snapshot := snapshotWithPatroniVersion(t, readFixtureSnapshot(), version)
-			if err := checkSnapshotPatroniVersion(snapshot, false); err != nil {
+			if err := service.checkSnapshotPatroniVersion(snapshot, false); err != nil {
 				t.Fatalf("supported version rejected: %v", err)
 			}
 		})
+	}
+}
+
+func TestEmbeddingProductCanNarrowPatroniVersionRange(t *testing.T) {
+	patroni4, err := model.NewVersionRange("4.0.0", "5.0.0")
+	if err != nil {
+		t.Fatal(err)
+	}
+	version3 := snapshotWithPatroniVersion(t, readFixtureSnapshot(), "3.3.8")
+	reader := &fakeSnapshotReader{snapshots: map[string]dcs.Snapshot{"alpha": version3}}
+	service, err := NewService(ServiceOptions{Snapshots: reader, SupportedPatroniRange: &patroni4})
+	if err != nil {
+		t.Fatal(err)
+	}
+	result := service.List(context.Background(), ListRequest{Targets: []model.Target{{Context: "lab", Scope: "alpha"}}})
+	if result.Outcome != Failed || result.Error == nil || result.Error.Category != CategoryUnsupported ||
+		!strings.Contains(result.Error.Message, ">=4.0.0,<5.0.0") {
+		t.Fatalf("embedding range did not reject Patroni 3.x: %#v", result)
+	}
+
+	widened := model.VersionRange{
+		Min: model.Version{Major: 2}, Max: model.Version{Major: 5},
+	}
+	if _, err := NewService(ServiceOptions{Snapshots: reader, SupportedPatroniRange: &widened}); err == nil {
+		t.Fatal("control service accepted range wider than the SDK audit")
 	}
 }
 

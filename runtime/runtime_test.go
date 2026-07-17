@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/pgsty/go-patroni/config"
+	"github.com/pgsty/go-patroni/model"
 )
 
 func TestEnvironmentEmbeddingIdentity(t *testing.T) {
@@ -29,5 +30,26 @@ func TestEnvironmentEmbeddingIdentity(t *testing.T) {
 	}
 	if defaults.userAgent == "" || defaults.productVersion == "" {
 		t.Fatalf("default identity = %q, %q", defaults.userAgent, defaults.productVersion)
+	}
+}
+
+func TestEnvironmentCopiesEmbeddingVersionRange(t *testing.T) {
+	document, err := config.Parse([]byte("scope: demo\n"), "fixture.yaml")
+	if err != nil {
+		t.Fatal(err)
+	}
+	patroni4, err := model.NewVersionRange("4.0.0", "5.0.0")
+	if err != nil {
+		t.Fatal(err)
+	}
+	environment, err := NewEnvironment(context.Background(), EnvironmentOptions{
+		Document: document, SupportedPatroniRange: &patroni4,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	patroni4.Min = model.Version{Major: 3}
+	if environment.supportedRange == nil || environment.supportedRange.Min.Major != 4 {
+		t.Fatalf("environment version policy aliases caller memory: %#v", environment.supportedRange)
 	}
 }

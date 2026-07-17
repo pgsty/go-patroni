@@ -8,12 +8,14 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"math/big"
 	"strings"
 	"time"
 
 	"github.com/pgsty/go-patroni/dcs"
 	buildversion "github.com/pgsty/go-patroni/internal/version"
+	"github.com/pgsty/go-patroni/model"
 )
 
 type ServiceOptions struct {
@@ -30,6 +32,9 @@ type ServiceOptions struct {
 	RandomIndex          func(int) (int, error)
 	Wait                 func(context.Context, time.Duration) error
 	VerificationAttempts int
+	// SupportedPatroniRange lets an embedding product narrow the SDK's audited
+	// range. Nil uses model.SupportedPatroniRange; widening is rejected.
+	SupportedPatroniRange *model.VersionRange
 	// StandbyVerificationAttempts bounds DCS convergence observations after
 	// demote-cluster and promote-cluster. Zero uses VerificationAttempts when
 	// that legacy option is explicitly set, otherwise the Patroni-compatible
@@ -59,6 +64,7 @@ type Service struct {
 	randomIndex                 func(int) (int, error)
 	wait                        func(context.Context, time.Duration) error
 	verificationAttempts        int
+	supportedPatroniRange       model.VersionRange
 	standbyVerificationAttempts int
 	standbyVerificationInterval time.Duration
 }
@@ -95,6 +101,13 @@ func NewService(options ServiceOptions) (*Service, error) {
 	if verificationAttempts <= 0 {
 		verificationAttempts = 3
 	}
+	supportedPatroniRange := model.SupportedPatroniRange
+	if options.SupportedPatroniRange != nil {
+		if err := options.SupportedPatroniRange.Validate(); err != nil {
+			return nil, fmt.Errorf("control service Patroni version range: %w", err)
+		}
+		supportedPatroniRange = *options.SupportedPatroniRange
+	}
 	standbyVerificationAttempts := options.StandbyVerificationAttempts
 	if standbyVerificationAttempts <= 0 {
 		if options.VerificationAttempts > 0 {
@@ -116,6 +129,7 @@ func NewService(options ServiceOptions) (*Service, error) {
 		planKey:    planKey, clock: clock,
 		newOperationID: newOperationID, productVersion: productVersion,
 		randomIndex: randomIndex, wait: wait, verificationAttempts: verificationAttempts,
+		supportedPatroniRange:       supportedPatroniRange,
 		standbyVerificationAttempts: standbyVerificationAttempts, standbyVerificationInterval: standbyVerificationInterval,
 	}, nil
 }

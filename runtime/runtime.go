@@ -32,6 +32,9 @@ type EnvironmentOptions struct {
 	// ProductVersion is returned by the high-level local version operation.
 	// Empty uses the complete go-patroni build version string.
 	ProductVersion string
+	// SupportedPatroniRange lets an embedding product narrow the SDK's audited
+	// range without mutating package-global state.
+	SupportedPatroniRange *model.VersionRange
 }
 
 type Environment struct {
@@ -39,6 +42,7 @@ type Environment struct {
 	overrides      config.Overrides
 	userAgent      string
 	productVersion string
+	supportedRange *model.VersionRange
 }
 
 type RuntimeOptions struct {
@@ -81,9 +85,18 @@ func NewEnvironment(ctx context.Context, options EnvironmentOptions) (*Environme
 	if productVersion == "" {
 		productVersion = version.String()
 	}
+	var supportedRange *model.VersionRange
+	if options.SupportedPatroniRange != nil {
+		if err := options.SupportedPatroniRange.Validate(); err != nil {
+			return nil, fmt.Errorf("Patroni environment version range: %w", err)
+		}
+		copyRange := *options.SupportedPatroniRange
+		supportedRange = &copyRange
+	}
 	return &Environment{
 		document: document, overrides: options.Overrides,
 		userAgent: userAgent, productVersion: productVersion,
+		supportedRange: supportedRange,
 	}, nil
 }
 
@@ -234,6 +247,7 @@ func (environment *Environment) Open(ctx context.Context, options RuntimeOptions
 	service, err := control.NewService(control.ServiceOptions{
 		Snapshots: store, Discovery: store, Patroni: restClient, Postgres: queryClient,
 		Config: store, Failover: store, Remover: store, ProductVersion: environment.productVersion,
+		SupportedPatroniRange: environment.supportedRange,
 	})
 	if err != nil {
 		return nil, err

@@ -52,7 +52,7 @@ func (service *Service) List(ctx context.Context, request ListRequest) Result[Li
 			category, retryable := classifyReadError(err)
 			return failedReadWithEvidence[ListData](service, operationID, "list", clusterTarget, PathDCS, category, retryable, "cluster snapshot failed", err, evidence)
 		}
-		if versionError := checkSnapshotPatroniVersion(snapshot, request.AllowUnsupportedRead); versionError != nil {
+		if versionError := service.checkSnapshotPatroniVersion(snapshot, request.AllowUnsupportedRead); versionError != nil {
 			return unsupportedVersionResult[ListData](service, operationID, "list", clusterTarget, PathDCS, snapshot, versionError)
 		}
 		cluster := projectCluster(snapshot, clusterTarget)
@@ -126,7 +126,7 @@ func (service *Service) Topology(ctx context.Context, request TopologyRequest) R
 		category, retryable := classifyReadError(err)
 		return failedRead[TopologyData](service, operationID, "topology", target, PathDCS, category, retryable, "cluster snapshot failed", err)
 	}
-	if versionError := checkSnapshotPatroniVersion(snapshot, request.AllowUnsupportedRead); versionError != nil {
+	if versionError := service.checkSnapshotPatroniVersion(snapshot, request.AllowUnsupportedRead); versionError != nil {
 		return unsupportedVersionResult[TopologyData](service, operationID, "topology", target, PathDCS, snapshot, versionError)
 	}
 	cluster := projectCluster(snapshot, target)
@@ -183,7 +183,7 @@ func (service *Service) ShowConfig(ctx context.Context, request ShowConfigReques
 		category, retryable := classifyReadError(err)
 		return failedRead[ConfigData](service, operationID, "show-config", target, PathDCS, category, retryable, "cluster snapshot failed", err)
 	}
-	if versionError := checkSnapshotPatroniVersion(snapshot, request.AllowUnsupportedRead); versionError != nil {
+	if versionError := service.checkSnapshotPatroniVersion(snapshot, request.AllowUnsupportedRead); versionError != nil {
 		return unsupportedVersionResult[ConfigData](service, operationID, "show-config", target, PathDCS, snapshot, versionError)
 	}
 	revision := int64(0)
@@ -211,7 +211,7 @@ func (service *Service) History(ctx context.Context, request HistoryRequest) Res
 		category, retryable := classifyReadError(err)
 		return failedRead[HistoryData](service, operationID, "history", target, PathDCS, category, retryable, "cluster snapshot failed", err)
 	}
-	if versionError := checkSnapshotPatroniVersion(snapshot, request.AllowUnsupportedRead); versionError != nil {
+	if versionError := service.checkSnapshotPatroniVersion(snapshot, request.AllowUnsupportedRead); versionError != nil {
 		return unsupportedVersionResult[HistoryData](service, operationID, "history", target, PathDCS, snapshot, versionError)
 	}
 	entries := make([]HistoryEntry, 0, len(snapshot.Cluster.History))
@@ -396,7 +396,7 @@ func (service *Service) Version(ctx context.Context, request VersionRequest) Res
 			} else {
 				item.PatroniVersion = response.Data.Patroni.Version
 				if !request.AllowUnsupportedRead {
-					if versionError := checkPatroniVersion(item.PatroniVersion); versionError != nil {
+					if versionError := service.checkPatroniVersion(item.PatroniVersion); versionError != nil {
 						return unsupportedVersionResult[VersionData](service, operationID, "version", target, PathREST, snapshot, versionError)
 					}
 				}

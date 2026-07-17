@@ -74,7 +74,7 @@ func (service *Service) prepareTransition(ctx context.Context, intent transition
 		return failedRead[Plan](service, operationID, intent.operation, intent.target, PathREST, category, retryable,
 			intent.operation+" cluster discovery failed", err)
 	}
-	if versionError := checkSnapshotPatroniVersion(snapshot, false); versionError != nil {
+	if versionError := service.checkSnapshotPatroniVersion(snapshot, false); versionError != nil {
 		return unsupportedVersionResult[Plan](service, operationID, intent.operation, intent.target, PathREST, snapshot, versionError)
 	}
 	selection, category, selectionError := resolveTransition(snapshot, intent)
@@ -142,7 +142,7 @@ func (service *Service) executeTransition(
 		return failedRead[ClusterWriteData](service, operationID, intent.operation, intent.target, PathREST,
 			category, retryable, intent.operation+" execution snapshot failed", err)
 	}
-	if versionError := checkSnapshotPatroniVersion(snapshot, false); versionError != nil {
+	if versionError := service.checkSnapshotPatroniVersion(snapshot, false); versionError != nil {
 		return unsupportedVersionResult[ClusterWriteData](service, operationID, intent.operation, intent.target, PathREST, snapshot, versionError)
 	}
 	selection, _, selectionError := resolveTransition(snapshot, intent)

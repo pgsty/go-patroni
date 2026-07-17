@@ -18,7 +18,7 @@ func (service *Service) operationSnapshots(
 	citus bool,
 	allowUnsupportedRead bool,
 ) ([]dcs.Snapshot, []Evidence, *discoveryFailure) {
-	return service.operationSnapshotsWithVersionCheck(ctx, operation, target, citus, allowUnsupportedRead, checkSnapshotPatroniVersion)
+	return service.operationSnapshotsWithVersionCheck(ctx, operation, target, citus, allowUnsupportedRead, service.checkSnapshotPatroniVersion)
 }
 
 // versionSnapshots differs only in its compatibility policy: the version
@@ -32,7 +32,7 @@ func (service *Service) versionSnapshots(
 	citus bool,
 	allowUnsupportedRead bool,
 ) ([]dcs.Snapshot, []Evidence, *discoveryFailure) {
-	return service.operationSnapshotsWithVersionCheck(ctx, operation, target, citus, allowUnsupportedRead, checkSnapshotKnownPatroniVersion)
+	return service.operationSnapshotsWithVersionCheck(ctx, operation, target, citus, allowUnsupportedRead, service.checkSnapshotKnownPatroniVersion)
 }
 
 // citusCoordinatorSnapshot implements Patroni's get_dcs(scope, nil)
@@ -51,7 +51,7 @@ func (service *Service) citusCoordinatorSnapshot(
 	}
 	coordinatorVersionCheck := func(snapshot dcs.Snapshot, allow bool) error {
 		if snapshot.Target.Group != nil && *snapshot.Target.Group == 0 {
-			return checkSnapshotPatroniVersion(snapshot, allow)
+			return service.checkSnapshotPatroniVersion(snapshot, allow)
 		}
 		return nil
 	}
@@ -89,7 +89,7 @@ func (service *Service) operationSnapshotsWithVersionCheck(
 	}
 	if versionErr := versionCheck(snapshot, allowUnsupportedRead); versionErr != nil {
 		evidence := []Evidence{snapshotEvidence(service, snapshot, "Patroni compatibility range checked during "+operation)}
-		return nil, evidence, &discoveryFailure{category: CategoryUnsupported, message: operation + " requires Patroni " + supportedPatroniRangeText, cause: versionErr}
+		return nil, evidence, &discoveryFailure{category: CategoryUnsupported, message: operation + " requires Patroni " + service.supportedPatroniRangeText(), cause: versionErr}
 	}
 	return []dcs.Snapshot{snapshot}, []Evidence{snapshotEvidence(service, snapshot, operation+" cluster snapshot read")}, nil
 }
@@ -170,7 +170,7 @@ func (service *Service) citusGroupSnapshots(
 	target model.Target,
 	allowUnsupportedRead bool,
 ) ([]dcs.Snapshot, []Evidence, *discoveryFailure) {
-	return service.citusGroupSnapshotsWithVersionCheck(ctx, operation, target, allowUnsupportedRead, checkSnapshotPatroniVersion)
+	return service.citusGroupSnapshotsWithVersionCheck(ctx, operation, target, allowUnsupportedRead, service.checkSnapshotPatroniVersion)
 }
 
 func (service *Service) citusGroupSnapshotsWithVersionCheck(
@@ -189,7 +189,7 @@ func (service *Service) citusGroupSnapshotsWithVersionCheck(
 		}
 		if versionErr := versionCheck(snapshot, allowUnsupportedRead); versionErr != nil {
 			return nil, []Evidence{snapshotEvidence(service, snapshot, "Patroni compatibility range checked during "+operation)},
-				&discoveryFailure{category: CategoryUnsupported, message: operation + " requires Patroni " + supportedPatroniRangeText, cause: versionErr}
+				&discoveryFailure{category: CategoryUnsupported, message: operation + " requires Patroni " + service.supportedPatroniRangeText(), cause: versionErr}
 		}
 		return []dcs.Snapshot{snapshot}, []Evidence{snapshotEvidence(service, snapshot, "cluster snapshot read")}, nil
 	}
@@ -233,7 +233,7 @@ func (service *Service) citusGroupSnapshotsWithVersionCheck(
 		}
 		if versionErr := versionCheck(snapshot, allowUnsupportedRead); versionErr != nil {
 			evidence = append(evidence, snapshotEvidence(service, snapshot, "Patroni compatibility range checked during "+operation))
-			return nil, evidence, &discoveryFailure{category: CategoryUnsupported, message: operation + " requires Patroni " + supportedPatroniRangeText, cause: versionErr}
+			return nil, evidence, &discoveryFailure{category: CategoryUnsupported, message: operation + " requires Patroni " + service.supportedPatroniRangeText(), cause: versionErr}
 		}
 		snapshots = append(snapshots, snapshot)
 	}

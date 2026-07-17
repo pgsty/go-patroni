@@ -142,9 +142,9 @@ func (service *Service) discoverClusters(
 			}
 			evidence = append(evidence, snapshotEvidence(service, snapshot, "legacy discoverer cluster snapshot read"))
 		}
-		if versionErr := checkSnapshotPatroniVersion(snapshot, allowUnsupportedRead); versionErr != nil {
+		if versionErr := service.checkSnapshotPatroniVersion(snapshot, allowUnsupportedRead); versionErr != nil {
 			evidence = append(evidence, snapshotEvidence(service, snapshot, "Patroni compatibility range checked during "+operation))
-			return nil, evidence, &discoveryFailure{category: CategoryUnsupported, message: operation + " requires Patroni " + supportedPatroniRangeText, cause: versionErr}
+			return nil, evidence, &discoveryFailure{category: CategoryUnsupported, message: operation + " requires Patroni " + service.supportedPatroniRangeText(), cause: versionErr}
 		}
 		cluster := projectCluster(snapshot, itemTarget)
 		cluster.DiscoveryState = model.DiscoveryDiscovered

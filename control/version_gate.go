@@ -1,7 +1,6 @@
 package control
 
 import (
-	"errors"
 	"fmt"
 	"strings"
 
@@ -10,13 +9,11 @@ import (
 	"github.com/pgsty/go-patroni/model"
 )
 
-const supportedPatroniRangeText = ">=3.0.0,<5.0.0"
-
 // checkSnapshotPatroniVersion rejects every explicit version outside the SDK's
 // supported range. Empty legacy member versions are not invented: REST writes
 // may probe them at the transport boundary, while an entirely offline DCS
 // cluster remains removable through the separately confirmed delete flow.
-func checkSnapshotPatroniVersion(snapshot dcs.Snapshot, allowUnsupportedRead bool) error {
+func (service *Service) checkSnapshotPatroniVersion(snapshot dcs.Snapshot, allowUnsupportedRead bool) error {
 	if allowUnsupportedRead {
 		return nil
 	}
@@ -25,7 +22,7 @@ func checkSnapshotPatroniVersion(snapshot dcs.Snapshot, allowUnsupportedRead boo
 		if version == "" {
 			return fmt.Errorf("member %s has no version: %w", member.Name, model.ErrUnsupportedPatroniVersion)
 		}
-		if err := checkPatroniVersion(version); err != nil {
+		if err := service.checkPatroniVersion(version); err != nil {
 			return fmt.Errorf("member %s reports %q: %w", member.Name, version, err)
 		}
 	}
@@ -35,7 +32,7 @@ func checkSnapshotPatroniVersion(snapshot dcs.Snapshot, allowUnsupportedRead boo
 // checkSnapshotKnownPatroniVersion lets the version diagnostic reach Patroni
 // REST when a legacy/malformed member record omits its version. The REST value
 // is still rejected unless the caller explicitly selected best-effort reads.
-func checkSnapshotKnownPatroniVersion(snapshot dcs.Snapshot, allowUnsupportedRead bool) error {
+func (service *Service) checkSnapshotKnownPatroniVersion(snapshot dcs.Snapshot, allowUnsupportedRead bool) error {
 	if allowUnsupportedRead {
 		return nil
 	}
@@ -44,21 +41,33 @@ func checkSnapshotKnownPatroniVersion(snapshot dcs.Snapshot, allowUnsupportedRea
 		if version == "" {
 			continue
 		}
-		if err := checkPatroniVersion(version); err != nil {
+		if err := service.checkPatroniVersion(version); err != nil {
 			return fmt.Errorf("member %s reports %q: %w", member.Name, version, err)
 		}
 	}
 	return nil
 }
 
-func checkPatroniVersion(version string) error {
-	if err := model.CheckPatroniVersion(strings.TrimSpace(version)); err != nil {
-		if errors.Is(err, model.ErrUnsupportedPatroniVersion) {
-			return err
-		}
+func (service *Service) checkPatroniVersion(version string) error {
+	parsed, err := model.ParseVersion(strings.TrimSpace(version))
+	if err != nil {
 		return fmt.Errorf("%w: %v", model.ErrUnsupportedPatroniVersion, err)
 	}
+	if !service.patroniVersionRange().Contains(parsed) {
+		return fmt.Errorf("%w: %s is outside %s", model.ErrUnsupportedPatroniVersion, parsed, service.supportedPatroniRangeText())
+	}
 	return nil
+}
+
+func (service *Service) patroniVersionRange() model.VersionRange {
+	if service == nil || service.supportedPatroniRange.Max.Major == 0 {
+		return model.SupportedPatroniRange
+	}
+	return service.supportedPatroniRange
+}
+
+func (service *Service) supportedPatroniRangeText() string {
+	return service.patroniVersionRange().String()
 }
 
 // checkSnapshotsFeature rejects a versioned operation unless every selected
@@ -96,6 +105,6 @@ func unsupportedVersionResult[T any](
 	cause error,
 ) Result[T] {
 	return failedRead[T](service, operationID, operation, target, path, CategoryUnsupported, false,
-		operation+" requires Patroni "+supportedPatroniRangeText, cause,
+		operation+" requires Patroni "+service.supportedPatroniRangeText(), cause,
 		snapshotEvidence(service, snapshot, "Patroni compatibility range checked before operation"))
 }

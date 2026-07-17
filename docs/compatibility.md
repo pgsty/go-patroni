@@ -16,6 +16,9 @@ the same contract.
 Version-gated operations are checked by the high-level control service before
 the SDK sends a write. Direct REST callers can use `EndpointCatalogFor`,
 `FeatureCatalog`, and `SupportsFeature` when selecting an operation.
+`ServiceOptions.SupportedPatroniRange` and
+`runtime.EnvironmentOptions.SupportedPatroniRange` allow an embedding product
+to narrow, but never widen, this audited range.
 
 ## Evidence
 

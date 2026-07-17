@@ -59,3 +59,20 @@ func TestParseVersion(t *testing.T) {
 		}
 	}
 }
+
+func TestVersionRangeCanOnlyNarrowAuditedSDKRange(t *testing.T) {
+	patroni4, err := model.NewVersionRange("4.0.0", "5.0.0")
+	if err != nil {
+		t.Fatal(err)
+	}
+	version3, _ := model.ParseVersion("3.3.8")
+	version4, _ := model.ParseVersion("4.1.3")
+	if patroni4.String() != ">=4.0.0,<5.0.0" || patroni4.Contains(version3) || !patroni4.Contains(version4) {
+		t.Fatalf("narrow range contract = %s", patroni4)
+	}
+	for _, bounds := range [][2]string{{"2.0.0", "5.0.0"}, {"3.0.0", "6.0.0"}, {"4.0.0", "4.0.0"}} {
+		if _, err := model.NewVersionRange(bounds[0], bounds[1]); err == nil {
+			t.Fatalf("invalid narrowed range %v was accepted", bounds)
+		}
+	}
+}

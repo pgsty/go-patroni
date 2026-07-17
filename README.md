@@ -12,7 +12,8 @@ The module provides two API levels:
 
 Patroni `>=3.0.0,<5.0.0` is the audited compatibility range. Patroni 4.x is the
 primary target; version-gated features are rejected before an unsupported write
-is sent.
+is sent. Embedding products may narrow this range per `control.Service` or
+`runtime.Environment` instance without changing package-global state.
 
 ## Install
 

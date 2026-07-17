@@ -367,6 +367,41 @@ func TestRestartRequestPreservesPatronictlTimeoutAndConditions(t *testing.T) {
 	}
 }
 
+func TestRestartWireContractsAcceptNumericTimeoutAndDecodeScheduledFilters(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
+		switch request.URL.Path {
+		case "/restart":
+			var body map[string]any
+			if err := json.NewDecoder(request.Body).Decode(&body); err != nil {
+				t.Fatal(err)
+			}
+			if timeout, ok := body["timeout"].(float64); !ok || timeout != 30 {
+				t.Fatalf("numeric restart timeout = %#v, want 30", body["timeout"])
+			}
+			_, _ = io.WriteString(writer, "restarted")
+		case "/patroni":
+			writer.Header().Set("Content-Type", "application/json")
+			_, _ = io.WriteString(writer, `{"state":"running","patroni":{"version":"4.1.3","scope":"demo","name":"node-1"},"scheduled_restart":{"schedule":"2026-07-18T00:00:00+00:00","role":"replica","postgres_version":"17.1","timeout":"30s","restart_pending":true}}`)
+		default:
+			t.Fatalf("unexpected request path %q", request.URL.Path)
+		}
+	}))
+	defer server.Close()
+
+	client, _ := patroni.NewClient(patroni.ClientOptions{})
+	if _, err := client.PostRestart(context.Background(), server.URL, patroni.RestartRequest{Timeout: 30}); err != nil {
+		t.Fatalf("numeric restart timeout failed: %v", err)
+	}
+	response, err := client.GetPatroni(context.Background(), server.URL)
+	if err != nil {
+		t.Fatalf("decode scheduled restart: %v", err)
+	}
+	scheduled := response.Data.ScheduledRestart
+	if scheduled == nil || scheduled.Role != "replica" || scheduled.PostgresVersion != "17.1" || scheduled.Timeout != "30s" || scheduled.RestartPending == nil || !*scheduled.RestartPending {
+		t.Fatalf("scheduled restart = %#v", scheduled)
+	}
+}
+
 func TestCancellationClassifiesNotSentAndMaybeSent(t *testing.T) {
 	release := make(chan struct{})
 	server := httptest.NewServer(http.HandlerFunc(func(http.ResponseWriter, *http.Request) {

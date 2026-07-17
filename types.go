@@ -47,7 +47,13 @@ type PendingRestartChange struct {
 }
 
 type ScheduledRestart struct {
-	Schedule string `json:"schedule,omitempty"`
+	Schedule        string `json:"schedule,omitempty"`
+	Role            string `json:"role,omitempty"`
+	PostgresVersion string `json:"postgres_version,omitempty"`
+	// Timeout is either a JSON number of seconds or a Patroni duration string,
+	// such as "30" or "30s". Patroni accepts and may publish both forms.
+	Timeout        any   `json:"timeout,omitempty"`
+	RestartPending *bool `json:"restart_pending,omitempty"`
 }
 
 // Status is the wire DTO returned by health aliases and GET /patroni. Unknown
@@ -88,7 +94,7 @@ type ClusterMember struct {
 	Timeline             *int                            `json:"timeline,omitempty"`
 	PendingRestart       *bool                           `json:"pending_restart,omitempty"`
 	PendingRestartReason map[string]PendingRestartChange `json:"pending_restart_reason,omitempty"`
-	ScheduledRestart     any                             `json:"scheduled_restart,omitempty"`
+	ScheduledRestart     *ScheduledRestart               `json:"scheduled_restart,omitempty"`
 	Tags                 map[string]any                  `json:"tags,omitempty"`
 	LSN                  json.RawMessage                 `json:"lsn,omitempty"`
 	Lag                  json.RawMessage                 `json:"lag,omitempty"`
@@ -177,8 +183,10 @@ type RestartRequest struct {
 	Schedule        string `json:"schedule,omitempty"`
 	Role            string `json:"role,omitempty"`
 	PostgresVersion string `json:"postgres_version,omitempty"`
-	Timeout         string `json:"timeout,omitempty"`
-	RestartPending  *bool  `json:"restart_pending,omitempty"`
+	// Timeout accepts either a JSON number of seconds or a Patroni duration
+	// string. Callers should use a numeric Go value or a string such as "30s".
+	Timeout        any   `json:"timeout,omitempty"`
+	RestartPending *bool `json:"restart_pending,omitempty"`
 }
 
 type ReinitializeRequest struct {

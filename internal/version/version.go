@@ -15,6 +15,7 @@ var (
 )
 
 const (
+	modulePath       = "github.com/pgsty/go-patroni"
 	SupportedPatroni = ">=3.0.0,<5.0.0"
 	MachineSchema    = "patroni.pgsty.com/v1alpha1"
 )
@@ -34,7 +35,7 @@ func Current() Info {
 	version := Version
 	if version == "0.0.0-dev" {
 		if build, ok := debug.ReadBuildInfo(); ok {
-			version = moduleVersion(build.Main.Path, build.Main.Version, version)
+			version = buildModuleVersion(build, version)
 		}
 	}
 	return Info{
@@ -43,10 +44,37 @@ func Current() Info {
 	}
 }
 
-func moduleVersion(path, reported, fallback string) string {
-	if path != "github.com/pgsty/go-patroni" {
+func buildModuleVersion(build *debug.BuildInfo, fallback string) string {
+	if build == nil {
 		return fallback
 	}
+	if build.Main.Path == modulePath {
+		return moduleVersion(build.Main.Path, build.Main.Version, fallback)
+	}
+	for _, dependency := range build.Deps {
+		if dependency == nil || dependency.Path != modulePath {
+			continue
+		}
+		reported := dependency.Version
+		if dependency.Replace != nil {
+			// A replacement is the code that was actually compiled. Local
+			// replacements have no trustworthy module version and therefore
+			// intentionally retain the development fallback.
+			reported = dependency.Replace.Version
+		}
+		return normalizedModuleVersion(reported, fallback)
+	}
+	return fallback
+}
+
+func moduleVersion(path, reported, fallback string) string {
+	if path != modulePath {
+		return fallback
+	}
+	return normalizedModuleVersion(reported, fallback)
+}
+
+func normalizedModuleVersion(reported, fallback string) string {
 	reported = strings.TrimSpace(reported)
 	if reported == "" || reported == "(devel)" {
 		return fallback

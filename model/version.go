@@ -10,7 +10,7 @@ import (
 var (
 	versionPattern = regexp.MustCompile(`^v?([0-9]+)\.([0-9]+)\.([0-9]+)([.-][0-9A-Za-z.-]+)?(?: \([^\r\n()]*\))?$`)
 
-	// ErrUnsupportedPatroniVersion identifies versions outside [4.0.0,5.0.0).
+	// ErrUnsupportedPatroniVersion identifies versions outside [3.0.0,5.0.0).
 	ErrUnsupportedPatroniVersion = errors.New("unsupported Patroni version")
 )
 
@@ -70,18 +70,18 @@ func (r VersionRange) Contains(version Version) bool {
 }
 
 var SupportedPatroniRange = VersionRange{
-	Min: Version{Major: 4, Minor: 0, Patch: 0},
+	Min: Version{Major: 3, Minor: 0, Patch: 0},
 	Max: Version{Major: 5, Minor: 0, Patch: 0},
 }
 
-// CheckPatroniVersion parses and enforces BOAR's fail-closed write range.
+// CheckPatroniVersion parses and enforces the audited SDK compatibility range.
 func CheckPatroniVersion(value string) error {
 	version, err := ParseVersion(value)
 	if err != nil {
 		return err
 	}
 	if !SupportedPatroniRange.Contains(version) {
-		return fmt.Errorf("%w: %s is outside >=4.0.0,<5.0.0", ErrUnsupportedPatroniVersion, version)
+		return fmt.Errorf("%w: %s is outside >=3.0.0,<5.0.0", ErrUnsupportedPatroniVersion, version)
 	}
 	return nil
 }

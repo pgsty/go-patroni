@@ -9,9 +9,9 @@ import (
 	"github.com/pgsty/go-patroni/model"
 )
 
-const supportedPatroniRangeText = ">=4.0.0,<5.0.0"
+const supportedPatroniRangeText = ">=3.0.0,<5.0.0"
 
-// checkSnapshotPatroniVersion rejects every explicit version outside BOAR's
+// checkSnapshotPatroniVersion rejects every explicit version outside the SDK's
 // supported range. Empty legacy member versions are not invented: REST writes
 // may probe them at the transport boundary, while an entirely offline DCS
 // cluster remains removable through the separately confirmed delete flow.

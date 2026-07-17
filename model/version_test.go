@@ -12,7 +12,9 @@ func TestPatroniVersionRange(t *testing.T) {
 		version   string
 		supported bool
 	}{
-		{"3.3.8", false},
+		{"2.1.0", false},
+		{"3.0.0", true},
+		{"3.3.8", true},
 		{"4.0.0", true},
 		{"4.0.7", true},
 		{"4.1.0", true},

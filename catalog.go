@@ -3,6 +3,15 @@ package patroni
 import (
 	"net/http"
 	"strings"
+
+	"github.com/pgsty/go-patroni/model"
+)
+
+const (
+	PatroniV3       = "3.0.0"
+	PatroniV3MPP    = "3.3.0"
+	PatroniV4       = "4.0.0"
+	PatroniV4Point1 = "4.1.0"
 )
 
 type Risk string
@@ -23,6 +32,68 @@ type Endpoint struct {
 	Risk     Risk
 	Request  string
 	Response string
+	Since    string
+}
+
+// AvailableIn reports whether this method/path contract exists in a supported
+// Patroni version. Version-specific semantics are described by FeatureCatalog.
+func (endpoint Endpoint) AvailableIn(version model.Version) bool {
+	since, err := model.ParseVersion(endpoint.Since)
+	return err == nil && version.Compare(since) >= 0 && model.SupportedPatroniRange.Contains(version)
+}
+
+type Feature string
+
+const (
+	FeatureCoreRESTAPI            Feature = "core-rest-api"
+	FeatureMPPEndpoint            Feature = "mpp-endpoint"
+	FeatureQuorumStatus           Feature = "quorum-status"
+	FeatureFailsafeLSNHeader      Feature = "failsafe-lsn-header"
+	FeatureReadinessLagMode       Feature = "readiness-lag-mode"
+	FeatureReinitializeFromLeader Feature = "reinitialize-from-leader"
+	FeatureStandbyClusterCLI      Feature = "standby-cluster-cli"
+)
+
+type FeatureAvailability struct {
+	Feature     Feature
+	Since       string
+	Description string
+}
+
+var featureCatalog = []FeatureAvailability{
+	{Feature: FeatureCoreRESTAPI, Since: PatroniV3, Description: "core health, monitoring, configuration, restart, failover, and Citus REST endpoints"},
+	{Feature: FeatureMPPEndpoint, Since: PatroniV3MPP, Description: "generic POST /mpp alias in addition to POST /citus"},
+	{Feature: FeatureQuorumStatus, Since: PatroniV4, Description: "quorum health aliases, status field, and Prometheus metric"},
+	{Feature: FeatureFailsafeLSNHeader, Since: PatroniV4, Description: "POST /failsafe returns the standby LSN header"},
+	{Feature: FeatureReadinessLagMode, Since: PatroniV4Point1, Description: "readiness lag threshold and apply/write mode query semantics"},
+	{Feature: FeatureReinitializeFromLeader, Since: PatroniV4Point1, Description: "POST /reinitialize from_leader request option"},
+	{Feature: FeatureStandbyClusterCLI, Since: PatroniV4Point1, Description: "patronictl demote-cluster and promote-cluster commands"},
+}
+
+// FeatureCatalog returns a copy of the audited Patroni version capability
+// matrix. The catalog is pinned against upstream 3.0.0 through 4.1.3.
+func FeatureCatalog() []FeatureAvailability {
+	return append([]FeatureAvailability(nil), featureCatalog...)
+}
+
+// SupportsFeature validates version and reports whether Patroni implements a
+// named versioned capability.
+func SupportsFeature(versionText string, feature Feature) (bool, error) {
+	version, err := model.ParseVersion(versionText)
+	if err != nil {
+		return false, err
+	}
+	if err := model.CheckPatroniVersion(versionText); err != nil {
+		return false, err
+	}
+	for _, candidate := range featureCatalog {
+		if candidate.Feature != feature {
+			continue
+		}
+		since, err := model.ParseVersion(candidate.Since)
+		return err == nil && version.Compare(since) >= 0, err
+	}
+	return false, &wireContractError{message: "unknown Patroni feature"}
 }
 
 type HealthAlias string
@@ -58,6 +129,40 @@ var healthAliases = []HealthAlias{
 
 func HealthAliases() []HealthAlias { return append([]HealthAlias(nil), healthAliases...) }
 
+// HealthAliasesFor returns the health aliases implemented by the requested
+// supported Patroni version.
+func HealthAliasesFor(versionText string) ([]HealthAlias, error) {
+	version, err := model.ParseVersion(versionText)
+	if err != nil {
+		return nil, err
+	}
+	if err := model.CheckPatroniVersion(versionText); err != nil {
+		return nil, err
+	}
+	aliases := make([]HealthAlias, 0, len(healthAliases))
+	for _, alias := range healthAliases {
+		if healthAliasAvailableIn(alias, version) {
+			aliases = append(aliases, alias)
+		}
+	}
+	return aliases, nil
+}
+
+func healthAliasAvailableIn(alias HealthAlias, version model.Version) bool {
+	if alias != HealthQuorum && alias != HealthReadOnlyQuorum {
+		return true
+	}
+	since, _ := model.ParseVersion(PatroniV4)
+	return version.Compare(since) >= 0
+}
+
+func healthAliasSince(alias HealthAlias) string {
+	if alias == HealthQuorum || alias == HealthReadOnlyQuorum {
+		return PatroniV4
+	}
+	return PatroniV3
+}
+
 func validHealthAlias(alias HealthAlias) bool {
 	for _, candidate := range healthAliases {
 		if alias == candidate {
@@ -79,7 +184,7 @@ func EndpointCatalog() []Endpoint {
 			}
 			output = append(output, Endpoint{
 				ID: endpointID(method, string(alias)), Method: method, Path: string(alias), Risk: RiskRead,
-				Request: "none", Response: response,
+				Request: "none", Response: response, Since: healthAliasSince(alias),
 			})
 		}
 	}
@@ -106,7 +211,35 @@ func EndpointCatalog() []Endpoint {
 		Endpoint{ID: "post-citus", Method: http.MethodPost, Path: "/citus", Risk: RiskPeerInternal, Request: "mpp-event-json", Response: "text"},
 		Endpoint{ID: "post-mpp", Method: http.MethodPost, Path: "/mpp", Risk: RiskPeerInternal, Request: "mpp-event-json", Response: "text"},
 	)
+	for index := range output {
+		if output[index].Since == "" {
+			output[index].Since = PatroniV3
+		}
+		if output[index].ID == "post-mpp" {
+			output[index].Since = PatroniV3MPP
+		}
+	}
 	return output
+}
+
+// EndpointCatalogFor returns only endpoints implemented by the requested
+// supported Patroni version, preserving upstream source order.
+func EndpointCatalogFor(versionText string) ([]Endpoint, error) {
+	version, err := model.ParseVersion(versionText)
+	if err != nil {
+		return nil, err
+	}
+	if err := model.CheckPatroniVersion(versionText); err != nil {
+		return nil, err
+	}
+	all := EndpointCatalog()
+	output := make([]Endpoint, 0, len(all))
+	for _, endpoint := range all {
+		if endpoint.AvailableIn(version) {
+			output = append(output, endpoint)
+		}
+	}
+	return output, nil
 }
 
 func endpointID(method, endpointPath string) string {

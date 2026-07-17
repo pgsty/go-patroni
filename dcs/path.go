@@ -16,7 +16,7 @@ func NamespacePrefix(namespace string) string {
 func ClusterPrefix(target model.Target) (string, error) {
 	target = target.Normalize()
 	if err := target.Validate(true); err != nil {
-		return "", fmt.Errorf("DCS cluster path: %w", err)
+		return "", fmt.Errorf("dcs cluster path: %w", err)
 	}
 	components := []string{"", strings.Trim(target.Namespace, "/"), target.Scope}
 	if target.Group != nil {

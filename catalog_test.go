@@ -21,7 +21,7 @@ func TestVersionedEndpointCatalog(t *testing.T) {
 		{version: "3.3.0", endpoints: 69, healthAliases: 16, mpp: true},
 		{version: "3.3.8", endpoints: 69, healthAliases: 16, mpp: true},
 		{version: "4.0.0", endpoints: 75, healthAliases: 18, mpp: true, quorum: true},
-		{version: "4.1.3", endpoints: 75, healthAliases: 18, mpp: true, quorum: true},
+		{version: "4.1.4", endpoints: 75, healthAliases: 18, mpp: true, quorum: true},
 	}
 	for _, test := range tests {
 		t.Run(test.version, func(t *testing.T) {
@@ -62,7 +62,8 @@ func TestFeatureAvailability(t *testing.T) {
 		{version: "4.0.0", feature: patroni.FeatureQuorumStatus, want: true},
 		{version: "4.0.7", feature: patroni.FeatureReadinessLagMode},
 		{version: "4.1.0", feature: patroni.FeatureReadinessLagMode, want: true},
-		{version: "4.1.3", feature: patroni.FeatureReinitializeFromLeader, want: true},
+		{version: "4.1.0-rc1", feature: patroni.FeatureReadinessLagMode},
+		{version: "4.1.4", feature: patroni.FeatureReinitializeFromLeader, want: true},
 	}
 	for _, test := range tests {
 		t.Run(test.version+"/"+string(test.feature), func(t *testing.T) {
@@ -86,7 +87,7 @@ func TestVersionedCatalogRejectsUnparseableAndUnsupportedVersions(t *testing.T) 
 	if _, err := patroni.SupportsFeature("5.0.0", patroni.FeatureCoreRESTAPI); !errors.Is(err, model.ErrUnsupportedPatroniVersion) {
 		t.Fatalf("unsupported version error=%v", err)
 	}
-	if _, err := patroni.SupportsFeature("4.1.3", patroni.Feature("unknown")); err == nil {
+	if _, err := patroni.SupportsFeature("4.1.4", patroni.Feature("unknown")); err == nil {
 		t.Fatal("unknown feature accepted")
 	}
 }

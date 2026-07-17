@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -380,13 +379,4 @@ func tabularString(value any) string {
 		}
 		return string(encoded)
 	}
-}
-
-func sortedMapKeys[V any](mapping map[string]V) []string {
-	keys := make([]string, 0, len(mapping))
-	for key := range mapping {
-		keys = append(keys, key)
-	}
-	sort.Strings(keys)
-	return keys
 }

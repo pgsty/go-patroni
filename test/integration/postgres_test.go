@@ -176,3 +176,52 @@ update go_patroni_query_fixture set payload = upper(payload) where id = 2;
 		t.Fatalf("query after canceled one-shot connection failed: result=%#v err=%v", afterCancel, err)
 	}
 }
+
+func TestPostgreSQLNativeQueryPlaintextFromSource(t *testing.T) {
+	if os.Getenv("GO_PATRONI_TEST_POSTGRES_ISOLATED") != "1" {
+		t.Fatal("refusing PostgreSQL integration test without GO_PATRONI_TEST_POSTGRES_ISOLATED=1")
+	}
+	host := os.Getenv("GO_PATRONI_TEST_POSTGRES_HOST")
+	if host != "127.0.0.1" {
+		t.Fatalf("refusing PostgreSQL integration test against non-loopback host %q", host)
+	}
+	portNumber, err := strconv.ParseUint(os.Getenv("GO_PATRONI_TEST_POSTGRES_PORT"), 10, 16)
+	if err != nil || portNumber == 0 {
+		t.Fatal("GO_PATRONI_TEST_POSTGRES_PORT must be a valid isolated loopback port")
+	}
+	client, err := patronipostgres.NewClient(patronipostgres.ClientOptions{Timeout: 10 * time.Second})
+	if err != nil {
+		t.Fatal(err)
+	}
+	options := patronipostgres.NewConnectionOptions("")
+	options.Host = host
+	options.Port = uint16(portNumber)
+	options.Database = "postgres"
+	options.Username = "postgres"
+	options.ApplicationName = "go-patroni-plaintext-integration"
+	options.ConnectTimeout = 5 * time.Second
+
+	// The direct SDK remains verify-full by default and must not silently
+	// downgrade when the server refuses TLS.
+	_, err = client.Query(context.Background(), options, patronipostgres.QueryRequest{SQL: "select 1"})
+	var typed *patronipostgres.Error
+	if !errors.As(err, &typed) || typed.Kind != patronipostgres.ErrorConnect {
+		t.Fatalf("verify-full unexpectedly connected to a plaintext-only PostgreSQL server: %#v", err)
+	}
+
+	// patronictl query selects TLSFromSource. With the script's explicit
+	// PGSSLMODE=prefer this must use libpq-compatible plaintext fallback.
+	sourced := options.WithTLSMode(patronipostgres.TLSFromSource)
+	result, err := client.Query(context.Background(), sourced, patronipostgres.QueryRequest{
+		SQL: "select ssl, current_setting('application_name') from pg_catalog.pg_stat_ssl " +
+			"where pid = pg_catalog.pg_backend_pid()",
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(result.Sets) != 1 || len(result.Sets[0].Rows) != 1 ||
+		result.Sets[0].Rows[0][0].Text != "f" ||
+		result.Sets[0].Rows[0][1].Text != "go-patroni-plaintext-integration" {
+		t.Fatalf("source-compatible plaintext query mismatch: %#v", result)
+	}
+}

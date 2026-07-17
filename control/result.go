@@ -131,18 +131,18 @@ func (r Result[T]) Validate() error {
 	switch r.Outcome {
 	case Succeeded:
 		if r.Error != nil {
-			return errors.New("SUCCEEDED result must not contain an error")
+			return errors.New("succeeded result must not contain an error")
 		}
 	case Failed:
 		if r.Error == nil {
-			return errors.New("FAILED result requires an error")
+			return errors.New("failed result requires an error")
 		}
 		if r.Error.Category == CategoryUnknown {
-			return errors.New("FAILED result cannot contain UNKNOWN error category")
+			return errors.New("failed result cannot contain UNKNOWN error category")
 		}
 	case Unknown:
 		if r.Error == nil || r.Error.Category != CategoryUnknown {
-			return errors.New("UNKNOWN result requires UNKNOWN error category")
+			return errors.New("unknown result requires UNKNOWN error category")
 		}
 	default:
 		return fmt.Errorf("result outcome %q is invalid", r.Outcome)

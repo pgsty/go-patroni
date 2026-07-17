@@ -21,7 +21,9 @@ type Empty struct{}
 type PatroniIdentity struct {
 	Version string `json:"version"`
 	Scope   string `json:"scope"`
-	Name    string `json:"name"`
+	// Name is absent from Patroni 3.0 and 3.1 status responses and is empty
+	// after decoding those historical payloads. Patroni added it in 3.2.0.
+	Name string `json:"name"`
 }
 
 type XLogStatus struct {

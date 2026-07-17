@@ -125,7 +125,7 @@ func TestDCSProjectionAgainstPinnedPatroni(t *testing.T) {
 func TestDCSMutationContractAgainstPinnedPatroni(t *testing.T) {
 	root := repositoryRoot(t)
 	source := patroniSource(root)
-	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), patroniOracleTimeout(t))
 	defer cancel()
 	script := filepath.Join(root, "test", "compat", "oracle", "dcs_mutation_contract.py")
 	command := exec.CommandContext(ctx, "python3", script, filepath.Join(source, "patroni", "dcs", "etcd3.py"))
@@ -175,7 +175,7 @@ func runPatroniDCSOracle(t *testing.T, input dcsOracleInput) dcsProjection {
 	if err != nil {
 		t.Fatal(err)
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), patroniOracleTimeout(t))
 	defer cancel()
 	script := filepath.Join(root, "test", "compat", "oracle", "dcs_projection.py")
 	command := exec.CommandContext(ctx, "python3", script)
@@ -194,6 +194,20 @@ func runPatroniDCSOracle(t *testing.T, input dcsOracleInput) dcsProjection {
 		t.Fatalf("decode Patroni DCS oracle output: %v", err)
 	}
 	return projection
+}
+
+func patroniOracleTimeout(t *testing.T) time.Duration {
+	t.Helper()
+	const defaultTimeout = time.Minute
+	value := os.Getenv("GO_PATRONI_ORACLE_TIMEOUT")
+	if value == "" {
+		return defaultTimeout
+	}
+	timeout, err := time.ParseDuration(value)
+	if err != nil || timeout <= 0 {
+		t.Fatalf("invalid GO_PATRONI_ORACLE_TIMEOUT %q", value)
+	}
+	return timeout
 }
 
 func patroniSource(root string) string {

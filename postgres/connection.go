@@ -3,7 +3,6 @@ package postgres
 import (
 	"context"
 	"crypto/tls"
-	"errors"
 	"fmt"
 	"strconv"
 	"strings"
@@ -205,7 +204,8 @@ func enforcedTLS(configuration *tls.Config, serverName string, insecure bool) *t
 	if configuration.MinVersion < tls.VersionTLS12 {
 		configuration.MinVersion = tls.VersionTLS12
 	}
-	configuration.InsecureSkipVerify = insecure //nolint:gosec -- explicit observable compatibility option
+	// The caller selected this observable compatibility mode explicitly.
+	configuration.InsecureSkipVerify = insecure
 	if insecure {
 		configuration.ServerName = ""
 		configuration.VerifyPeerCertificate = nil
@@ -317,15 +317,4 @@ func copyRow(values [][]byte) (Row, int64) {
 		row[index] = Cell{Text: string(value), Bytes: int64(len(value))}
 	}
 	return row, bytes
-}
-
-func connectionError(stage string, err error) error {
-	if err == nil {
-		return nil
-	}
-	var typed *Error
-	if errors.As(err, &typed) {
-		return typed
-	}
-	return newError(ErrorConnect, stage, err)
 }

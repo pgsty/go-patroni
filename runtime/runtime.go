@@ -67,7 +67,7 @@ type Runtime struct {
 
 func NewEnvironment(ctx context.Context, options EnvironmentOptions) (*Environment, error) {
 	if ctx == nil {
-		return nil, errors.New("Patroni environment requires a context")
+		return nil, errors.New("patroni environment requires a context")
 	}
 	document := options.Document
 	if document == nil {
@@ -88,7 +88,7 @@ func NewEnvironment(ctx context.Context, options EnvironmentOptions) (*Environme
 	var supportedRange *model.VersionRange
 	if options.SupportedPatroniRange != nil {
 		if err := options.SupportedPatroniRange.Validate(); err != nil {
-			return nil, fmt.Errorf("Patroni environment version range: %w", err)
+			return nil, fmt.Errorf("patroni environment version range: %w", err)
 		}
 		copyRange := *options.SupportedPatroniRange
 		supportedRange = &copyRange
@@ -116,7 +116,7 @@ func (environment *Environment) DefaultContext() string {
 
 func (environment *Environment) Resolve(contextName string) (config.Resolved, error) {
 	if environment == nil || environment.document == nil {
-		return config.Resolved{}, errors.New("Patroni environment is not initialized")
+		return config.Resolved{}, errors.New("patroni environment is not initialized")
 	}
 	return environment.document.Resolve(config.ResolveRequest{Context: contextName, Overrides: environment.overrides})
 }
@@ -126,10 +126,10 @@ func (environment *Environment) Resolve(contextName string) (config.Resolved, er
 // open etcd, Patroni REST, or PostgreSQL connections.
 func (environment *Environment) OpenConfiguration(ctx context.Context, contextName string) (*Runtime, error) {
 	if ctx == nil {
-		return nil, errors.New("Patroni configuration runtime requires a context")
+		return nil, errors.New("patroni configuration runtime requires a context")
 	}
 	if environment == nil || environment.document == nil {
-		return nil, errors.New("Patroni environment is not initialized")
+		return nil, errors.New("patroni environment is not initialized")
 	}
 	resolved, err := environment.Resolve(contextName)
 	if err != nil {
@@ -152,10 +152,10 @@ func (environment *Environment) OpenConfiguration(ctx context.Context, contextNa
 
 func (environment *Environment) Open(ctx context.Context, options RuntimeOptions) (*Runtime, error) {
 	if ctx == nil {
-		return nil, errors.New("Patroni runtime requires a context")
+		return nil, errors.New("patroni runtime requires a context")
 	}
 	if environment == nil || environment.document == nil {
-		return nil, errors.New("Patroni environment is not initialized")
+		return nil, errors.New("patroni environment is not initialized")
 	}
 	overrides := environment.overrides
 	if options.ExplicitGroup != nil {

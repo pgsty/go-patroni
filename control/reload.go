@@ -248,26 +248,6 @@ func memberNamesFromTargets(targets []model.Target) []string {
 	return names
 }
 
-func resolvePlannedMembers(service *Service, operation string, snapshot dcs.Snapshot, targets []model.Target, role Role) ([]dcs.Member, []MemberWriteResult) {
-	byName := make(map[string]dcs.Member, len(snapshot.Cluster.Members))
-	for _, member := range snapshot.Cluster.Members {
-		byName[member.Name] = member
-	}
-	resolved := make([]dcs.Member, 0, len(targets))
-	conflicts := make([]MemberWriteResult, 0)
-	for _, target := range targets {
-		member, exists := byName[target.Member]
-		if exists && memberMatchesRole(snapshot.Cluster, member, role) {
-			resolved = append(resolved, member)
-			continue
-		}
-		evidence := Evidence{Source: EvidenceDCS, ObservedAt: service.now(), Summary: "confirmed member is absent or no longer matches its role", Revision: strconv.FormatInt(snapshot.Revision, 10), Path: snapshot.Prefix, SendState: SendNotSent}
-		errorValue := NewError(CategoryConflict, operation, target, false, operation+" was not sent because cluster membership changed", nil, evidence)
-		conflicts = append(conflicts, MemberWriteResult{Target: target, Outcome: Failed, SendState: SendNotSent, Verification: VerifiedFailed, Summary: errorValue.Message, Evidence: []Evidence{evidence}, Error: errorValue})
-	}
-	return resolved, conflicts
-}
-
 func classifyReloadResponse(service *Service, target model.Target, response patroni.Response[string], callError error) MemberWriteResult {
 	send := patroniSendState(callError, response.StatusCode)
 	status := response.StatusCode

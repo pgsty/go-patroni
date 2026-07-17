@@ -188,6 +188,7 @@ func cliRuntimeFactory(service *control.Service, invocations *[]runtimeInvocatio
 	}
 }
 
+//nolint:staticcheck // test helper keeps stdout, stderr, and command error adjacent.
 func executeCLIForTest(
 	t *testing.T,
 	stdin string,
@@ -240,6 +241,9 @@ func TestReadAdaptersUseControlAndPreserveMachineSecretBoundary(t *testing.T) {
 	if stderr != "" || closes != 1 || len(database.requests) != 1 || database.requests[0].SQL != sqlMarker {
 		t.Fatalf("machine query request mismatch: stderr=%q closes=%d requests=%#v", stderr, closes, database.requests)
 	}
+	if mode := database.connections[0].TLSMode(); mode != postgres.TLSFromSource {
+		t.Fatalf("query TLS mode = %q, want source-compatible behavior", mode)
+	}
 
 	stdout, stderr, err, _, closes = executeCLIForTest(t, passwordMarker+"\n", service,
 		"query", "alpha", "--command", sqlMarker, "--password", "--username", "operator", "--format", "json")
@@ -252,6 +256,9 @@ func TestReadAdaptersUseControlAndPreserveMachineSecretBoundary(t *testing.T) {
 	}
 	if got := database.connections[1].String(); !strings.Contains(got, "password:true") || strings.Contains(got, passwordMarker) {
 		t.Fatalf("password connection boundary mismatch: %s", got)
+	}
+	if mode := database.connections[1].TLSMode(); mode != postgres.TLSFromSource {
+		t.Fatalf("password query TLS mode = %q, want source-compatible behavior", mode)
 	}
 }
 

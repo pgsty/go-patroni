@@ -6,7 +6,7 @@ application; it has no dependency on BOAR.
 
 The module provides two API levels:
 
-- a direct, typed REST client for every Patroni 4.1.3 HTTP method/path contract;
+- a direct, typed REST client for every Patroni 4.1.4 HTTP method/path contract;
 - a higher-level `control.Service` and `runtime` that implement Patroni DCS,
   PostgreSQL, Citus, safety, and `patronictl` orchestration semantics.
 
@@ -29,6 +29,15 @@ Install the command-line client independently:
 go install github.com/pgsty/go-patroni/cmd/patronictl@latest
 patronictl --help
 ```
+
+## Documentation
+
+- [中文用户与 Agent 使用手册](docs/user-guide.zh-CN.md) covers direct REST,
+  Patroni YAML/runtime, CLI, and machine-output workflows.
+- [中文 SDK 指南与实现审计](docs/go-patroni-sdk.zh-CN.md) records API coverage,
+  version compatibility, design details, and review findings.
+- [Contract specifications](docs/spec/README.md) define the normative project
+  invariants and release evidence.
 
 ## Direct REST API
 
@@ -164,7 +173,7 @@ should use the product-neutral names.
 
 ## `patronictl` compatibility
 
-The Go CLI implements all 19 commands in Patroni 4.1.3's `patronictl`:
+The Go CLI implements all 19 commands in Patroni 4.1.4's `patronictl`:
 `dsn`, `query`, `remove`, `reload`, `restart`, `reinit`, `failover`,
 `switchover`, `list`, `topology`, `flush`, `pause`, `resume`, `edit-config`,
 `show-config`, `version`, `history`, `demote-cluster`, and `promote-cluster`.
@@ -176,21 +185,21 @@ JSON/YAML envelopes through `-o`. Machine output uses the versioned
 The source-pinned compatibility evidence is in [`compatibility`](compatibility),
 with the detailed support matrix in
 [`docs/compatibility.md`](docs/compatibility.md). There are currently no
-declared CLI deviations from the pinned Patroni 4.1.3 command contract.
+declared CLI deviations from the pinned Patroni 4.1.4 command contract.
 
 ## Package map
 
-| Package | Purpose |
-| --- | --- |
-| module root | Complete Patroni REST API client, TLS, errors, endpoint and feature catalogs |
-| `config` | Tolerant Patroni YAML loading, context overlays, secret-safe projection |
-| `model` | Stable Patroni cluster/member identities and domain objects |
-| `dcs` | Capability-scoped Patroni DCS contracts and state decoding |
-| `dcs/etcd3` | Native etcd3 implementation, transactions, discovery, and watches |
-| `postgres` | One-shot role-checked PostgreSQL query client |
-| `control` | Adapter-neutral, `patronictl`-compatible control operations |
-| `runtime` | Configuration-to-client assembly for applications and CLIs |
-| `cmd/patronictl` | Standalone native Go command-line client |
+| Package          | Purpose                                                                      |
+|------------------|------------------------------------------------------------------------------|
+| module root      | Complete Patroni REST API client, TLS, errors, endpoint and feature catalogs |
+| `config`         | Tolerant Patroni YAML loading, context overlays, secret-safe projection      |
+| `model`          | Stable Patroni cluster/member identities and domain objects                  |
+| `dcs`            | Capability-scoped Patroni DCS contracts and state decoding                   |
+| `dcs/etcd3`      | Native etcd3 implementation, transactions, discovery, and watches            |
+| `postgres`       | One-shot role-checked PostgreSQL query client                                |
+| `control`        | Adapter-neutral, `patronictl`-compatible control operations                  |
+| `runtime`        | Configuration-to-client assembly for applications and CLIs                   |
+| `cmd/patronictl` | Standalone native Go command-line client                                     |
 
 ## Safety model
 

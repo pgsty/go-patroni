@@ -16,7 +16,7 @@ import (
 	"go.yaml.in/yaml/v3"
 )
 
-func (application *adapter) runEditConfig(command *cobra.Command, args []string, options *editConfigOptions) error {
+func (application *adapter) runEditConfig(command *cobra.Command, args []string, options *editConfigOptions) (returnedError error) {
 	if options.applyFile != "" && options.replaceFile != "" && options.applyFile == "-" && options.replaceFile == "-" {
 		return usageError("--apply - and --replace - cannot both consume standard input")
 	}
@@ -26,7 +26,7 @@ func (application *adapter) runEditConfig(command *cobra.Command, args []string,
 	if err != nil {
 		return err
 	}
-	defer runtime.Close()
+	defer closeCommandRuntime(runtime, &returnedError)
 
 	currentResult := runtime.service.ShowConfig(command.Context(), control.ShowConfigRequest{Target: runtime.target})
 	if currentResult.Outcome != control.Succeeded {

@@ -166,7 +166,7 @@ func (service *Service) executeTransition(
 	}
 
 	payload := transitionRESTPayload(intent, selection)
-	response, callError, restSend, legacyEndpoint, restEvidence := service.callTransitionREST(ctx, intent, selection, payload)
+	response, restSend, legacyEndpoint, restEvidence, callError := service.callTransitionREST(ctx, intent, selection, payload)
 	baseEvidence = append(baseEvidence, restEvidence...)
 	data.RESTSendState = restSend
 	data.HTTPStatus = response.StatusCode
@@ -216,7 +216,7 @@ func normalizeFailoverRequest(request FailoverRequest) (transitionIntent, error)
 		return intent, err
 	}
 	if intent.citus && intent.target.Group == nil {
-		return intent, errors.New("Citus failover requires an explicit group")
+		return intent, errors.New("citus failover requires an explicit group")
 	}
 	return intent, nil
 }
@@ -238,7 +238,7 @@ func normalizeSwitchoverRequest(request SwitchoverRequest) (transitionIntent, er
 		return intent, errors.New("scheduled switchover time is zero")
 	}
 	if intent.citus && intent.target.Group == nil {
-		return intent, errors.New("Citus switchover requires an explicit group")
+		return intent, errors.New("citus switchover requires an explicit group")
 	}
 	return intent, nil
 }
@@ -469,28 +469,28 @@ func (service *Service) callTransitionREST(
 	intent transitionIntent,
 	selection transitionSelection,
 	payload patroni.FailoverRequest,
-) (patroni.Response[string], error, SendState, bool, []Evidence) {
+) (patroni.Response[string], SendState, bool, []Evidence, error) {
 	path := "/" + intent.operation
 	if service.patroni == nil {
-		err := errors.New("Patroni REST client is unavailable")
-		return patroni.Response[string]{}, err, SendNotSent, false, []Evidence{{
+		err := errors.New("patroni REST client is unavailable")
+		return patroni.Response[string]{}, SendNotSent, false, []Evidence{{
 			Source: EvidencePatroni, ObservedAt: service.now(), Summary: intent.operation + " REST client is unavailable; command fallback is required",
 			Path: path, SendState: SendNotSent,
-		}}
+		}}, err
 	}
 	if selection.restMember == nil {
-		err := errors.New("REST target member is absent from DCS")
-		return patroni.Response[string]{}, err, SendNotSent, false, []Evidence{{
+		err := errors.New("rest target member is absent from DCS")
+		return patroni.Response[string]{}, SendNotSent, false, []Evidence{{
 			Source: EvidencePatroni, ObservedAt: service.now(), Summary: intent.operation + " REST target is unavailable; command fallback is required",
 			Path: path, SendState: SendNotSent,
-		}}
+		}}, err
 	}
 	baseURL, err := patroniBaseURL(selection.restMember.Data.APIURL)
 	if err != nil {
-		return patroni.Response[string]{}, err, SendNotSent, false, []Evidence{{
+		return patroni.Response[string]{}, SendNotSent, false, []Evidence{{
 			Source: EvidencePatroni, ObservedAt: service.now(), Summary: intent.operation + " REST target has no usable address; command fallback is required",
 			Path: path, SendState: SendNotSent,
-		}}
+		}}, err
 	}
 	var response patroni.Response[string]
 	if intent.operation == "failover" {
@@ -502,7 +502,7 @@ func (service *Service) callTransitionREST(
 	send := patroniSendState(err, response.StatusCode)
 	if intent.operation == "switchover" && response.StatusCode == 501 && strings.Contains(response.Data, legacySwitchoverResponse) {
 		if ctxErr := ctx.Err(); ctxErr != nil {
-			return response, ctxErr, send, false, evidence
+			return response, send, false, evidence, ctxErr
 		}
 		legacyResponse, legacyError := service.patroni.PostFailover(ctx, baseURL, payload)
 		evidence = append(evidence, Evidence{
@@ -510,9 +510,9 @@ func (service *Service) callTransitionREST(
 			Path: "/switchover->/failover", SendState: SendNotSent,
 		})
 		evidence = append(evidence, transitionRESTEvidence(service, intent.operation, "/failover", legacyResponse, legacyError))
-		return legacyResponse, legacyError, patroniSendState(legacyError, legacyResponse.StatusCode), true, evidence
+		return legacyResponse, patroniSendState(legacyError, legacyResponse.StatusCode), true, evidence, legacyError
 	}
-	return response, err, send, false, evidence
+	return response, send, false, evidence, err
 }
 
 func transitionRESTEvidence(service *Service, operation, path string, response patroni.Response[string], err error) Evidence {
@@ -564,7 +564,7 @@ func (service *Service) executeTransitionFallback(
 			intent.operation+" fallback aborted because cluster topology changed", err, evidence)
 	}
 	if service.failoverDCS == nil {
-		err := errors.New("DCS failover capability is unavailable")
+		err := errors.New("dcs failover capability is unavailable")
 		if data.RESTSendState == SendMaybeSent || data.RESTSendState == SendAccepted {
 			return transitionUnknown(service, operationID, intent, PathRESTToDCS, data,
 				intent.operation+" may have been sent and DCS fallback is unavailable", err, evidence)

@@ -3,8 +3,8 @@
   "kind": "PatroniDCSCompatibility",
   "generatedBy": "tools/compatgen + test/compat/oracle/extract_inventory.py",
   "source": {
-    "commit": "d35409952f970d7f33d36d8f868eb20fc1e2a7f7",
-    "version": "4.1.3",
+    "commit": "d701f7b9c3d7e8cb400092d30170ff507697bce9",
+    "version": "4.1.4",
     "files": [
       "patroni/dcs/__init__.py",
       "patroni/dcs/etcd3.py"
@@ -31,7 +31,7 @@
         "remove-prefix"
       ],
       "cas": "none",
-      "sourceRef": "patroni/dcs/__init__.py:1515",
+      "sourceRef": "patroni/dcs/__init__.py:1517",
       "etcd3SourceRefs": [
         "patroni/dcs/etcd3.py:1070"
       ],
@@ -57,7 +57,7 @@
         "remove-prefix"
       ],
       "cas": "mod_revision",
-      "sourceRef": "patroni/dcs/__init__.py:1516",
+      "sourceRef": "patroni/dcs/__init__.py:1518",
       "etcd3SourceRefs": [
         "patroni/dcs/etcd3.py:1015"
       ],
@@ -82,7 +82,7 @@
         "remove-prefix"
       ],
       "cas": "none",
-      "sourceRef": "patroni/dcs/__init__.py:1520",
+      "sourceRef": "patroni/dcs/__init__.py:1522",
       "etcd3SourceRefs": [
         "patroni/dcs/etcd3.py:1070"
       ],
@@ -107,7 +107,7 @@
         "remove-prefix"
       ],
       "cas": "none",
-      "sourceRef": "patroni/dcs/__init__.py:1517",
+      "sourceRef": "patroni/dcs/__init__.py:1519",
       "etcd3SourceRefs": [
         "patroni/dcs/etcd3.py:1070"
       ],
@@ -134,7 +134,7 @@
         "remove-prefix"
       ],
       "cas": "mod_revision",
-      "sourceRef": "patroni/dcs/__init__.py:1518",
+      "sourceRef": "patroni/dcs/__init__.py:1520",
       "etcd3SourceRefs": [
         "patroni/dcs/etcd3.py:1011",
         "patroni/dcs/etcd3.py:1070"
@@ -160,7 +160,7 @@
         "remove-prefix"
       ],
       "cas": "none",
-      "sourceRef": "patroni/dcs/__init__.py:1519",
+      "sourceRef": "patroni/dcs/__init__.py:1521",
       "etcd3SourceRefs": [
         "patroni/dcs/etcd3.py:1070"
       ],
@@ -185,7 +185,7 @@
         "remove-prefix"
       ],
       "cas": "none",
-      "sourceRef": "patroni/dcs/__init__.py:1522",
+      "sourceRef": "patroni/dcs/__init__.py:1524",
       "etcd3SourceRefs": [
         "patroni/dcs/etcd3.py:1070"
       ],
@@ -210,7 +210,7 @@
         "remove-prefix"
       ],
       "cas": "none",
-      "sourceRef": "patroni/dcs/__init__.py:1523",
+      "sourceRef": "patroni/dcs/__init__.py:1525",
       "etcd3SourceRefs": [
         "patroni/dcs/etcd3.py:1070"
       ],
@@ -235,7 +235,7 @@
         "remove-prefix"
       ],
       "cas": "none",
-      "sourceRef": "patroni/dcs/__init__.py:1524",
+      "sourceRef": "patroni/dcs/__init__.py:1526",
       "etcd3SourceRefs": [
         "patroni/dcs/etcd3.py:1070"
       ],
@@ -260,7 +260,7 @@
         "remove-prefix"
       ],
       "cas": "none",
-      "sourceRef": "patroni/dcs/__init__.py:1525",
+      "sourceRef": "patroni/dcs/__init__.py:1527",
       "etcd3SourceRefs": [
         "patroni/dcs/etcd3.py:1070"
       ],

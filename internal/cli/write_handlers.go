@@ -16,7 +16,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func (application *adapter) runRemove(command *cobra.Command, args []string, options *removeOptions) error {
+func (application *adapter) runRemove(command *cobra.Command, args []string, options *removeOptions) (returnedError error) {
 	if !oneOf(options.format, "pretty", "tsv", "json", "yaml", "yml") {
 		return usageError(fmt.Sprintf("invalid --format %q", options.format))
 	}
@@ -32,7 +32,7 @@ func (application *adapter) runRemove(command *cobra.Command, args []string, opt
 	if err != nil {
 		return err
 	}
-	defer runtime.Close()
+	defer closeCommandRuntime(runtime, &returnedError)
 
 	request := control.RemoveRequest{Target: runtime.target, Citus: runtime.resolved.Citus}
 	prepared := runtime.service.PrepareRemove(command.Context(), request)
@@ -91,7 +91,7 @@ func (application *adapter) runRemove(command *cobra.Command, args []string, opt
 	return finishWriteResult(application, runtime, result, "RemoveResult", func(io.Writer, control.RemoveData) error { return nil })
 }
 
-func (application *adapter) runReload(command *cobra.Command, args []string, options *reloadOptions) error {
+func (application *adapter) runReload(command *cobra.Command, args []string, options *reloadOptions) (returnedError error) {
 	role, err := parseRole(options.role)
 	if err != nil {
 		return err
@@ -102,7 +102,7 @@ func (application *adapter) runReload(command *cobra.Command, args []string, opt
 	if err != nil {
 		return err
 	}
-	defer runtime.Close()
+	defer closeCommandRuntime(runtime, &returnedError)
 	request := control.ReloadRequest{Target: runtime.target, Members: append([]string(nil), args[1:]...), Role: role, Citus: runtime.resolved.Citus}
 	prepared := runtime.service.PrepareReload(command.Context(), request)
 	plan, err := application.confirmPreparedPlan(runtime, prepared, options.force, "Are you sure you want to reload members %s?")
@@ -121,7 +121,7 @@ func (application *adapter) runReload(command *cobra.Command, args []string, opt
 	})
 }
 
-func (application *adapter) runRestart(command *cobra.Command, args []string, options *restartOptions) error {
+func (application *adapter) runRestart(command *cobra.Command, args []string, options *restartOptions) (returnedError error) {
 	role, err := parseRole(options.role)
 	if err != nil {
 		return err
@@ -150,7 +150,7 @@ func (application *adapter) runRestart(command *cobra.Command, args []string, op
 	if err != nil {
 		return err
 	}
-	defer runtime.Close()
+	defer closeCommandRuntime(runtime, &returnedError)
 	request := control.RestartRequest{
 		Target: runtime.target, Members: append([]string(nil), args[1:]...), Role: role, Any: options.any,
 		ScheduledAt: scheduledAt, PostgresVersion: postgresVersion, Pending: options.pending, Timeout: options.timeout, Force: options.force,
@@ -169,14 +169,14 @@ func (application *adapter) runRestart(command *cobra.Command, args []string, op
 	return finishWriteResult(application, runtime, result, "RestartResult", renderRestartWrite)
 }
 
-func (application *adapter) runReinit(command *cobra.Command, args []string, options *reinitOptions) error {
+func (application *adapter) runReinit(command *cobra.Command, args []string, options *reinitOptions) (returnedError error) {
 	runtime, err := application.openRuntime(command, runtimeRequest{
 		operation: config.OperationRESTWrite, explicitScope: args[0], explicitGroup: optionalGroup(command, options.group),
 	})
 	if err != nil {
 		return err
 	}
-	defer runtime.Close()
+	defer closeCommandRuntime(runtime, &returnedError)
 	members := append([]string(nil), args[1:]...)
 	if len(members) == 0 && !options.force {
 		candidates, candidatesError := application.replicaNamesForPrompt(command.Context(), runtime)
@@ -204,14 +204,14 @@ func (application *adapter) runReinit(command *cobra.Command, args []string, opt
 	return finishWriteResult(application, runtime, result, "ReinitializeResult", renderReinitializeWrite)
 }
 
-func (application *adapter) runFailover(command *cobra.Command, args []string, options *failoverOptions) error {
+func (application *adapter) runFailover(command *cobra.Command, args []string, options *failoverOptions) (returnedError error) {
 	runtime, err := application.openRuntime(command, runtimeRequest{
 		operation: config.OperationRESTWrite, explicitScope: firstArgument(args), explicitGroup: optionalGroup(command, options.group),
 	})
 	if err != nil {
 		return err
 	}
-	defer runtime.Close()
+	defer closeCommandRuntime(runtime, &returnedError)
 	if err := application.resolveInteractiveGroup(command, runtime, options.force); err != nil {
 		return err
 	}
@@ -250,14 +250,14 @@ func (application *adapter) runFailover(command *cobra.Command, args []string, o
 	return finishWriteResult(application, runtime, result, "FailoverResult", renderClusterWrite)
 }
 
-func (application *adapter) runSwitchover(command *cobra.Command, args []string, options *switchoverOptions) error {
+func (application *adapter) runSwitchover(command *cobra.Command, args []string, options *switchoverOptions) (returnedError error) {
 	runtime, err := application.openRuntime(command, runtimeRequest{
 		operation: config.OperationRESTWrite, explicitScope: firstArgument(args), explicitGroup: optionalGroup(command, options.group),
 	})
 	if err != nil {
 		return err
 	}
-	defer runtime.Close()
+	defer closeCommandRuntime(runtime, &returnedError)
 	if err := application.resolveInteractiveGroup(command, runtime, options.force); err != nil {
 		return err
 	}
@@ -304,7 +304,7 @@ func (application *adapter) runSwitchover(command *cobra.Command, args []string,
 	return finishWriteResult(application, runtime, result, "SwitchoverResult", renderClusterWrite)
 }
 
-func (application *adapter) runFlush(command *cobra.Command, args []string, options *flushOptions) error {
+func (application *adapter) runFlush(command *cobra.Command, args []string, options *flushOptions) (returnedError error) {
 	eventText := args[len(args)-1]
 	if !oneOf(eventText, string(control.FlushRestart), string(control.FlushSwitchover)) {
 		return usageError("flush target must be restart or switchover")
@@ -319,7 +319,7 @@ func (application *adapter) runFlush(command *cobra.Command, args []string, opti
 	if err != nil {
 		return err
 	}
-	defer runtime.Close()
+	defer closeCommandRuntime(runtime, &returnedError)
 	request := control.FlushRequest{
 		Target: runtime.target, Event: control.FlushEvent(eventText), Members: append([]string(nil), args[1:len(args)-1]...),
 		Role: role, Force: options.force, Citus: runtime.resolved.Citus,
@@ -333,14 +333,14 @@ func (application *adapter) runFlush(command *cobra.Command, args []string, opti
 	return finishWriteResult(application, runtime, result, "FlushResult", renderFlushWrite)
 }
 
-func (application *adapter) runPause(command *cobra.Command, args []string, options *pauseOptions, resume bool) error {
+func (application *adapter) runPause(command *cobra.Command, args []string, options *pauseOptions, resume bool) (returnedError error) {
 	runtime, err := application.openRuntime(command, runtimeRequest{
 		operation: config.OperationRESTWrite, explicitScope: firstArgument(args), explicitGroup: optionalGroup(command, options.group), useConfiguredGroup: true,
 	})
 	if err != nil {
 		return err
 	}
-	defer runtime.Close()
+	defer closeCommandRuntime(runtime, &returnedError)
 	request := control.PauseRequest{Target: runtime.target, Wait: options.wait, Citus: runtime.resolved.Citus}
 	var prepared control.Result[control.Plan]
 	if resume {
@@ -365,7 +365,7 @@ func (application *adapter) runPause(command *cobra.Command, args []string, opti
 	return finishWriteResult(application, runtime, result, kind, renderPauseWrite)
 }
 
-func (application *adapter) runDemoteCluster(command *cobra.Command, args []string, options *demoteClusterOptions) error {
+func (application *adapter) runDemoteCluster(command *cobra.Command, args []string, options *demoteClusterOptions) (returnedError error) {
 	if strings.TrimSpace(options.host) == "" && options.port == 0 && strings.TrimSpace(options.restoreCommand) == "" {
 		return usageError("At least --host, --port or --restore-command should be specified")
 	}
@@ -375,7 +375,7 @@ func (application *adapter) runDemoteCluster(command *cobra.Command, args []stri
 	if err != nil {
 		return err
 	}
-	defer runtime.Close()
+	defer closeCommandRuntime(runtime, &returnedError)
 	request := control.DemoteClusterRequest{
 		Target: runtime.target,
 		Standby: control.StandbyConfig{
@@ -396,14 +396,14 @@ func (application *adapter) runDemoteCluster(command *cobra.Command, args []stri
 	return finishWriteResult(application, runtime, result, "DemoteClusterResult", renderClusterRoleWrite)
 }
 
-func (application *adapter) runPromoteCluster(command *cobra.Command, args []string, options *promoteClusterOptions) error {
+func (application *adapter) runPromoteCluster(command *cobra.Command, args []string, options *promoteClusterOptions) (returnedError error) {
 	runtime, err := application.openRuntime(command, runtimeRequest{
 		operation: config.OperationRESTWrite, explicitScope: firstArgument(args),
 	})
 	if err != nil {
 		return err
 	}
-	defer runtime.Close()
+	defer closeCommandRuntime(runtime, &returnedError)
 	request := control.PromoteClusterRequest{Target: runtime.target, Force: options.force, Citus: runtime.resolved.Citus}
 	prepared := runtime.service.PreparePromoteCluster(command.Context(), request)
 	plan, err := application.confirmPreparedPlan(runtime, prepared, options.force, "Are you sure you want to promote cluster %s?")

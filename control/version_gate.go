@@ -61,7 +61,7 @@ func (service *Service) checkPatroniVersion(version string) error {
 
 func (service *Service) patroniVersionRange() model.VersionRange {
 	if service == nil || service.supportedPatroniRange.Max.Major == 0 {
-		return model.SupportedPatroniRange
+		return model.AuditedPatroniRange()
 	}
 	return service.supportedPatroniRange
 }

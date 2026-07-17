@@ -105,4 +105,47 @@ for index in "${!images[@]}"; do
   "$test_binary" -test.count=1 -test.run '^TestPostgreSQLNativeQueryTLSAuthMultiResultLimitsErrorAndCancel$'
 
   docker rm -f "$container" >/dev/null
+
+  plaintext_container="go-patroni-postgres-plaintext-${PPID}-${index}-${RANDOM}"
+  containers+=("$plaintext_container")
+  docker run --detach --rm \
+    --name "$plaintext_container" \
+    --publish 127.0.0.1::5432 \
+    --env POSTGRES_PASSWORD_FILE=/run/go-patroni-secret/postgres-password \
+    --env POSTGRES_INITDB_ARGS=--auth-host=scram-sha-256 \
+    --mount "type=bind,source=$lab_dir/postgres-password,target=/run/go-patroni-secret/postgres-password,readonly" \
+    "$image" postgres -c ssl=off >/dev/null
+
+  for _ in $(seq 1 120); do
+    if docker exec "$plaintext_container" pg_isready -h 127.0.0.1 -p 5432 -U postgres -d postgres >/dev/null 2>&1; then
+      break
+    fi
+    sleep 0.25
+  done
+  if ! docker exec "$plaintext_container" pg_isready -h 127.0.0.1 -p 5432 -U postgres -d postgres >/dev/null 2>&1; then
+    docker logs "$plaintext_container" >&2
+    printf 'isolated plaintext PostgreSQL did not become healthy: %s\n' "$image" >&2
+    exit 1
+  fi
+
+  plaintext_published=$(docker port "$plaintext_container" 5432/tcp | head -n 1)
+  if [[ $plaintext_published != 127.0.0.1:* ]]; then
+    printf 'unexpected plaintext PostgreSQL loopback publication: %s\n' "$plaintext_published" >&2
+    exit 1
+  fi
+  plaintext_port=${plaintext_published##*:}
+  password=$(<"$lab_dir/postgres-password")
+  printf '127.0.0.1:%s:postgres:postgres:%s\n' "$plaintext_port" "$password" >"$lab_dir/pgpass-plaintext"
+  unset password
+  chmod 600 "$lab_dir/pgpass-plaintext"
+
+  printf 'PostgreSQL plaintext compatibility: %s image=%s\n' "$version" "$digest"
+  PGPASSFILE="$lab_dir/pgpass-plaintext" \
+  PGSSLMODE=prefer \
+  GO_PATRONI_TEST_POSTGRES_ISOLATED=1 \
+  GO_PATRONI_TEST_POSTGRES_HOST=127.0.0.1 \
+  GO_PATRONI_TEST_POSTGRES_PORT="$plaintext_port" \
+  "$test_binary" -test.count=1 -test.run '^TestPostgreSQLNativeQueryPlaintextFromSource$'
+
+  docker rm -f "$plaintext_container" >/dev/null
 done

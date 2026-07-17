@@ -13,7 +13,7 @@ import (
 	patroni "github.com/pgsty/go-patroni"
 )
 
-const pinnedCommit = "d35409952f970d7f33d36d8f868eb20fc1e2a7f7"
+const pinnedCommit = "d701f7b9c3d7e8cb400092d30170ff507697bce9"
 
 type tests struct {
 	Inventory    []string `json:"inventory"`
@@ -52,6 +52,7 @@ func TestPatroniSourcePin(t *testing.T) {
 		Kind           string `json:"kind"`
 		Commit         string `json:"commit"`
 		Version        string `json:"version"`
+		SourceKind     string `json:"sourceKind"`
 		SupportedRange string `json:"supportedRange"`
 		ContractFiles  []struct {
 			Path   string `json:"path"`
@@ -61,11 +62,14 @@ func TestPatroniSourcePin(t *testing.T) {
 			Clean bool `json:"contractFilesClean"`
 		} `json:"worktree"`
 	}](t, "compatibility/patroni-source.yaml")
-	if manifest.Kind != "PatroniSourcePin" || manifest.Commit != pinnedCommit || manifest.Version != "4.1.3" {
+	if manifest.Kind != "PatroniSourcePin" || manifest.Commit != pinnedCommit || manifest.Version != "4.1.4" {
 		t.Fatalf("unexpected Patroni pin: kind=%q commit=%q version=%q", manifest.Kind, manifest.Commit, manifest.Version)
 	}
 	if manifest.SupportedRange != ">=3.0.0,<5.0.0" {
 		t.Fatalf("unexpected supported range %q", manifest.SupportedRange)
+	}
+	if manifest.SourceKind != "pinned-official-source" {
+		t.Fatalf("source pin depends on input provenance: %q", manifest.SourceKind)
 	}
 	if !manifest.Worktree.Clean {
 		t.Fatal("generated pin must come from clean Patroni contract files")

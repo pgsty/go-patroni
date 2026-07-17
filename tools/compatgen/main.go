@@ -34,7 +34,7 @@ func main() {
 	flag.Parse()
 
 	if source == "" {
-		fatal(errors.New("Patroni source is required: pass -source or set PATRONI_SOURCE"))
+		fatal(errors.New("patroni source is required: pass -source or set PATRONI_SOURCE"))
 	}
 	var err error
 	if outputRoot == "" {

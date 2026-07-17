@@ -6,6 +6,13 @@ source "$repo_root/scripts/go-toolchain.sh"
 activate_go_patroni_go_toolchain "$repo_root"
 go_command=$GO_PATRONI_GO_COMMAND
 patroni_source=${PATRONI_SOURCE:-$(cd "$repo_root/../dev/patroni" && pwd)}
+oracle_base_digest=sha256:57c72fd2a128e416c7fcc499958864df5301e940bca0a56f58fddf30ffc07777
+oracle_base_image=${GO_PATRONI_ORACLE_BASE_IMAGE:-postgres:16-alpine@$oracle_base_digest}
+oracle_build_proxy=${GO_PATRONI_ORACLE_BUILD_PROXY:-}
+if [[ ${oracle_base_image##*@} != "$oracle_base_digest" ]]; then
+  printf 'refusing patronictl Oracle base without pinned manifest %s: %s\n' "$oracle_base_digest" "$oracle_base_image" >&2
+  exit 1
+fi
 work_dir=$(mktemp -d "${TMPDIR:-/tmp}/go-patroni-patronictl-compat.XXXXXX")
 
 cleanup() {
@@ -27,7 +34,8 @@ if [[ -n $(git -C "$patroni_source" status --porcelain=v1) ]]; then
 fi
 
 declare -A outputs
-for tag in v4.0.7 v4.1.3; do
+printf 'patronictl Oracle base: image=%s manifest=%s\n' "$oracle_base_image" "$oracle_base_digest"
+for tag in v4.0.10 v4.1.4; do
   version=${tag#v}
   commit=$(git -C "$patroni_source" rev-parse "$tag^{commit}")
   context="$work_dir/source-$version"
@@ -36,9 +44,14 @@ for tag in v4.0.7 v4.1.3; do
   cp "$repo_root/test/compat/oracle/patroni-rest-constraints.txt" "$context/go-patroni-oracle-constraints.txt"
 
   image="go-patroni-patroni-rest-oracle:${version}-${commit:0:12}"
+  build_arguments=(--build-arg "GO_PATRONI_ORACLE_BASE_IMAGE=$oracle_base_image")
+  if [[ -n $oracle_build_proxy ]]; then
+    build_arguments+=(--build-arg "HTTP_PROXY=$oracle_build_proxy" --build-arg "HTTPS_PROXY=$oracle_build_proxy")
+  fi
   docker build \
     --quiet \
     --provenance=false \
+    "${build_arguments[@]}" \
     --file "$repo_root/test/compat/oracle/Dockerfile.patroni-rest" \
     --tag "$image" \
     "$context" >/dev/null
@@ -56,9 +69,9 @@ for tag in v4.0.7 v4.1.3; do
 done
 
 cd "$repo_root"
-GO_PATRONI_PATRONICTL_ORACLE_40=${outputs[4.0.7]} \
-GO_PATRONI_PATRONICTL_ORACLE_41=${outputs[4.1.3]} \
+GO_PATRONI_PATRONICTL_ORACLE_40=${outputs[4.0.10]} \
+GO_PATRONI_PATRONICTL_ORACLE_41=${outputs[4.1.4]} \
 GOSUMDB=off GOPROXY=off \
 "$go_command" test -count=1 -tags=oracle ./internal/cli -run '^TestPatronictlSemanticParity$'
 
-printf 'patronictl semantic differential: 4.0.7=26 cases 4.1.3=29 cases status=PASS\n'
+printf 'patronictl semantic differential: 4.0.10=26 cases 4.1.4=29 cases status=PASS\n'

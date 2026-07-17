@@ -18,10 +18,10 @@ import sys
 from typing import Any
 
 
-PINNED_COMMIT = "d35409952f970d7f33d36d8f868eb20fc1e2a7f7"
-PINNED_VERSION = "4.1.3"
-PINNED_DESCRIBE = "v4.1.3"
-PINNED_COMMIT_DATE = "2026-05-05T14:33:39Z"
+PINNED_COMMIT = "d701f7b9c3d7e8cb400092d30170ff507697bce9"
+PINNED_VERSION = "4.1.4"
+PINNED_DESCRIBE = "v4.1.4"
+PINNED_COMMIT_DATE = "2026-07-07T11:28:52Z"
 SUPPORTED_RANGE = ">=3.0.0,<5.0.0"
 EXPECTED_COMMANDS = [
     "dsn", "query", "remove", "reload", "restart", "reinit", "failover", "switchover",
@@ -527,16 +527,18 @@ class Extractor:
             raise SystemExit(f"Patroni version mismatch: expected {PINNED_VERSION}, got {got}")
 
     def source_inventory(self) -> dict[str, Any]:
-        commit_date = run_git(self.source, "show", "-s", "--format=%aI", "HEAD") if self.git_source else PINNED_COMMIT_DATE
+        # Input provenance is deliberately excluded from the generated
+        # contract. A verified git checkout and the corresponding official
+        # archive must produce byte-identical manifests.
         return {
             "schemaVersion": "patroni.pgsty.com/compatibility/v1alpha1",
             "kind": "PatroniSourcePin",
             "generatedBy": "tools/compatgen + test/compat/oracle/extract_inventory.py",
             "repository": "https://github.com/patroni/patroni",
             "commit": PINNED_COMMIT,
-            "describe": run_git(self.source, "describe", "--tags", "--always") if self.git_source else PINNED_DESCRIBE,
+            "describe": PINNED_DESCRIBE,
             "version": PINNED_VERSION,
-            "commitDate": commit_date,
+            "commitDate": PINNED_COMMIT_DATE,
             "supportedRange": SUPPORTED_RANGE,
             "contractFiles": [
                 {
@@ -545,7 +547,7 @@ class Extractor:
                 }
                 for path in self.files.values()
             ],
-            "sourceKind": "git-checkout" if self.git_source else "github-tag-archive",
+            "sourceKind": "pinned-official-source",
             "worktree": {"contractFilesClean": True},
         }
 
@@ -663,7 +665,7 @@ class Extractor:
             ],
             "integration": [
                 "test/integration/patroni_rest_test.go#TestPatroniRESTInventoryAgainstIsolatedRealPatroni",
-                "scripts/test-patroni-integration.sh#v3.3.8-v4.0.7-v4.1.3-matrix",
+                "scripts/test-patroni-integration.sh#v3.0.4-v3.1.2-v3.2.2-v3.3.11-v4.0.10-v4.1.4-matrix",
             ],
         }
         endpoints: list[dict[str, Any]] = []
@@ -671,6 +673,9 @@ class Extractor:
         def add(method: str, path: str, handler: str, risk: str, response: str, request: str = "none") -> None:
             since = "4.0.0" if path in {"/quorum", "/read-only-quorum"} else \
                 "3.3.0" if method == "POST" and path == "/mpp" else "3.0.0"
+            endpoint_tests = {kind: list(references) for kind, references in tests.items()}
+            if method == "GET" and path == "/patroni":
+                endpoint_tests["contract"].append("client_test.go#TestPatroniIdentityNameIsOptionalBefore32")
             endpoints.append({
                 "id": f"{method.lower()}-{path.strip('/').replace('/', '-') or 'root'}",
                 "method": method,
@@ -682,7 +687,7 @@ class Extractor:
                 "since": since,
                 "rawResponse": True,
                 "sourceRef": source_ref("patroni/api.py", handlers[handler]),
-                "tests": tests,
+                "tests": endpoint_tests,
                 "status": "complete",
             })
 

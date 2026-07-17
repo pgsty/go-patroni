@@ -187,7 +187,11 @@ func (client *Client) execute(
 		}
 		return wireResponse{}, newError(ErrorTransport, method, endpoint, delivery, 0, err)
 	}
-	defer response.Body.Close()
+	defer func() {
+		if closeErr := response.Body.Close(); closeErr != nil && returnedError == nil {
+			returnedError = newError(ErrorResponseBody, method, endpoint, DeliveryResponseReceived, response.StatusCode, closeErr)
+		}
+	}()
 
 	raw, readErr := io.ReadAll(io.LimitReader(response.Body, client.maxResponseBytes+1))
 	wire = wireResponse{status: response.StatusCode, header: response.Header.Clone(), raw: raw}

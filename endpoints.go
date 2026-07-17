@@ -7,7 +7,10 @@ import (
 )
 
 type HealthQuery struct {
-	Lag              string
+	Lag string
+	// ReplicationState is retained for source compatibility only. Patroni does
+	// not implement replication_state as a health-query filter.
+	// Deprecated: use Lag and Tags, or inspect Status.ReplicationState.
 	ReplicationState string
 	Tags             map[string]string
 }
@@ -16,9 +19,6 @@ func (query HealthQuery) values() url.Values {
 	values := url.Values{}
 	if query.Lag != "" {
 		values.Set("lag", query.Lag)
-	}
-	if query.ReplicationState != "" {
-		values.Set("replication_state", query.ReplicationState)
 	}
 	for name, value := range query.Tags {
 		values.Set("tag_"+name, value)

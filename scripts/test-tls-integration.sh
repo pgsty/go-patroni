@@ -2,7 +2,7 @@
 set -euo pipefail
 
 repo_root=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
-patroni_tag=${GO_PATRONI_TLS_PATRONI_TAG:-v4.1.3}
+patroni_tag=${GO_PATRONI_TLS_PATRONI_TAG:-v4.1.4}
 postgres_image=${GO_PATRONI_TLS_POSTGRES_IMAGE:-postgres:18-alpine}
 etcd_image=${GO_PATRONI_TLS_ETCD_IMAGE:-quay.io/coreos/etcd:v3.6.13}
 

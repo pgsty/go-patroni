@@ -216,7 +216,7 @@ func normalizeRemoveRequest(request RemoveRequest) (RemoveRequest, error) {
 		return request, err
 	}
 	if request.Citus && request.Target.Group == nil {
-		return request, errors.New("Citus remove requires an explicit group")
+		return request, errors.New("citus remove requires an explicit group")
 	}
 	return request, nil
 }
@@ -255,10 +255,10 @@ func (service *Service) validateRemovePlan(plan Plan, request RemoveRequest) err
 		return err
 	}
 	if plan.Operation != "remove" || plan.Path != PathDCS || plan.Risk != RiskDestructive || plan.RetrySafety != UnsafeAfterSend {
-		return errors.New("Plan operation contract differs from remove")
+		return errors.New("plan operation contract differs from remove")
 	}
 	if plan.Target.Normalize().ClusterID() != request.Target.ClusterID() {
-		return errors.New("Plan cluster differs from request")
+		return errors.New("plan cluster differs from request")
 	}
 	clusterName, clusterOK := expectedPrecondition(plan, "remove.clusterName")
 	acknowledgement, acknowledgementOK := expectedPrecondition(plan, "remove.acknowledgement")
@@ -266,17 +266,17 @@ func (service *Service) validateRemovePlan(plan Plan, request RemoveRequest) err
 	citus, citusOK := expectedPrecondition(plan, "request.citus")
 	if !clusterOK || clusterName != request.Target.Scope || !acknowledgementOK || acknowledgement != RemoveAcknowledgement ||
 		!leaderOK || !citusOK || citus != strconv.FormatBool(request.Citus) {
-		return errors.New("Plan confirmation contract differs from remove request")
+		return errors.New("plan confirmation contract differs from remove request")
 	}
 	keys, err := removePlanKeys(plan)
 	if err != nil || len(keys) == 0 {
-		return errors.New("Plan remove key inventory is invalid")
+		return errors.New("plan remove key inventory is invalid")
 	}
 	keysJSON, _ := json.Marshal(keys)
 	revisionText, revisionOK := expectedPrecondition(plan, "dcs.revision")
 	revision, revisionError := strconv.ParseInt(revisionText, 10, 64)
 	if !revisionOK || revisionError != nil || revision <= 0 {
-		return errors.New("Plan DCS revision is invalid")
+		return errors.New("plan DCS revision is invalid")
 	}
 	binding, err := service.removePlanBinding(request, revision, leader, string(keysJSON))
 	if err != nil {
@@ -284,7 +284,7 @@ func (service *Service) validateRemovePlan(plan Plan, request RemoveRequest) err
 	}
 	plannedBinding, ok := expectedPrecondition(plan, "remove.binding")
 	if !ok || len(plannedBinding) != sha256.Size*2 || !hmac.Equal([]byte(plannedBinding), []byte(binding)) {
-		return errors.New("Plan remove binding is invalid")
+		return errors.New("plan remove binding is invalid")
 	}
 	return nil
 }
@@ -292,15 +292,15 @@ func (service *Service) validateRemovePlan(plan Plan, request RemoveRequest) err
 func removePlanKeys(plan Plan) ([]string, error) {
 	value, ok := expectedPrecondition(plan, "remove.keys")
 	if !ok {
-		return nil, errors.New("Plan remove keys are missing")
+		return nil, errors.New("plan remove keys are missing")
 	}
 	var keys []string
 	if err := json.Unmarshal([]byte(value), &keys); err != nil || !sort.StringsAreSorted(keys) {
-		return nil, errors.New("Plan remove keys are invalid")
+		return nil, errors.New("plan remove keys are invalid")
 	}
 	for index, key := range keys {
 		if strings.TrimSpace(key) == "" || (index > 0 && keys[index-1] == key) {
-			return nil, errors.New("Plan remove keys are empty or duplicated")
+			return nil, errors.New("plan remove keys are empty or duplicated")
 		}
 	}
 	return keys, nil

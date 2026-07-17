@@ -49,7 +49,11 @@ func TestPreflightCancellationIsNotSentAndPreciselyClassified(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer store.Close()
+	t.Cleanup(func() {
+		if closeErr := store.Close(); closeErr != nil {
+			t.Errorf("close store: %v", closeErr)
+		}
+	})
 
 	canceled, cancel := context.WithCancel(context.Background())
 	cancel()
@@ -72,7 +76,11 @@ func TestAuthenticatedConstructionHonorsCallerDeadline(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer listener.Close()
+	t.Cleanup(func() {
+		if closeErr := listener.Close(); closeErr != nil && !errors.Is(closeErr, net.ErrClosed) {
+			t.Errorf("close listener: %v", closeErr)
+		}
+	})
 	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
 	defer cancel()
 	go func() {
@@ -130,7 +138,11 @@ func TestRequestTimeoutClampsLongerCallerDeadline(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer listener.Close()
+	t.Cleanup(func() {
+		if closeErr := listener.Close(); closeErr != nil && !errors.Is(closeErr, net.ErrClosed) {
+			t.Errorf("close listener: %v", closeErr)
+		}
+	})
 	stop := make(chan struct{})
 	go func() {
 		connection, acceptErr := listener.Accept()
@@ -148,7 +160,11 @@ func TestRequestTimeoutClampsLongerCallerDeadline(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer store.Close()
+	t.Cleanup(func() {
+		if closeErr := store.Close(); closeErr != nil {
+			t.Errorf("close store: %v", closeErr)
+		}
+	})
 	caller, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	started := time.Now()
@@ -174,12 +190,16 @@ func TestNilStoreAndNilContextFailWithoutPanics(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer store.Close()
-	if _, err := store.Discover(nil, dcs.DiscoveryRequest{}); err == nil {
+	t.Cleanup(func() {
+		if closeErr := store.Close(); closeErr != nil {
+			t.Errorf("close store: %v", closeErr)
+		}
+	})
+	if _, err := store.Discover(nil, dcs.DiscoveryRequest{}); err == nil { //nolint:staticcheck // nil-context contract test
 		t.Fatal("nil context discovery succeeded")
 	}
 
-	stream := store.Watch(nil, model.Target{Scope: "alpha"}, 0)
+	stream := store.Watch(nil, model.Target{Scope: "alpha"}, 0) //nolint:staticcheck // nil-context contract test
 	if err := <-stream.Errors; err == nil {
 		t.Fatal("nil context watch did not report an error")
 	}

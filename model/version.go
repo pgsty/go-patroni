@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"regexp"
 	"strconv"
+	"strings"
 )
 
 var (
@@ -43,8 +44,8 @@ func (v Version) String() string {
 	return fmt.Sprintf("%d.%d.%d%s", v.Major, v.Minor, v.Patch, v.Suffix)
 }
 
-// Compare compares the numeric version core. Patroni pre-release suffixes do
-// not permit crossing the supported major-version boundary.
+// Compare applies SemVer precedence to the numeric core and optional
+// pre-release suffix. A release is newer than a pre-release with the same core.
 func (v Version) Compare(other Version) int {
 	left := [...]int{v.Major, v.Minor, v.Patch}
 	right := [...]int{other.Major, other.Minor, other.Patch}
@@ -56,7 +57,69 @@ func (v Version) Compare(other Version) int {
 			return 1
 		}
 	}
+	return comparePrerelease(v.Suffix, other.Suffix)
+}
+
+func comparePrerelease(left, right string) int {
+	left = strings.TrimLeft(left, ".-")
+	right = strings.TrimLeft(right, ".-")
+	if left == "" && right == "" {
+		return 0
+	}
+	if left == "" {
+		return 1
+	}
+	if right == "" {
+		return -1
+	}
+	leftParts := strings.Split(left, ".")
+	rightParts := strings.Split(right, ".")
+	for index := 0; index < len(leftParts) && index < len(rightParts); index++ {
+		leftNumber, leftNumeric := numericIdentifier(leftParts[index])
+		rightNumber, rightNumeric := numericIdentifier(rightParts[index])
+		switch {
+		case leftNumeric && rightNumeric:
+			if len(leftNumber) < len(rightNumber) ||
+				(len(leftNumber) == len(rightNumber) && leftNumber < rightNumber) {
+				return -1
+			}
+			if len(leftNumber) > len(rightNumber) ||
+				(len(leftNumber) == len(rightNumber) && leftNumber > rightNumber) {
+				return 1
+			}
+		case leftNumeric:
+			return -1
+		case rightNumeric:
+			return 1
+		case leftParts[index] < rightParts[index]:
+			return -1
+		case leftParts[index] > rightParts[index]:
+			return 1
+		}
+	}
+	if len(leftParts) < len(rightParts) {
+		return -1
+	}
+	if len(leftParts) > len(rightParts) {
+		return 1
+	}
 	return 0
+}
+
+func numericIdentifier(value string) (string, bool) {
+	if value == "" {
+		return "", false
+	}
+	for _, character := range value {
+		if character < '0' || character > '9' {
+			return "", false
+		}
+	}
+	normalized := strings.TrimLeft(value, "0")
+	if normalized == "" {
+		normalized = "0"
+	}
+	return normalized, true
 }
 
 // VersionRange is inclusive at Min and exclusive at Max.
@@ -66,7 +129,23 @@ type VersionRange struct {
 }
 
 func (r VersionRange) Contains(version Version) bool {
-	return version.Compare(r.Min) >= 0 && version.Compare(r.Max) < 0
+	// Feature and major-version upper bounds fail closed for prereleases of the
+	// boundary itself: <5.0.0 does not opt into 5.0.0-rc1.
+	return version.Compare(r.Min) >= 0 && compareNumericCore(version, r.Max) < 0
+}
+
+func compareNumericCore(left, right Version) int {
+	leftParts := [...]int{left.Major, left.Minor, left.Patch}
+	rightParts := [...]int{right.Major, right.Minor, right.Patch}
+	for index := range leftParts {
+		if leftParts[index] < rightParts[index] {
+			return -1
+		}
+		if leftParts[index] > rightParts[index] {
+			return 1
+		}
+	}
+	return 0
 }
 
 // NewVersionRange parses an inclusive lower bound and exclusive upper bound.
@@ -90,10 +169,11 @@ func NewVersionRange(minimum, maximum string) (VersionRange, error) {
 // audited Patroni range.
 func (r VersionRange) Validate() error {
 	if r.Min.Compare(r.Max) >= 0 {
-		return errors.New("Patroni version range minimum must be less than maximum")
+		return errors.New("patroni version range minimum must be less than maximum")
 	}
-	if r.Min.Compare(SupportedPatroniRange.Min) < 0 || r.Max.Compare(SupportedPatroniRange.Max) > 0 {
-		return fmt.Errorf("Patroni version range %s is outside SDK range %s", r, SupportedPatroniRange)
+	audited := AuditedPatroniRange()
+	if r.Min.Compare(audited.Min) < 0 || r.Max.Compare(audited.Max) > 0 {
+		return fmt.Errorf("patroni version range %s is outside SDK range %s", r, audited)
 	}
 	return nil
 }
@@ -102,10 +182,19 @@ func (r VersionRange) String() string {
 	return fmt.Sprintf(">=%s,<%s", r.Min, r.Max)
 }
 
-var SupportedPatroniRange = VersionRange{
+var auditedPatroniRange = VersionRange{
 	Min: Version{Major: 3, Minor: 0, Patch: 0},
 	Max: Version{Major: 5, Minor: 0, Patch: 0},
 }
+
+// SupportedPatroniRange is retained as a source-compatible snapshot. SDK
+// behavior uses AuditedPatroniRange and cannot be changed by mutating this
+// variable.
+// Deprecated: use AuditedPatroniRange.
+var SupportedPatroniRange = auditedPatroniRange
+
+// AuditedPatroniRange returns an immutable-by-copy SDK compatibility boundary.
+func AuditedPatroniRange() VersionRange { return auditedPatroniRange }
 
 // CheckPatroniVersion parses and enforces the audited SDK compatibility range.
 func CheckPatroniVersion(value string) error {
@@ -113,8 +202,9 @@ func CheckPatroniVersion(value string) error {
 	if err != nil {
 		return err
 	}
-	if !SupportedPatroniRange.Contains(version) {
-		return fmt.Errorf("%w: %s is outside %s", ErrUnsupportedPatroniVersion, version, SupportedPatroniRange)
+	audited := AuditedPatroniRange()
+	if !audited.Contains(version) {
+		return fmt.Errorf("%w: %s is outside %s", ErrUnsupportedPatroniVersion, version, audited)
 	}
 	return nil
 }

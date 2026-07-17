@@ -23,7 +23,7 @@ import (
 	"go.yaml.in/yaml/v3"
 )
 
-func (application *adapter) runDSN(command *cobra.Command, args []string, options *dsnOptions) error {
+func (application *adapter) runDSN(command *cobra.Command, args []string, options *dsnOptions) (returnedError error) {
 	if strings.TrimSpace(options.role) != "" && strings.TrimSpace(options.member) != "" {
 		return usageError("--role and --member are mutually exclusive options")
 	}
@@ -37,7 +37,7 @@ func (application *adapter) runDSN(command *cobra.Command, args []string, option
 	if err != nil {
 		return err
 	}
-	defer runtime.Close()
+	defer closeCommandRuntime(runtime, &returnedError)
 	result := runtime.service.DSN(command.Context(), control.DSNRequest{
 		Target: runtime.target, Role: role, Member: options.member, Citus: runtime.resolved.Citus, AllowUnsupportedRead: application.root.allowUnsupportedRead,
 	})
@@ -47,7 +47,7 @@ func (application *adapter) runDSN(command *cobra.Command, args []string, option
 	})
 }
 
-func (application *adapter) runQuery(command *cobra.Command, args []string, options *queryOptions) error {
+func (application *adapter) runQuery(command *cobra.Command, args []string, options *queryOptions) (returnedError error) {
 	if !oneOf(options.format, "pretty", "tsv", "json", "yaml") {
 		return usageError(fmt.Sprintf("invalid --format %q: choose pretty, tsv, json, or yaml", options.format))
 	}
@@ -68,7 +68,10 @@ func (application *adapter) runQuery(command *cobra.Command, args []string, opti
 	if err != nil {
 		return err
 	}
-	connection := postgres.ConnectionOptions{Database: options.database, Username: options.username}
+	// Match patronictl/libpq behavior: inherit sslmode and fallback semantics
+	// from standard PostgreSQL sources unless the embedding API explicitly
+	// chooses a stricter mode.
+	connection := (postgres.ConnectionOptions{Database: options.database, Username: options.username}).WithTLSMode(postgres.TLSFromSource)
 	if options.password {
 		password, promptError := application.promptPassword("Password")
 		if promptError != nil {
@@ -82,7 +85,7 @@ func (application *adapter) runQuery(command *cobra.Command, args []string, opti
 	if err != nil {
 		return err
 	}
-	defer runtime.Close()
+	defer closeCommandRuntime(runtime, &returnedError)
 	interval, err := watchInterval(options.watchTwo, options.watch)
 	if err != nil {
 		return err
@@ -100,12 +103,12 @@ func (application *adapter) runQuery(command *cobra.Command, args []string, opti
 	})
 }
 
-func (application *adapter) runInspectConfig(command *cobra.Command) error {
+func (application *adapter) runInspectConfig(command *cobra.Command) (returnedError error) {
 	runtime, err := application.openRuntime(command, runtimeRequest{operation: config.OperationInspect})
 	if err != nil {
 		return err
 	}
-	defer runtime.Close()
+	defer closeCommandRuntime(runtime, &returnedError)
 	result := runtime.service.InspectConfiguration(command.Context(), control.InspectConfigurationRequest{Resolved: runtime.resolved})
 	return finishResult(application, application.root.output, runtime, result, "EffectiveConfiguration", renderConfigurationInspection)
 }
@@ -164,7 +167,7 @@ func renderConfigurationInspection(writer io.Writer, data control.ConfigurationI
 	return renderRows(writer, []string{"Field", "Layer", "Source"}, rows, "pretty", "\t", "")
 }
 
-func (application *adapter) runDiscover(command *cobra.Command, options *discoverOptions) error {
+func (application *adapter) runDiscover(command *cobra.Command, options *discoverOptions) (returnedError error) {
 	if !oneOf(options.format, "pretty", "tsv", "json", "yaml", "yml") {
 		return usageError(fmt.Sprintf("invalid --format %q", options.format))
 	}
@@ -172,7 +175,7 @@ func (application *adapter) runDiscover(command *cobra.Command, options *discove
 	if err != nil {
 		return err
 	}
-	defer runtime.Close()
+	defer closeCommandRuntime(runtime, &returnedError)
 	result := runtime.service.Discover(command.Context(), control.DiscoverRequest{
 		Context: runtime.target.Context, Namespace: runtime.target.Namespace,
 		AllowUnsupportedRead: application.root.allowUnsupportedRead,
@@ -185,7 +188,7 @@ func (application *adapter) runDiscover(command *cobra.Command, options *discove
 	})
 }
 
-func (application *adapter) runList(command *cobra.Command, args []string, options *listOptions) error {
+func (application *adapter) runList(command *cobra.Command, args []string, options *listOptions) (returnedError error) {
 	if !oneOf(options.format, "pretty", "tsv", "json", "yaml", "yml") {
 		return usageError(fmt.Sprintf("invalid --format %q", options.format))
 	}
@@ -214,7 +217,7 @@ func (application *adapter) runList(command *cobra.Command, args []string, optio
 	if err != nil {
 		return err
 	}
-	defer runtime.Close()
+	defer closeCommandRuntime(runtime, &returnedError)
 	if options.all {
 		return runWatch(command.Context(), interval, func() error {
 			result := runtime.service.ListAll(command.Context(), control.ListAllRequest{
@@ -307,7 +310,7 @@ func projectMachineCluster(cluster model.Cluster) machineCluster {
 	}
 }
 
-func (application *adapter) runTopology(command *cobra.Command, args []string, options *topologyOptions) error {
+func (application *adapter) runTopology(command *cobra.Command, args []string, options *topologyOptions) (returnedError error) {
 	if options.all && len(args) > 0 {
 		return usageError("--all and explicit cluster names are mutually exclusive")
 	}
@@ -333,7 +336,7 @@ func (application *adapter) runTopology(command *cobra.Command, args []string, o
 	if err != nil {
 		return err
 	}
-	defer runtime.Close()
+	defer closeCommandRuntime(runtime, &returnedError)
 	if options.all {
 		return runWatch(command.Context(), interval, func() error {
 			result := runtime.service.TopologyAll(command.Context(), control.TopologyAllRequest{
@@ -463,14 +466,14 @@ func machineTopologyListResult(result control.Result[control.TopologyListData]) 
 	}
 }
 
-func (application *adapter) runShowConfig(command *cobra.Command, args []string, options *showConfigOptions) error {
+func (application *adapter) runShowConfig(command *cobra.Command, args []string, options *showConfigOptions) (returnedError error) {
 	runtime, err := application.openRuntime(command, runtimeRequest{
 		operation: config.OperationClusterRead, explicitScope: firstArgument(args), explicitGroup: optionalGroup(command, options.group), useConfiguredGroup: true,
 	})
 	if err != nil {
 		return err
 	}
-	defer runtime.Close()
+	defer closeCommandRuntime(runtime, &returnedError)
 	result := runtime.service.ShowConfig(command.Context(), control.ShowConfigRequest{
 		Target: runtime.target, AllowUnsupportedRead: application.root.allowUnsupportedRead,
 	})
@@ -484,7 +487,7 @@ func (application *adapter) runShowConfig(command *cobra.Command, args []string,
 	})
 }
 
-func (application *adapter) runVersion(command *cobra.Command, args []string, options *versionOptions) error {
+func (application *adapter) runVersion(command *cobra.Command, args []string, options *versionOptions) (returnedError error) {
 	if len(args) == 0 {
 		information := newMachineVersionInfo(nil)
 		if application.root.output == "json" || application.root.output == "yaml" {
@@ -508,7 +511,7 @@ func (application *adapter) runVersion(command *cobra.Command, args []string, op
 	if err != nil {
 		return err
 	}
-	defer runtime.Close()
+	defer closeCommandRuntime(runtime, &returnedError)
 	result := runtime.service.Version(command.Context(), control.VersionRequest{
 		Target: runtime.target, Members: append([]string(nil), args[1:]...),
 		Citus:                runtime.resolved.Citus,
@@ -589,7 +592,7 @@ func machineVersionResult(result control.Result[control.VersionData]) control.Re
 	}
 }
 
-func (application *adapter) runHistory(command *cobra.Command, args []string, options *historyOptions) error {
+func (application *adapter) runHistory(command *cobra.Command, args []string, options *historyOptions) (returnedError error) {
 	if !oneOf(options.format, "pretty", "tsv", "json", "yaml", "yml") {
 		return usageError(fmt.Sprintf("invalid --format %q", options.format))
 	}
@@ -599,7 +602,7 @@ func (application *adapter) runHistory(command *cobra.Command, args []string, op
 	if err != nil {
 		return err
 	}
-	defer runtime.Close()
+	defer closeCommandRuntime(runtime, &returnedError)
 	result := runtime.service.History(command.Context(), control.HistoryRequest{
 		Target: runtime.target, AllowUnsupportedRead: application.root.allowUnsupportedRead,
 	})

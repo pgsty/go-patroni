@@ -33,7 +33,7 @@ type ServiceOptions struct {
 	Wait                 func(context.Context, time.Duration) error
 	VerificationAttempts int
 	// SupportedPatroniRange lets an embedding product narrow the SDK's audited
-	// range. Nil uses model.SupportedPatroniRange; widening is rejected.
+	// range. Nil uses model.AuditedPatroniRange; widening is rejected.
 	SupportedPatroniRange *model.VersionRange
 	// StandbyVerificationAttempts bounds DCS convergence observations after
 	// demote-cluster and promote-cluster. Zero uses VerificationAttempts when
@@ -101,7 +101,7 @@ func NewService(options ServiceOptions) (*Service, error) {
 	if verificationAttempts <= 0 {
 		verificationAttempts = 3
 	}
-	supportedPatroniRange := model.SupportedPatroniRange
+	supportedPatroniRange := model.AuditedPatroniRange()
 	if options.SupportedPatroniRange != nil {
 		if err := options.SupportedPatroniRange.Validate(); err != nil {
 			return nil, fmt.Errorf("control service Patroni version range: %w", err)

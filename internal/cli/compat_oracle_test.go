@@ -273,8 +273,8 @@ func TestPatronictlSemanticParity(t *testing.T) {
 		env  string
 		want string
 	}{
-		{name: "patroni-4.0", env: "GO_PATRONI_PATRONICTL_ORACLE_40", want: "4.0.7"},
-		{name: "patroni-4.1", env: "GO_PATRONI_PATRONICTL_ORACLE_41", want: "4.1.3"},
+		{name: "patroni-4.0", env: "GO_PATRONI_PATRONICTL_ORACLE_40", want: "4.0.10"},
+		{name: "patroni-4.1", env: "GO_PATRONI_PATRONICTL_ORACLE_41", want: "4.1.4"},
 	}
 	for _, version := range paths {
 		version := version
@@ -284,7 +284,7 @@ func TestPatronictlSemanticParity(t *testing.T) {
 				t.Fatalf("oracle version = %q, want %q", document.PatroniVersion, version.want)
 			}
 			wantCases := 26
-			if version.want == "4.1.3" {
+			if version.want == "4.1.4" {
 				wantCases = 29
 			}
 			if len(document.Cases) != wantCases {
@@ -293,7 +293,7 @@ func TestPatronictlSemanticParity(t *testing.T) {
 			for _, testCase := range document.Cases {
 				testCase := testCase
 				t.Run(testCase.ID, func(t *testing.T) {
-					if version.want == "4.0.7" && testCase.ID == "reinit" {
+					if version.want == "4.0.10" && testCase.ID == "reinit" {
 						if testCase.Exit != 2 || !strings.Contains(testCase.Output, "No such option '--from-leader'") {
 							t.Fatalf("4.0 additive --from-leader boundary changed: %#v", testCase)
 						}

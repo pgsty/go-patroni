@@ -25,3 +25,31 @@ jobs:
       - run: go build ./cmd/patronictl
       - run: go test -run '^$' -tags=integration ./test/integration
       - run: go run ./tools/machineschema -check
+      - if: matrix.go == '1.26.x'
+        run: go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.11.3
+      - if: matrix.go == '1.26.x'
+        run: golangci-lint run ./...
+      - if: matrix.go == '1.26.x'
+        run: go install golang.org/x/vuln/cmd/govulncheck@v1.2.0
+      - if: matrix.go == '1.26.x'
+        run: govulncheck ./...
+
+  compatibility:
+    runs-on: ubuntu-latest
+    env:
+      PATRONI_COMMIT: d701f7b9c3d7e8cb400092d30170ff507697bce9
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.26.x"
+          cache: true
+      - name: Extract pinned official Patroni source
+        run: |
+          curl --fail --silent --show-error --location \
+            "https://github.com/patroni/patroni/archive/${PATRONI_COMMIT}.tar.gz" \
+            | tar -xz -C "${RUNNER_TEMP}"
+          printf 'PATRONI_SOURCE=%s\n' \
+            "${RUNNER_TEMP}/patroni-${PATRONI_COMMIT}" >>"${GITHUB_ENV}"
+      - run: go run ./tools/compatgen -check -source "${PATRONI_SOURCE}"
+      - run: go test -mod=readonly -tags=oracle ./test/compat

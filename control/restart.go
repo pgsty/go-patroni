@@ -138,7 +138,9 @@ func (service *Service) ExecuteRestart(ctx context.Context, request RestartReque
 		}
 		payload := patroni.RestartRequest{
 			PostgresVersion: request.PostgresVersion,
-			Timeout:         request.Timeout,
+		}
+		if request.Timeout != "" {
+			payload.Timeout = request.Timeout
 		}
 		if request.Pending {
 			value := true
@@ -208,13 +210,13 @@ func normalizeRestartRequest(request RestartRequest) (model.Target, []string, er
 func validatePostgresVersion(value string) error {
 	parts := strings.Split(value, ".")
 	if len(parts) < 2 || len(parts) > 3 {
-		return errors.New("PostgreSQL version must use X.Y or X.Y.Z")
+		return errors.New("postgresql version must use X.Y or X.Y.Z")
 	}
 	components := make([]int, len(parts))
 	for index, part := range parts {
 		component, err := strconv.Atoi(part)
 		if err != nil || component < 0 {
-			return errors.New("PostgreSQL version contains a non-numeric component")
+			return errors.New("postgresql version contains a non-numeric component")
 		}
 		components[index] = component
 	}

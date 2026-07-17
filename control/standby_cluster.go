@@ -492,10 +492,10 @@ func (service *Service) validateStandbyClusterPlan(plan Plan, intent standbyClus
 		return err
 	}
 	if plan.Operation != intent.operation || plan.Path != PathREST || plan.Risk != RiskAvailability || plan.RetrySafety != UnsafeAfterSend {
-		return errors.New("Plan operation contract differs from standby-cluster transition")
+		return errors.New("plan operation contract differs from standby-cluster transition")
 	}
 	if plan.Target.Normalize().ClusterID() != intent.target.ClusterID() || len(plan.Targets) != 1 {
-		return errors.New("Plan cluster or leader target differs from request")
+		return errors.New("plan cluster or leader target differs from request")
 	}
 	required := map[string]int{
 		"dcs.revision": 0, "cluster.leader": 0, "leader.role": 0, "leader.state": 0,
@@ -509,7 +509,7 @@ func (service *Service) validateStandbyClusterPlan(plan Plan, intent standbyClus
 	}
 	for field, count := range required {
 		if count != 1 {
-			return fmt.Errorf("Plan requires exactly one %s precondition", field)
+			return fmt.Errorf("plan requires exactly one %s precondition", field)
 		}
 	}
 	leader, leaderOK := expectedPrecondition(plan, "cluster.leader")
@@ -530,25 +530,25 @@ func (service *Service) validateStandbyClusterPlan(plan Plan, intent standbyClus
 		!citusOK || citus != strconv.FormatBool(intent.citus) || !groupsOK ||
 		!bindingOK || requestBinding == "" || !stateBindingOK || stateBinding == "" || !endpointOK || endpointBinding == "" ||
 		!planBindingOK || planBinding == "" || plan.Targets[0].Member != leader {
-		return errors.New("Plan standby-cluster preconditions are incomplete")
+		return errors.New("plan standby-cluster preconditions are incomplete")
 	}
 	expectedBinding, err := service.standbyClusterRequestBinding(intent)
 	if err != nil {
 		return err
 	}
 	if requestBinding != expectedBinding {
-		return errors.New("Plan request binding differs from request")
+		return errors.New("plan request binding differs from request")
 	}
 	plannedSelection := standbyClusterSelection{leader: dcs.Member{Name: leader, Data: dcs.MemberData{Role: role, State: state}}}
 	expectedStateBinding, err := service.standbyClusterStateBinding(intent, plannedSelection)
 	if err != nil || stateBinding != expectedStateBinding {
-		return errors.New("Plan leader-state binding is invalid")
+		return errors.New("plan leader-state binding is invalid")
 	}
 	expectedPlanBinding, err := service.standbyClusterPlanBinding(
 		intent, revision, leader, role, state, requestBinding, stateBinding, endpointBinding,
 	)
 	if err != nil || planBinding != expectedPlanBinding {
-		return errors.New("Plan binding is invalid")
+		return errors.New("plan binding is invalid")
 	}
 	return nil
 }

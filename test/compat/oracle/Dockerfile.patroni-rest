@@ -1,6 +1,7 @@
 # This image is used only by the compatibility-oracle integration harness.
 # No Python package or executable from it is copied into go-patroni release/runtime artifacts.
-FROM postgres:16-alpine@sha256:57c72fd2a128e416c7fcc499958864df5301e940bca0a56f58fddf30ffc07777
+ARG GO_PATRONI_ORACLE_BASE_IMAGE=postgres:16-alpine@sha256:57c72fd2a128e416c7fcc499958864df5301e940bca0a56f58fddf30ffc07777
+FROM ${GO_PATRONI_ORACLE_BASE_IMAGE}
 
 RUN apk add --no-cache python3 py3-pip \
     && python3 -m venv /opt/patroni \
@@ -8,7 +9,11 @@ RUN apk add --no-cache python3 py3-pip \
         'pip==26.1.2' 'setuptools==83.0.0' 'wheel==0.47.0' 'packaging==26.2'
 
 COPY . /src
-RUN /opt/patroni/bin/pip install --no-cache-dir --no-build-isolation \
+# Patroni 3.0 and 3.1 import the selected PostgreSQL driver while setup.py is
+# preparing metadata, before pip can resolve the project extras.
+RUN /opt/patroni/bin/pip install --no-cache-dir \
+        --constraint /src/go-patroni-oracle-constraints.txt psycopg psycopg-binary \
+    && /opt/patroni/bin/pip install --no-cache-dir --no-build-isolation \
         --constraint /src/go-patroni-oracle-constraints.txt '/src[etcd3,psycopg3]' \
     && install -d -o postgres -g postgres -m 700 /var/lib/postgresql/go-patroni
 

@@ -542,7 +542,7 @@ func (service *Service) executeSwitchoverFlushFallback(
 		return flushFailure(service, operationID, intent, PathRESTToDCS, data, CategoryConflict, "scheduled switchover fallback lost its confirmed preconditions", err, evidence)
 	}
 	if service.failoverDCS == nil {
-		err := errors.New("DCS failover capability is unavailable")
+		err := errors.New("dcs failover capability is unavailable")
 		if flushHasAmbiguousREST(data.Results) {
 			return flushUnknown(service, operationID, intent, PathRESTToDCS, data, "scheduled switchover may have been flushed and DCS fallback is unavailable", err, evidence)
 		}

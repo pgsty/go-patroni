@@ -6,10 +6,17 @@ source "$repo_root/scripts/go-toolchain.sh"
 activate_go_patroni_go_toolchain "$repo_root"
 go_command=$GO_PATRONI_GO_COMMAND
 patroni_source=${PATRONI_SOURCE:-$(cd "$repo_root/../dev/patroni" && pwd)}
+oracle_base_digest=sha256:57c72fd2a128e416c7fcc499958864df5301e940bca0a56f58fddf30ffc07777
+oracle_base_image=${GO_PATRONI_ORACLE_BASE_IMAGE:-postgres:16-alpine@$oracle_base_digest}
+oracle_build_proxy=${GO_PATRONI_ORACLE_BUILD_PROXY:-}
+if [[ ${oracle_base_image##*@} != "$oracle_base_digest" ]]; then
+  printf 'refusing Patroni Oracle base without pinned manifest %s: %s\n' "$oracle_base_digest" "$oracle_base_image" >&2
+  exit 1
+fi
 if [[ -n ${GO_PATRONI_PATRONI_TAG:-} ]]; then
   tags=("$GO_PATRONI_PATRONI_TAG")
 else
-  read -r -a tags <<<"${GO_PATRONI_PATRONI_TAGS:-v3.3.8 v4.0.7 v4.1.3}"
+  read -r -a tags <<<"${GO_PATRONI_PATRONI_TAGS:-v3.0.4 v3.1.2 v3.2.2 v3.3.11 v4.0.10 v4.1.4}"
 fi
 containers=()
 networks=()
@@ -52,6 +59,7 @@ if [[ -n $(git -C "$patroni_source" status --porcelain=v1) ]]; then
 fi
 
 cd "$repo_root"
+printf 'Patroni Oracle base: image=%s manifest=%s\n' "$oracle_base_image" "$oracle_base_digest"
 test_binary=$(mktemp "${TMPDIR:-/tmp}/go-patroni-patroni-integration.XXXXXX")
 lab_dir=$(mktemp -d "${TMPDIR:-/tmp}/go-patroni-patroni-lab.XXXXXX")
 "$go_command" test -c -tags=integration -o "$test_binary" ./test/integration
@@ -60,7 +68,7 @@ for index in "${!tags[@]}"; do
   tag=${tags[$index]}
   version=${tag#v}
   case "$version" in
-    3.3.*|4.0.*|4.1.*) ;;
+    3.0.*|3.1.*|3.2.*|3.3.*|4.0.*|4.1.*) ;;
     *) printf 'refusing unsupported Patroni oracle tag: %s\n' "$tag" >&2; exit 1 ;;
   esac
   commit=$(git -C "$patroni_source" rev-parse "$tag^{commit}")
@@ -69,9 +77,14 @@ for index in "${!tags[@]}"; do
   git -C "$patroni_source" archive "$tag" | tar -x -C "$context"
   cp "$repo_root/test/compat/oracle/patroni-rest-constraints.txt" "$context/go-patroni-oracle-constraints.txt"
   image="go-patroni-patroni-rest-oracle:${version}-${commit:0:12}"
+  build_arguments=(--build-arg "GO_PATRONI_ORACLE_BASE_IMAGE=$oracle_base_image")
+  if [[ -n $oracle_build_proxy ]]; then
+    build_arguments+=(--build-arg "HTTP_PROXY=$oracle_build_proxy" --build-arg "HTTPS_PROXY=$oracle_build_proxy")
+  fi
   docker build \
     --quiet \
     --provenance=false \
+    "${build_arguments[@]}" \
     --file "$repo_root/test/compat/oracle/Dockerfile.patroni-rest" \
     --tag "$image" \
     "$context" >/dev/null
@@ -241,15 +254,18 @@ EOF
 
   image_id=$(docker image inspect "$image" --format '{{.Id}}')
   printf 'Patroni REST integration: version=%s tag=%s commit=%s image=%s\n' "$version" "$tag" "$commit" "$image_id"
-  GO_PATRONI_TEST_PATRONI_ISOLATED=1 \
-  GO_PATRONI_TEST_PATRONI_URL="$base_url" \
-  GO_PATRONI_TEST_PATRONI_VERSION="$version" \
-  GO_PATRONI_TEST_PATRONI_CA="$instance/tls/ca.crt" \
-  GO_PATRONI_TEST_PATRONI_CLIENT_CERT="$instance/tls/client.crt" \
-  GO_PATRONI_TEST_PATRONI_CLIENT_KEY="$instance/tls/client.key" \
-  GO_PATRONI_TEST_PATRONI_USERNAME=go-patroni \
-  GO_PATRONI_TEST_PATRONI_PASSWORD="$rest_password" \
-  "$test_binary" -test.count=1 -test.run '^TestPatroniRESTInventoryAgainstIsolatedRealPatroni$'
+  if ! GO_PATRONI_TEST_PATRONI_ISOLATED=1 \
+    GO_PATRONI_TEST_PATRONI_URL="$base_url" \
+    GO_PATRONI_TEST_PATRONI_VERSION="$version" \
+    GO_PATRONI_TEST_PATRONI_CA="$instance/tls/ca.crt" \
+    GO_PATRONI_TEST_PATRONI_CLIENT_CERT="$instance/tls/client.crt" \
+    GO_PATRONI_TEST_PATRONI_CLIENT_KEY="$instance/tls/client.key" \
+    GO_PATRONI_TEST_PATRONI_USERNAME=go-patroni \
+    GO_PATRONI_TEST_PATRONI_PASSWORD="$rest_password" \
+    "$test_binary" -test.count=1 -test.run '^TestPatroniRESTInventoryAgainstIsolatedRealPatroni$'; then
+    safe_logs "$patroni_container"
+    exit 1
+  fi
 
   docker rm -f "$patroni_container" "$etcd_container" >/dev/null
   docker network rm "$network" >/dev/null

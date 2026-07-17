@@ -21,6 +21,10 @@ type TLSOptions struct {
 	KeyFile            string
 	ServerName         string
 	InsecureSkipVerify bool
+	// IncludeSystemCAs augments an explicit CAFile with the host root pool.
+	// By default an explicit CAFile is the exclusive trust bundle, matching
+	// Patroni ctl.cacert/restapi.cafile behavior.
+	IncludeSystemCAs bool
 
 	keyPassword []byte
 }
@@ -34,9 +38,9 @@ func (options TLSOptions) WithKeyPassword(password string) TLSOptions {
 }
 
 func (options TLSOptions) String() string {
-	return fmt.Sprintf("patroni.TLSOptions{ca:%t,cert:%t,key:%t,keyPassword:%t,serverName:%q,insecure:%t}",
+	return fmt.Sprintf("patroni.TLSOptions{ca:%t,cert:%t,key:%t,keyPassword:%t,serverName:%q,insecure:%t,includeSystemCAs:%t}",
 		options.CAFile != "", options.CertFile != "", options.KeyFile != "", len(options.keyPassword) > 0,
-		options.ServerName, options.InsecureSkipVerify)
+		options.ServerName, options.InsecureSkipVerify, options.IncludeSystemCAs)
 }
 
 func (options TLSOptions) GoString() string { return options.String() }
@@ -130,12 +134,16 @@ func buildHTTPTransport(material tlsMaterial) (*http.Transport, error) {
 		ServerName: material.options.ServerName,
 		// This value is deliberately explicit and remains observable through
 		// TLSOptions.String/config warnings; verification is on by default.
-		InsecureSkipVerify: material.options.InsecureSkipVerify, //nolint:gosec
+		InsecureSkipVerify: material.options.InsecureSkipVerify,
 	}
 	if len(material.ca) > 0 {
-		roots, err := x509.SystemCertPool()
-		if err != nil || roots == nil {
-			roots = x509.NewCertPool()
+		roots := x509.NewCertPool()
+		if material.options.IncludeSystemCAs {
+			var err error
+			roots, err = x509.SystemCertPool()
+			if err != nil || roots == nil {
+				roots = x509.NewCertPool()
+			}
 		}
 		if !roots.AppendCertsFromPEM(material.ca) {
 			return nil, &TLSConfigError{Field: "cacert", cause: errors.New("no CA certificate found")}
@@ -228,16 +236,42 @@ func NewHTTPTransport(ctx context.Context, options TLSOptions) (*http.Transport,
 	return buildHTTPTransport(material)
 }
 
-// TransportCache is an instance-scoped, rotation-aware transport cache. The
-// fingerprint includes file contents and TLS settings, so replacing a
+const defaultTransportCacheEntries = 8
+
+type TransportCacheOptions struct {
+	// MaxEntries bounds retained certificate fingerprints. Zero uses the
+	// default; negative values are invalid.
+	MaxEntries int
+}
+
+// TransportCache is an instance-scoped, rotation-aware LRU transport cache.
+// The fingerprint includes file contents and TLS settings, so replacing a
 // certificate/key creates a new pool without process-global mutable state.
 type TransportCache struct {
 	mutex      sync.Mutex
+	maxEntries int
 	transports map[[sha256.Size]byte]*http.Transport
+	order      [][sha256.Size]byte
 }
 
 func NewTransportCache() *TransportCache {
-	return &TransportCache{transports: make(map[[sha256.Size]byte]*http.Transport)}
+	cache, _ := NewTransportCacheWithOptions(TransportCacheOptions{})
+	return cache
+}
+
+func NewTransportCacheWithOptions(options TransportCacheOptions) (*TransportCache, error) {
+	if options.MaxEntries < 0 {
+		return nil, &TLSConfigError{Field: "cache.max_entries", cause: errors.New("maximum entries must not be negative")}
+	}
+	maximum := options.MaxEntries
+	if maximum == 0 {
+		maximum = defaultTransportCacheEntries
+	}
+	return &TransportCache{
+		maxEntries: maximum,
+		transports: make(map[[sha256.Size]byte]*http.Transport, maximum),
+		order:      make([][sha256.Size]byte, 0, maximum),
+	}, nil
 }
 
 func (cache *TransportCache) Transport(ctx context.Context, options TLSOptions) (*http.Transport, error) {
@@ -252,7 +286,9 @@ func (cache *TransportCache) Transport(ctx context.Context, options TLSOptions) 
 	fingerprint := material.fingerprint()
 	cache.mutex.Lock()
 	defer cache.mutex.Unlock()
+	cache.initialize()
 	if transport := cache.transports[fingerprint]; transport != nil {
+		cache.touch(fingerprint)
 		return transport, nil
 	}
 	transport, err := buildHTTPTransport(material)
@@ -260,14 +296,49 @@ func (cache *TransportCache) Transport(ctx context.Context, options TLSOptions) 
 		return nil, err
 	}
 	cache.transports[fingerprint] = transport
+	cache.order = append(cache.order, fingerprint)
+	cache.evict()
 	return transport, nil
+}
+
+func (cache *TransportCache) initialize() {
+	if cache.maxEntries <= 0 {
+		cache.maxEntries = defaultTransportCacheEntries
+	}
+	if cache.transports == nil {
+		cache.transports = make(map[[sha256.Size]byte]*http.Transport, cache.maxEntries)
+	}
+}
+
+func (cache *TransportCache) touch(fingerprint [sha256.Size]byte) {
+	for index, candidate := range cache.order {
+		if candidate != fingerprint {
+			continue
+		}
+		copy(cache.order[index:], cache.order[index+1:])
+		cache.order[len(cache.order)-1] = fingerprint
+		return
+	}
+	cache.order = append(cache.order, fingerprint)
+}
+
+func (cache *TransportCache) evict() {
+	for len(cache.order) > cache.maxEntries {
+		fingerprint := cache.order[0]
+		cache.order = cache.order[1:]
+		transport := cache.transports[fingerprint]
+		delete(cache.transports, fingerprint)
+		if transport != nil {
+			transport.CloseIdleConnections()
+		}
+	}
 }
 
 func (material tlsMaterial) fingerprint() [sha256.Size]byte {
 	hash := sha256.New()
-	_, _ = fmt.Fprintf(hash, "%q\x00%q\x00%q\x00%q\x00%t\x00", material.options.CAFile,
+	_, _ = fmt.Fprintf(hash, "%q\x00%q\x00%q\x00%q\x00%t\x00%t\x00", material.options.CAFile,
 		material.options.CertFile, material.options.KeyFile, material.options.ServerName,
-		material.options.InsecureSkipVerify)
+		material.options.InsecureSkipVerify, material.options.IncludeSystemCAs)
 	for _, value := range [][]byte{material.ca, material.cert, material.key, material.keyPass} {
 		_, _ = fmt.Fprintf(hash, "%d\x00", len(value))
 		_, _ = hash.Write(value)
@@ -286,4 +357,19 @@ func (cache *TransportCache) CloseIdleConnections() {
 	for _, transport := range cache.transports {
 		transport.CloseIdleConnections()
 	}
+}
+
+// Purge closes idle connections and forgets every cached fingerprint. Active
+// connections remain valid according to net/http transport semantics.
+func (cache *TransportCache) Purge() {
+	if cache == nil {
+		return
+	}
+	cache.mutex.Lock()
+	defer cache.mutex.Unlock()
+	for _, transport := range cache.transports {
+		transport.CloseIdleConnections()
+	}
+	cache.transports = make(map[[sha256.Size]byte]*http.Transport, cache.maxEntries)
+	cache.order = cache.order[:0]
 }

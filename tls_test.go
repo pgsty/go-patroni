@@ -196,6 +196,68 @@ func TestTLSVerificationDefaultsAndExplicitInsecureMode(t *testing.T) {
 	}
 }
 
+func TestTLSExplicitCAIsExclusiveAndTransportCacheIsBounded(t *testing.T) {
+	directory := t.TempDir()
+	cas := []testCA{newTestCA(t), newTestCA(t), newTestCA(t)}
+	paths := make([]string, len(cas))
+	for index, ca := range cas {
+		paths[index] = writeTLSFile(t, directory, fmt.Sprintf("ca-%d.pem", index), ca.pem)
+	}
+
+	strict, err := patroni.NewHTTPTransport(context.Background(), patroni.TLSOptions{CAFile: paths[0]})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := cas[0].certificate.Verify(x509.VerifyOptions{Roots: strict.TLSClientConfig.RootCAs}); err != nil {
+		t.Fatalf("explicit CA trust bundle lost configured root: %v", err)
+	}
+	if _, err := cas[1].certificate.Verify(x509.VerifyOptions{Roots: strict.TLSClientConfig.RootCAs}); err == nil {
+		t.Fatal("explicit CA trust bundle accepted an unrelated root")
+	}
+	augmentedOptions := patroni.TLSOptions{CAFile: paths[0], IncludeSystemCAs: true}
+	augmented, err := patroni.NewHTTPTransport(context.Background(), augmentedOptions)
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, verifyErr := cas[0].certificate.Verify(x509.VerifyOptions{Roots: augmented.TLSClientConfig.RootCAs})
+	if !strings.Contains(augmentedOptions.String(), "includeSystemCAs:true") || verifyErr != nil {
+		t.Fatal("explicit system-CA augmentation is not observable or lost the configured CA")
+	}
+
+	cache, err := patroni.NewTransportCacheWithOptions(patroni.TransportCacheOptions{MaxEntries: 2})
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(cache.Purge)
+	first, err := cache.Transport(context.Background(), patroni.TLSOptions{CAFile: paths[0]})
+	if err != nil {
+		t.Fatal(err)
+	}
+	second, err := cache.Transport(context.Background(), patroni.TLSOptions{CAFile: paths[1]})
+	if err != nil {
+		t.Fatal(err)
+	}
+	firstAgain, err := cache.Transport(context.Background(), patroni.TLSOptions{CAFile: paths[0]})
+	if err != nil || firstAgain != first {
+		t.Fatalf("LRU cache did not retain recently used transport: same=%t err=%v", firstAgain == first, err)
+	}
+	if _, err := cache.Transport(context.Background(), patroni.TLSOptions{CAFile: paths[2]}); err != nil {
+		t.Fatal(err)
+	}
+	secondAfterEviction, err := cache.Transport(context.Background(), patroni.TLSOptions{CAFile: paths[1]})
+	if err != nil || secondAfterEviction == second {
+		t.Fatalf("least-recent transport was not evicted: same=%t err=%v", secondAfterEviction == second, err)
+	}
+	cache.Purge()
+	firstAfterPurge, err := cache.Transport(context.Background(), patroni.TLSOptions{CAFile: paths[0]})
+	if err != nil || firstAfterPurge == first {
+		t.Fatalf("cache purge retained transport: same=%t err=%v", firstAfterPurge == first, err)
+	}
+	if _, err := patroni.NewTransportCacheWithOptions(patroni.TransportCacheOptions{MaxEntries: -1}); err == nil {
+		t.Fatal("negative transport cache bound was accepted")
+	}
+}
+
 func TestTLSConfigurationErrorsAreTypedSecretSafeAndCancellable(t *testing.T) {
 	const password = "__BOAR_TEST_ONLY_WRONG_TLS_PASSWORD__"
 	directory := t.TempDir()

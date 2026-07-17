@@ -85,7 +85,9 @@ func TestPatroniRESTInventoryAgainstIsolatedRealPatroni(t *testing.T) {
 		t.Fatalf("refusing Patroni integration test against non-loopback URL %q", baseURL)
 	}
 	version := os.Getenv("GO_PATRONI_TEST_PATRONI_VERSION")
-	if version != "3.3.8" && version != "4.0.7" && version != "4.1.3" {
+	parsedVersion, versionErr := model.ParseVersion(version)
+	if versionErr != nil || model.CheckPatroniVersion(version) != nil ||
+		parsedVersion.Major < 3 || parsedVersion.Major > 4 || parsedVersion.Major == 4 && parsedVersion.Minor > 1 {
 		t.Fatalf("unexpected Patroni oracle version %q", version)
 	}
 	tlsOptions := patroni.TLSOptions{
@@ -109,7 +111,11 @@ func TestPatroniRESTInventoryAgainstIsolatedRealPatroni(t *testing.T) {
 
 	assertRealPatroniTLSAndAuthentication(t, baseURL, tlsOptions, transport)
 	identity, err := client.GetPatroni(context.Background(), baseURL)
-	if err != nil || identity.StatusCode != http.StatusOK || identity.Data.Patroni.Name != "node1" ||
+	nameMatchesVersion := identity.Data.Patroni.Name == ""
+	if parsedVersion.Compare(model.Version{Major: 3, Minor: 2}) >= 0 {
+		nameMatchesVersion = identity.Data.Patroni.Name == "node1"
+	}
+	if err != nil || identity.StatusCode != http.StatusOK || !nameMatchesVersion ||
 		identity.Data.Patroni.Scope == "" || identity.Data.Patroni.Version != version || identity.Header.Get("X-GoPatroni-Lab") != "isolated" {
 		t.Fatalf("real Patroni identity/TLS header mismatch: response=%#v err=%v", identity, err)
 	}

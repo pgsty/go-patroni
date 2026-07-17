@@ -49,6 +49,21 @@ func (runtime *commandRuntime) Close() error {
 	return runtime.close()
 }
 
+func closeCommandRuntime(runtime *commandRuntime, returnedError *error) {
+	if runtime == nil || returnedError == nil {
+		return
+	}
+	if err := runtime.Close(); err != nil {
+		closeError := &exitError{
+			category: control.CategoryInternal,
+			code:     control.ExitCode(control.CategoryInternal),
+			message:  "closing command runtime failed",
+			cause:    err,
+		}
+		*returnedError = errors.Join(*returnedError, closeError)
+	}
+}
+
 type runtimeFactory func(context.Context, runtimeInvocation) (*commandRuntime, error)
 
 func resolveDefaultConfigPath() (string, error) { return config.DefaultConfigPath() }

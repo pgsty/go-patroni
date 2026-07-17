@@ -161,7 +161,7 @@ func (client *Client) StreamChecked(
 		}
 		matches := expectation == RecoveryStandby && inRecovery || expectation == RecoveryPrimary && !inRecovery
 		if !matches {
-			return summary, newError(ErrorRoleMismatch, "role-check", errors.New("PostgreSQL recovery state does not match requested role"))
+			return summary, newError(ErrorRoleMismatch, "role-check", errors.New("postgresql recovery state does not match requested role"))
 		}
 	}
 	reader := connection.Execute(streamContext, request.SQL)

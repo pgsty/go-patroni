@@ -148,7 +148,7 @@ func (service *Service) TopologyGroups(ctx context.Context, request TopologyGrou
 	}
 	if err := target.Validate(true); err != nil || target.Group != nil || target.Member != "" {
 		if err == nil {
-			err = errors.New("Citus topology group expansion requires a group-less cluster target")
+			err = errors.New("citus topology group expansion requires a group-less cluster target")
 		}
 		return failedRead[TopologyListData](service, operationID, "topology", target, PathDCS, CategoryUsage, false, "Citus topology target is invalid", err)
 	}
@@ -767,7 +767,7 @@ func patroniBaseURL(apiURL string) (string, error) {
 		return "", errors.New("invalid Patroni API URL")
 	}
 	if parsed.RawQuery != "" || parsed.Fragment != "" {
-		return "", errors.New("Patroni API URL contains query or fragment")
+		return "", errors.New("patroni API URL contains query or fragment")
 	}
 	parsed.Path = strings.TrimSuffix(strings.TrimRight(parsed.Path, "/"), "/patroni")
 	parsed.RawPath = ""

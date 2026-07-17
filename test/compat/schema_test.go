@@ -66,10 +66,13 @@ func TestMachineGoldenDocumentsValidateAgainstPublishedSchemas(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			defer file.Close()
 			instance, err := jsonschema.UnmarshalJSON(file)
+			closeErr := file.Close()
 			if err != nil {
 				t.Fatalf("decode %s: %v", path, err)
+			}
+			if closeErr != nil {
+				t.Fatalf("close %s: %v", path, closeErr)
 			}
 			if err := schema.Validate(instance); err != nil {
 				t.Fatalf("%s does not match %s: %v", test.golden, test.schema, err)

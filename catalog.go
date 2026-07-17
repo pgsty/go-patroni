@@ -39,7 +39,7 @@ type Endpoint struct {
 // Patroni version. Version-specific semantics are described by FeatureCatalog.
 func (endpoint Endpoint) AvailableIn(version model.Version) bool {
 	since, err := model.ParseVersion(endpoint.Since)
-	return err == nil && version.Compare(since) >= 0 && model.SupportedPatroniRange.Contains(version)
+	return err == nil && version.Compare(since) >= 0 && model.AuditedPatroniRange().Contains(version)
 }
 
 type Feature string
@@ -71,7 +71,7 @@ var featureCatalog = []FeatureAvailability{
 }
 
 // FeatureCatalog returns a copy of the audited Patroni version capability
-// matrix. The catalog is pinned against upstream 3.0.0 through 4.1.3.
+// matrix. The catalog is pinned against upstream 3.0.0 through 4.1.4.
 func FeatureCatalog() []FeatureAvailability {
 	return append([]FeatureAvailability(nil), featureCatalog...)
 }

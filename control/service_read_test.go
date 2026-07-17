@@ -855,6 +855,9 @@ func TestRestartImmediateAmbiguousAndNotSentAreNeverRetried(t *testing.T) {
 	if result.Outcome != Unknown || result.Data.Members[0].SendState != SendMaybeSent || len(transport.restartCalls) != 1 {
 		t.Fatalf("ambiguous immediate restart = %#v calls=%v", result, transport.restartCalls)
 	}
+	if len(transport.restartRequests) != 1 || transport.restartRequests[0].Timeout != nil {
+		t.Fatalf("default restart payload sent an empty timeout: %#v", transport.restartRequests)
+	}
 	transport.restartErrors["https://node-a:8008"] = &patroni.Error{Kind: patroni.ErrorTransport, Method: "POST", Endpoint: "/restart", Delivery: patroni.DeliveryNotSent}
 	transport.restartCalls = nil
 	result = service.ExecuteRestart(context.Background(), request, prepared.Data)

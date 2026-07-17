@@ -25,6 +25,19 @@ type observation struct {
 	err    error
 }
 
+type roundTripFunc func(*http.Request) (*http.Response, error)
+
+func (function roundTripFunc) RoundTrip(request *http.Request) (*http.Response, error) {
+	return function(request)
+}
+
+type closeErrorBody struct {
+	io.Reader
+	err error
+}
+
+func (body closeErrorBody) Close() error { return body.err }
+
 func observe[T any](response patroni.Response[T], err error) observation {
 	return observation{status: response.StatusCode, header: response.Header, raw: response.Raw, err: err}
 }
@@ -155,6 +168,29 @@ func writeErrorContractResponse(writer http.ResponseWriter, endpoint patroni.End
 	}
 }
 
+func TestPatroniIdentityNameIsOptionalBefore32(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
+		if request.Method != http.MethodGet || request.URL.Path != "/patroni" {
+			t.Fatalf("unexpected Patroni identity request %s %s", request.Method, request.URL.Path)
+		}
+		writer.Header().Set("Content-Type", "application/json")
+		_, _ = io.WriteString(writer, `{"state":"running","role":"primary","patroni":{"version":"3.1.2","scope":"demo"}}`)
+	}))
+	defer server.Close()
+
+	client, err := patroni.NewClient(patroni.ClientOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	response, err := client.GetPatroni(context.Background(), server.URL)
+	if err != nil {
+		t.Fatalf("decode Patroni 3.1 identity: %v", err)
+	}
+	if response.Data.Patroni.Version != "3.1.2" || response.Data.Patroni.Scope != "demo" || response.Data.Patroni.Name != "" {
+		t.Fatalf("Patroni 3.1 identity = %#v", response.Data.Patroni)
+	}
+}
+
 func TestEveryCatalogEndpointHasCallableWireContract(t *testing.T) {
 	client, err := patroni.NewClient(patroni.ClientOptions{UserAgent: "go-patroni-contract-test"})
 	if err != nil {
@@ -227,7 +263,7 @@ func TestTypedResponsesQueriesAndUnknownFields(t *testing.T) {
 		writer.Header().Set("X-Test", "preserved")
 		switch request.URL.Path {
 		case "/api/replica":
-			if request.URL.Query().Get("lag") != "10MB" || request.URL.Query().Get("replication_state") != "streaming" || request.URL.Query().Get("tag_zone") != "east" {
+			if request.URL.Query().Get("lag") != "10MB" || request.URL.Query().Has("replication_state") || request.URL.Query().Get("tag_zone") != "east" {
 				t.Errorf("health query mismatch: %v", request.URL.Query())
 			}
 			writer.WriteHeader(http.StatusServiceUnavailable)
@@ -295,6 +331,31 @@ func TestDecodeErrorPreservesStatusHeadersAndRaw(t *testing.T) {
 	}
 	if response.StatusCode != 200 || response.Header.Get("X-Decode") != "evidence" || !strings.Contains(string(response.Raw), "not-an-integer") {
 		t.Fatalf("decode evidence was lost: %#v", response)
+	}
+}
+
+func TestResponseBodyCloseErrorPreservesReceivedEvidence(t *testing.T) {
+	closeError := errors.New("test-only response close failure")
+	transport := roundTripFunc(func(*http.Request) (*http.Response, error) {
+		return &http.Response{
+			StatusCode: http.StatusOK,
+			Header:     http.Header{"X-Close-Test": []string{"preserved"}},
+			Body:       closeErrorBody{Reader: strings.NewReader("patroni_primary 1\n"), err: closeError},
+		}, nil
+	})
+	client, err := patroni.NewClient(patroni.ClientOptions{Transport: transport})
+	if err != nil {
+		t.Fatal(err)
+	}
+	response, err := client.GetMetrics(context.Background(), "https://patroni.example.invalid")
+	var typed *patroni.Error
+	if !errors.As(err, &typed) || !errors.Is(err, closeError) || typed.Kind != patroni.ErrorResponseBody ||
+		typed.Delivery != patroni.DeliveryResponseReceived {
+		t.Fatalf("response close error classification mismatch: %#v", err)
+	}
+	if response.StatusCode != http.StatusOK || response.Header.Get("X-Close-Test") != "preserved" ||
+		response.Data != "patroni_primary 1\n" || string(response.Raw) != response.Data {
+		t.Fatalf("response close error lost received evidence: %#v", response)
 	}
 }
 

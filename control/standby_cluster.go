@@ -190,6 +190,10 @@ func (service *Service) prepareStandbyCluster(ctx context.Context, intent standb
 		return failedReadWithEvidence[Plan](service, operationID, intent.operation, intent.target, PathREST,
 			failure.category, failure.retryable, failure.message, failure.cause, evidence)
 	}
+	if featureError := checkSnapshotsFeature(snapshots, patroni.FeatureStandbyClusterCLI); featureError != nil {
+		return failedReadWithEvidence[Plan](service, operationID, intent.operation, intent.target, PathREST,
+			CategoryUnsupported, false, intent.operation+" requires Patroni 4.1 or newer", featureError, evidence)
+	}
 	snapshot := snapshots[0]
 	selection, category, selectionError := resolveStandbyClusterSelection(snapshot)
 	if selectionError != nil {
@@ -294,6 +298,11 @@ func (service *Service) executeStandbyCluster(
 		data.Verification = VerifiedFailed
 		return standbyClusterFailure(service, operationID, intent, data, failure.category, failure.retryable,
 			failure.message, failure.cause, evidence)
+	}
+	if featureError := checkSnapshotsFeature(snapshots, patroni.FeatureStandbyClusterCLI); featureError != nil {
+		data.Verification = VerifiedFailed
+		return standbyClusterFailure(service, operationID, intent, data, CategoryUnsupported, false,
+			intent.operation+" requires Patroni 4.1 or newer", featureError, evidence)
 	}
 	snapshot := snapshots[0]
 	plannedGroups, _ := expectedPrecondition(plan, "citus.groups")

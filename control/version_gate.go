@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/pgsty/go-patroni"
 	"github.com/pgsty/go-patroni/dcs"
 	"github.com/pgsty/go-patroni/model"
 )
@@ -56,6 +57,32 @@ func checkPatroniVersion(version string) error {
 			return err
 		}
 		return fmt.Errorf("%w: %v", model.ErrUnsupportedPatroniVersion, err)
+	}
+	return nil
+}
+
+// checkSnapshotsFeature rejects a versioned operation unless every selected
+// cluster member is known to implement the upstream Patroni feature. This is
+// deliberately stricter than the module-wide 3.x/4.x compatibility gate:
+// callers can use the common surface on all supported releases without
+// accidentally sending a 4.1-only request to an older member.
+func checkSnapshotsFeature(snapshots []dcs.Snapshot, feature patroni.Feature) error {
+	for _, snapshot := range snapshots {
+		for _, member := range snapshot.Cluster.Members {
+			version := strings.TrimSpace(member.Data.PatroniVersion)
+			if version == "" {
+				return fmt.Errorf("member %s has no version for feature %s: %w",
+					member.Name, feature, model.ErrUnsupportedPatroniVersion)
+			}
+			supported, err := patroni.SupportsFeature(version, feature)
+			if err != nil {
+				return fmt.Errorf("member %s reports %q for feature %s: %w", member.Name, version, feature, err)
+			}
+			if !supported {
+				return fmt.Errorf("member %s reports %q without feature %s: %w",
+					member.Name, version, feature, model.ErrUnsupportedPatroniVersion)
+			}
+		}
 	}
 	return nil
 }

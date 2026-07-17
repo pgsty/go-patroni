@@ -28,6 +28,12 @@ func (service *Service) PrepareReinitialize(ctx context.Context, request Reiniti
 	if failure != nil {
 		return failedReadWithEvidence[Plan](service, operationID, "reinit", target, PathREST, failure.category, failure.retryable, failure.message, failure.cause, evidence)
 	}
+	if request.FromLeader {
+		if featureError := checkSnapshotsFeature(snapshots, patroni.FeatureReinitializeFromLeader); featureError != nil {
+			return failedReadWithEvidence[Plan](service, operationID, "reinit", target, PathREST, CategoryUnsupported, false,
+				"reinitialize from-leader requires Patroni 4.1 or newer", featureError, evidence)
+		}
+	}
 	replicaCount := 0
 	targets := make([]model.Target, 0)
 	for _, snapshot := range snapshots {
@@ -86,6 +92,12 @@ func (service *Service) ExecuteReinitialize(ctx context.Context, request Reiniti
 	snapshots, baseEvidence, failure := service.operationSnapshots(ctx, "reinit", target, request.Citus, false)
 	if failure != nil {
 		return failedReadWithEvidence[BatchWriteData](service, operationID, "reinit", target, PathREST, failure.category, failure.retryable, failure.message, failure.cause, baseEvidence)
+	}
+	if request.FromLeader {
+		if featureError := checkSnapshotsFeature(snapshots, patroni.FeatureReinitializeFromLeader); featureError != nil {
+			return failedReadWithEvidence[BatchWriteData](service, operationID, "reinit", target, PathREST, CategoryUnsupported, false,
+				"reinitialize from-leader requires Patroni 4.1 or newer", featureError, baseEvidence)
+		}
 	}
 	plannedGroups, _ := expectedPrecondition(plan, "citus.groups")
 	if snapshotGroupIDs(snapshots) != plannedGroups {

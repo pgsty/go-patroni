@@ -184,3 +184,51 @@ func TestWriteExecutionRechecksVersionBeforeAnySend(t *testing.T) {
 		t.Fatalf("version drift crossed write boundary: result=%#v calls=%v", result, transport.reloadCalls)
 	}
 }
+
+func TestVersionSpecificControlFeaturesFailClosed(t *testing.T) {
+	older := snapshotWithPatroniVersion(t, readFixtureSnapshot(), "4.0.7")
+	reader := &fakeSnapshotReader{snapshots: map[string]dcs.Snapshot{"alpha": older}}
+	transport := &fakePatroniStatusReader{}
+	service := newReadService(t, reader, transport)
+	target := model.Target{Context: "lab", Scope: "alpha"}
+
+	reinitialize := service.PrepareReinitialize(context.Background(), ReinitializeRequest{
+		Target: target, Members: []string{"node-b"}, Force: true, FromLeader: true,
+	})
+	if reinitialize.Outcome != Failed || reinitialize.Error == nil || reinitialize.Error.Category != CategoryUnsupported {
+		t.Fatalf("Patroni 4.0 accepted 4.1-only reinitialize from-leader: %#v", reinitialize)
+	}
+
+	demote := service.PrepareDemoteCluster(context.Background(), DemoteClusterRequest{
+		Target: target, Force: true, Standby: StandbyConfig{Host: "standby.invalid"},
+	})
+	if demote.Outcome != Failed || demote.Error == nil || demote.Error.Category != CategoryUnsupported {
+		t.Fatalf("Patroni 4.0 accepted 4.1-only demote-cluster: %#v", demote)
+	}
+
+	commonReinitialize := service.PrepareReinitialize(context.Background(), ReinitializeRequest{
+		Target: target, Members: []string{"node-b"}, Force: true,
+	})
+	if commonReinitialize.Outcome != Succeeded {
+		t.Fatalf("Patroni 4.0 common reinitialize surface was rejected: %#v", commonReinitialize)
+	}
+}
+
+func TestVersionSpecificFeatureDriftIsRecheckedBeforeSend(t *testing.T) {
+	newer := snapshotWithPatroniVersion(t, readFixtureSnapshot(), "4.1.3")
+	older := snapshotWithPatroniVersion(t, readFixtureSnapshot(), "4.0.7")
+	reader := &fakeSnapshotReader{sequence: []dcs.Snapshot{newer, older}}
+	transport := &fakePatroniStatusReader{}
+	service := newReadService(t, reader, transport)
+	request := ReinitializeRequest{
+		Target: model.Target{Context: "lab", Scope: "alpha"}, Members: []string{"node-b"}, Force: true, FromLeader: true,
+	}
+	prepared := service.PrepareReinitialize(context.Background(), request)
+	if prepared.Outcome != Succeeded {
+		t.Fatalf("Patroni 4.1 feature prepare failed: %#v", prepared)
+	}
+	result := service.ExecuteReinitialize(context.Background(), request, prepared.Data)
+	if result.Outcome != Failed || result.Error == nil || result.Error.Category != CategoryUnsupported || len(transport.reinitializeRequests) != 0 {
+		t.Fatalf("4.1 to 4.0 feature drift crossed write boundary: result=%#v requests=%#v", result, transport.reinitializeRequests)
+	}
+}

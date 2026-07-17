@@ -1,6 +1,6 @@
 package model
 
-// MemberRole is BOAR's normalized Patroni role. It is deliberately separate
+// MemberRole is the SDK's normalized Patroni role. It is deliberately separate
 // from both Patroni REST wire DTOs and adapter-specific rendering values.
 type MemberRole string
 

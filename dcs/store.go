@@ -24,7 +24,7 @@ type Watcher interface {
 	Watch(context.Context, model.Target, int64) WatchStream
 }
 
-// ConfigCAS is deliberately capability-scoped; BOAR has no public arbitrary
+// ConfigCAS is deliberately capability-scoped; the SDK has no public arbitrary
 // DCS put surface.
 type ConfigCAS interface {
 	CompareAndSwapConfig(context.Context, model.Target, []byte, *int64) (WriteResult, error)
@@ -42,7 +42,7 @@ type ClusterRemover interface {
 	DeleteCluster(context.Context, model.Target) (RemoveResult, error)
 }
 
-// Store is BOAR's complete Patroni-oriented DCS contract. Smaller control use
+// Store is the SDK's complete Patroni-oriented DCS contract. Smaller control use
 // cases should depend on the capability interface they actually need.
 type Store interface {
 	SnapshotReader

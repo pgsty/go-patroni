@@ -8,9 +8,9 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/pgsty/go-patroni"
 	"github.com/pgsty/go-patroni/dcs"
 	"github.com/pgsty/go-patroni/model"
-	"github.com/pgsty/go-patroni"
 )
 
 func (service *Service) PrepareReload(ctx context.Context, request ReloadRequest) Result[Plan] {
@@ -308,7 +308,7 @@ func patroniSendState(err error, status int) SendState {
 		}
 	}
 	// A write port that loses delivery metadata is unsafe to classify as a
-	// definite failure. Concrete BOAR transports always return typed errors,
+	// definite failure. Concrete SDK transports always return typed errors,
 	// but third-party implementations fail closed here.
 	return SendMaybeSent
 }

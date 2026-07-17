@@ -1,4 +1,4 @@
-// Package model contains normalized BOAR domain types. These types are kept
+// Package model contains normalized Patroni domain types. These types are kept
 // separate from Patroni wire payloads and adapter-specific machine contracts.
 package model
 
@@ -14,11 +14,13 @@ const (
 	DefaultContext   = "default"
 	DefaultNamespace = "/service"
 
-	clusterIDPrefix = "boar:cluster/"
-	memberIDPrefix  = "boar:member/"
+	clusterIDPrefix       = "patroni:cluster/"
+	memberIDPrefix        = "patroni:member/"
+	legacyClusterIDPrefix = "boar:cluster/"
+	legacyMemberIDPrefix  = "boar:member/"
 )
 
-// Target is the complete stable resource identity shared by BOAR adapters.
+// Target is the complete stable resource identity shared by SDK adapters.
 // Scope alone is deliberately not a globally unique identifier.
 type Target struct {
 	Context   string `json:"context" yaml:"context"`
@@ -128,6 +130,11 @@ func ParseTargetID(value string) (Target, error) {
 	case strings.HasPrefix(value, memberIDPrefix):
 		member = true
 		encoded = strings.TrimPrefix(value, memberIDPrefix)
+	case strings.HasPrefix(value, legacyClusterIDPrefix):
+		encoded = strings.TrimPrefix(value, legacyClusterIDPrefix)
+	case strings.HasPrefix(value, legacyMemberIDPrefix):
+		member = true
+		encoded = strings.TrimPrefix(value, legacyMemberIDPrefix)
 	default:
 		return Target{}, errors.New("target ID has an unknown prefix")
 	}

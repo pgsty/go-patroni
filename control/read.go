@@ -11,9 +11,9 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/pgsty/go-patroni"
 	"github.com/pgsty/go-patroni/dcs"
 	"github.com/pgsty/go-patroni/model"
-	"github.com/pgsty/go-patroni"
 	"github.com/pgsty/go-patroni/postgres"
 )
 
@@ -350,7 +350,7 @@ func (service *Service) Version(ctx context.Context, request VersionRequest) Res
 	if !validContext(ctx) {
 		return failedRead[VersionData](service, operationID, "version", target, PathLocal, CategoryUsage, false, "version requires a context", nil)
 	}
-	localEvidence := Evidence{Source: EvidenceLocal, ObservedAt: service.now(), Summary: "local BOAR version read", Path: string(PathLocal)}
+	localEvidence := Evidence{Source: EvidenceLocal, ObservedAt: service.now(), Summary: "local go-patroni version read", Path: string(PathLocal)}
 	if target.Scope == "" {
 		return Result[VersionData]{OperationID: operationID, Outcome: Succeeded, Target: target, Path: PathLocal, Data: data, Evidence: []Evidence{localEvidence}}
 	}

@@ -7,9 +7,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/pgsty/go-patroni"
 	"github.com/pgsty/go-patroni/dcs"
 	"github.com/pgsty/go-patroni/model"
-	"github.com/pgsty/go-patroni"
 )
 
 const flushSchedule = "2026-07-14T03:04:05Z"

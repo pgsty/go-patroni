@@ -13,7 +13,7 @@ import (
 	"time"
 
 	"github.com/pgsty/go-patroni/dcs"
-	boarversion "github.com/pgsty/go-patroni/internal/version"
+	buildversion "github.com/pgsty/go-patroni/internal/version"
 )
 
 type ServiceOptions struct {
@@ -41,7 +41,7 @@ type ServiceOptions struct {
 	StandbyVerificationInterval time.Duration
 }
 
-// Service is BOAR's adapter-neutral high-level API. It stores transport
+// Service is the SDK's adapter-neutral high-level API. It stores transport
 // capabilities and immutable policy only; a context is supplied to every I/O
 // method and is never retained.
 type Service struct {
@@ -81,7 +81,7 @@ func NewService(options ServiceOptions) (*Service, error) {
 	}
 	productVersion := strings.TrimSpace(options.ProductVersion)
 	if productVersion == "" {
-		productVersion = boarversion.Current().Version
+		productVersion = buildversion.Current().Version
 	}
 	randomIndex := options.RandomIndex
 	if randomIndex == nil {
@@ -153,9 +153,9 @@ func waitForContext(ctx context.Context, duration time.Duration) error {
 func randomOperationID() string {
 	var value [16]byte
 	if _, err := rand.Read(value[:]); err != nil {
-		return "boar-operation-" + time.Now().UTC().Format("20060102T150405.000000000")
+		return "patroni-operation-" + time.Now().UTC().Format("20060102T150405.000000000")
 	}
-	return "boar-operation-" + hex.EncodeToString(value[:])
+	return "patroni-operation-" + hex.EncodeToString(value[:])
 }
 
 func (service *Service) operationID() string {
@@ -180,7 +180,7 @@ func (service *Service) planToken(domain string, value any) (string, error) {
 		return "", err
 	}
 	mac := hmac.New(sha256.New, service.planKey[:])
-	_, _ = mac.Write([]byte("boar/control/" + domain + "\x00"))
+	_, _ = mac.Write([]byte("go-patroni/control/" + domain + "\x00"))
 	_, _ = mac.Write(encoded)
 	return hex.EncodeToString(mac.Sum(nil)), nil
 }

@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/pgsty/go-patroni/model"
 	"github.com/pgsty/go-patroni"
+	"github.com/pgsty/go-patroni/model"
 	"github.com/pgsty/go-patroni/postgres"
 )
 

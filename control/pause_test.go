@@ -7,9 +7,9 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/pgsty/go-patroni"
 	"github.com/pgsty/go-patroni/dcs"
 	"github.com/pgsty/go-patroni/model"
-	"github.com/pgsty/go-patroni"
 )
 
 func snapshotWithPauseState(t *testing.T, snapshot dcs.Snapshot, clusterPaused bool, members map[string]bool) dcs.Snapshot {

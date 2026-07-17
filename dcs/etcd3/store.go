@@ -1,4 +1,4 @@
-// Package etcd3 is the only BOAR DCS backend. It maps etcd v3 revisions,
+// Package etcd3 implements the SDK's Patroni-oriented etcd v3 backend. It maps revisions,
 // transactions, and watches into Patroni-oriented dcs contracts.
 package etcd3
 

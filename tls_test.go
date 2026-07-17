@@ -39,7 +39,7 @@ func newTestCA(t *testing.T) testCA {
 		t.Fatal(err)
 	}
 	template := &x509.Certificate{
-		SerialNumber: big.NewInt(1), Subject: pkix.Name{CommonName: "BOAR test CA"},
+		SerialNumber: big.NewInt(1), Subject: pkix.Name{CommonName: "go-patroni test CA"},
 		NotBefore: time.Now().Add(-time.Hour), NotAfter: time.Now().Add(time.Hour),
 		IsCA: true, BasicConstraintsValid: true, KeyUsage: x509.KeyUsageCertSign | x509.KeyUsageDigitalSignature,
 	}

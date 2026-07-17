@@ -104,7 +104,7 @@ func (options ConnectionOptions) connectConfig() (*pgx.ConnConfig, error) {
 	}
 	applicationName := options.ApplicationName
 	if applicationName == "" {
-		applicationName = "boar"
+		applicationName = "go-patroni"
 	}
 	if configuration.RuntimeParams == nil {
 		configuration.RuntimeParams = map[string]string{}

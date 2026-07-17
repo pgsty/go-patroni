@@ -1,4 +1,4 @@
-// Package control owns BOAR orchestration contracts. Only this package may
+// Package control owns Patroni orchestration contracts. Only this package may
 // construct final operation outcomes; transports and adapters return evidence.
 package control
 
@@ -88,7 +88,7 @@ func (e *Error) Validate() error {
 	return nil
 }
 
-// ExitCode freezes BOAR's additive process contract.
+// ExitCode freezes the Go CLI's additive process contract.
 func ExitCode(category Category) int {
 	switch category {
 	case CategoryFailed:

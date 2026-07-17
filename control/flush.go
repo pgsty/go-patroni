@@ -7,9 +7,9 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/pgsty/go-patroni"
 	"github.com/pgsty/go-patroni/dcs"
 	"github.com/pgsty/go-patroni/model"
-	"github.com/pgsty/go-patroni"
 )
 
 type flushIntent struct {

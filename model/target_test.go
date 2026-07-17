@@ -70,6 +70,19 @@ func TestTargetRejectsMalformedIDs(t *testing.T) {
 	}
 }
 
+func TestTargetParsesLegacyBOARIDs(t *testing.T) {
+	legacy, err := model.ParseTargetID("boar:member/default/%2Fservice/alpha/-/node-a")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if legacy.Context != "default" || legacy.Namespace != "/service" || legacy.Scope != "alpha" || legacy.Member != "node-a" {
+		t.Fatalf("legacy target mismatch: %#v", legacy)
+	}
+	if got := legacy.MemberID(); got != "patroni:member/default/%2Fservice/alpha/-/node-a" {
+		t.Fatalf("legacy ID did not canonicalize to public prefix: %q", got)
+	}
+}
+
 func FuzzTargetIDRoundTrip(f *testing.F) {
 	f.Add("default", "/service", "alpha", "node-1")
 	f.Add("prod/east", "/nested/ns", "scope with spaces", "member/slash")

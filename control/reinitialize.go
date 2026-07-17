@@ -7,8 +7,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/pgsty/go-patroni/model"
 	"github.com/pgsty/go-patroni"
+	"github.com/pgsty/go-patroni/model"
 )
 
 func (service *Service) PrepareReinitialize(ctx context.Context, request ReinitializeRequest) Result[Plan] {

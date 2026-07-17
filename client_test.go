@@ -156,7 +156,7 @@ func writeErrorContractResponse(writer http.ResponseWriter, endpoint patroni.End
 }
 
 func TestEveryCatalogEndpointHasCallableWireContract(t *testing.T) {
-	client, err := patroni.NewClient(patroni.ClientOptions{UserAgent: "boar-contract-test"})
+	client, err := patroni.NewClient(patroni.ClientOptions{UserAgent: "go-patroni-contract-test"})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -175,7 +175,7 @@ func TestEveryCatalogEndpointHasCallableWireContract(t *testing.T) {
 				if request.Method != endpoint.Method || request.URL.Path != wantPath {
 					t.Errorf("wire request mismatch: got %s %s want %s %s", request.Method, request.URL.Path, endpoint.Method, wantPath)
 				}
-				if request.UserAgent() != "boar-contract-test" {
+				if request.UserAgent() != "go-patroni-contract-test" {
 					t.Errorf("user agent missing: %q", request.UserAgent())
 				}
 				body, readErr := io.ReadAll(request.Body)

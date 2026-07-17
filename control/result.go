@@ -155,7 +155,7 @@ func (r Result[T]) Validate() error {
 	return nil
 }
 
-// ClassifyWrite applies BOAR's no-false-failure rule. Verification is
+// ClassifyWrite applies the SDK's no-false-failure rule. Verification is
 // authoritative; without it, any maybe-sent or accepted write is UNKNOWN.
 func ClassifyWrite(send SendState, verification Verification, operationError *Error) Outcome {
 	switch verification {
